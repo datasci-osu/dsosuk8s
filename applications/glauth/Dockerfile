@@ -1,4 +1,4 @@
-FROM alpine:3.10
+FROM busybox:1.31-glibc
 
 USER root
 
@@ -10,4 +10,4 @@ COPY cfg/sample-simple.cfg /etc/glauth/config.cfg
 
 EXPOSE 389 636 5555
 
-CMD ["/usr/sgin/glauth", "-c", "/etc/glauth/config.cfg"]
+CMD ["/usr/sbin/glauth64", "-c", "/etc/glauth/config.cfg"]
