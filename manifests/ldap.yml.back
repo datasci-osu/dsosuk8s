@@ -1,0 +1,53 @@
+apiVersion: apps/v1beta2
+kind: Deployment
+metadata:
+  name: ldap-dep
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: ldap-pod
+  strategy:
+    type: Recreate
+  template:
+    metadata:
+      labels:
+        app: ldap-pod
+    spec:
+      containers:
+      - name: openldap-con
+        image: osixia/openldap
+        ports:
+        - containerPort: 636
+          protocol: TCP
+          name: port636
+        - containerPort: 389
+          protocol: TCP
+          name: port389
+      - name: phpldapadmin-con
+        image: osixia/phpldapadmin
+        ports:
+        - containerPort: 80
+        env:
+        - name: PHPLDAPADMIN_HTTPS
+          value: "false"
+        - name: PHPLDAPADMIN_LDAP_HOSTS
+          value: localhost
+
+
+---
+
+apiVersion: v1
+kind: Service
+metadata:
+  name: ldap-svc
+spec:
+  type: NodePort
+  ports:
+  - port: 80
+    protocol: TCP
+    nodePort: 30010
+  selector:
+    app: ldap-pod
+
+

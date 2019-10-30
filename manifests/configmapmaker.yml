@@ -1,0 +1,43 @@
+apiVersion: apps/v1beta2
+kind: Deployment
+metadata:
+  name: configmapmaker-dep
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: configmapmaker-pod
+  strategy:
+    type: Recreate
+  template:
+    metadata:
+      labels:
+        app: configmapmaker-pod
+    spec:
+      serviceAccountName: configmapper-serviceaccount
+      volumes:
+      - emptyDir: {}
+        name: nfsshare
+      containers:
+      - name: configmapmaker-con
+        image: oneilsh/ktesting-configmapmaker
+        securityContext:
+          capabilities:
+            add: ["SYS_ADMIN", "SETPCAP"] 
+        env:
+          - name: APP_NAME
+            value: studentvol
+          - name: POD_NAMESPACE
+            valueFrom:
+              fieldRef: 
+                fieldPath: metadata.namespace
+          - name: POD_IP
+            valueFrom:
+              fieldRef:
+                fieldPath: status.hostIP
+          - name: SHARED_DIRECTORY
+            value: "/nfsshare"
+        volumeMounts:
+        - mountPath: "/nfsshare"   # it seems the shared dir must be a volume mount, see https://github.com/kubernetes/kubernetes/issues/19593#issuecomment-417106013
+          name: nfsshare
+

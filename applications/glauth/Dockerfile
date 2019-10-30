@@ -1,4 +1,5 @@
-FROM busybox:1.31-glibc
+FROM ubuntu:18.04
+# ubuntu:18.04 on dockerhub is a minimal install: https://ubuntu.com/blog/minimal-ubuntu-released
 
 USER root
 
@@ -8,6 +9,6 @@ RUN mkdir -p /etc/glauth
 
 COPY cfg/sample-simple.cfg /etc/glauth/config.cfg
 
-EXPOSE 389 636 5555
+EXPOSE 3893 3894 5555
 
 CMD ["/usr/sbin/glauth64", "-c", "/etc/glauth/config.cfg"]
