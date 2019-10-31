@@ -1,0 +1,28 @@
+apiVersion: apps/v1beta2
+kind: Deployment
+metadata:
+  name: nfs-{{required "Valid name entry required." .Values.name }}-dep
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: nfs-{{ .Values.name }}-pod
+  strategy:
+    type: Recreate
+  template:
+    metadata:
+      labels:
+        app: nfs-{{ .Values.name }}-pod
+    spec:
+      volumes:
+      - emptyDir: {}
+        name: nfsshare-{{ .Values.name }}
+      containers:
+      - name: nfs
+        image: oneilsh/ktesting-nfsserver3
+        securityContext:
+          capabilities:
+            add: ["SYS_ADMIN", "SETPCAP"]
+        volumeMounts:
+        - mountPath: "/nfsshare"   # it seems the shared dir must be a volume mount, see https://github.com/kubernetes/kubernetes/issues/19593#issuecomment-417106013
+          name: nfsshare-{{ .Values.name }}

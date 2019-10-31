@@ -1,0 +1,6 @@
+name: datastorage
+version: 0.8
+appVersion: 0.8
+description: Create storage for use by apps.
+icon: catalogIcon-drive.svg
+engine: gotpl

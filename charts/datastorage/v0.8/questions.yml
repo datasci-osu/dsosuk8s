@@ -1,0 +1,6 @@
+questions:
+- variable: name
+  default: "mystorage"
+  description: "Name for the storage drive."
+  type: string
+  label: "Name: "
