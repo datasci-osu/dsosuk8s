@@ -15,8 +15,9 @@ spec:
         app: nfs-{{ .Values.name }}-pod
     spec:
       volumes:
-      - emptyDir: {}
-        name: nfsshare-{{ .Values.name }}
+      - name: pvol-{{ .Values.name }}
+        persistentVolumeClaim:
+          claimName: pvclaim-{{ .Values.name }}
       containers:
       - name: nfs
         image: oneilsh/ktesting-nfsserver3
@@ -25,4 +26,18 @@ spec:
             add: ["SYS_ADMIN", "SETPCAP"]
         volumeMounts:
         - mountPath: "/nfsshare"   # it seems the shared dir must be a volume mount, see https://github.com/kubernetes/kubernetes/issues/19593#issuecomment-417106013
-          name: nfsshare-{{ .Values.name }}
+          name: pvol-{{ .Values.name }}
+
+---
+
+kind: PersistentVolumeClaim
+apiVersion: v1
+metadata:
+  name: pvclaim-{{ .Values.name }}
+spec:
+  accessModes: 
+  - ReadWriteOnce
+  resources: 
+    requests: 
+      storage: 2Gi
+  
