@@ -1,19 +1,39 @@
 stages:
-- name: upgrade
+- name: server
   steps:
   - applyAppConfig:
       catalogTemplate: cattle-global-data:oneilsh-datastorage
       version: "0.8"
       name: studentvol
       targetNamespace: deploy
+- name: clients
+  steps:
   - applyAppConfig:
       catalogTemplate: cattle-global-data:oneilsh-nfsclient
       version: "0.8"
       answers:
         datastorage: studentvol
-        targetdir: /mnt/studentvol
-      name: studentserver
+        targetdir: /mnt/shared
+      name: client1
       targetNamespace: deploy
+  - applyAppConfig:
+      catalogTemplate: cattle-global-data:oneilsh-nfsclient
+      version: "0.8"
+      answers:
+        datastorage: studentvol
+        targetdir: /mnt/shared
+      name: client2
+      targetNamespace: deploy
+- name: createfile
+  steps:
+  - runScriptConfig:
+      image: node:latest
+      shellScript: echo test > /mnt/shared/testing.txt
+- name: readfile
+  steps:
+  - runScriptConfig:
+      image: node:latest
+      shellScript: cat /mnt/shared/testing.txt
 timeout: 3
 branch:
   include:
