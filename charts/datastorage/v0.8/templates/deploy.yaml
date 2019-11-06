@@ -30,8 +30,8 @@ spec:
 
 ---
 
-kind: PersistentVolumeClaim
 apiVersion: v1
+kind: PersistentVolumeClaim
 metadata:
   name: pvclaim-{{ .Values.name }}
 spec:
@@ -39,5 +39,5 @@ spec:
   - ReadWriteOnce
   resources: 
     requests: 
-      storage: 2Gi
+      storage: 4Gi
   
