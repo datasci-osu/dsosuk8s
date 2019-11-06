@@ -1,0 +1,15 @@
+stages:
+- name: upgrade
+  steps:
+  - applyAppConfig:
+      catalogTemplate: cattle-global-data:oneilsh-datastorage
+      version: "0.8"
+      answers:
+        name: studentvol
+      name: studentvol
+      targetNamespace: deploy
+timeout: 3
+branch:
+  include:
+  - master
+notification: {}
