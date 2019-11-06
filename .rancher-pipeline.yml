@@ -6,6 +6,14 @@ stages:
       version: "0.8"
       name: studentvol
       targetNamespace: deploy
+  - applyAppConfig:
+      catalogTemplate: cattle-global-data:oneilsh-nfsclient
+      version: "0.8"
+      answers:
+        datastorage: studentvol
+        targetdir: /mnt/studentvol
+      name: studentserver
+      targetNamespace: deploy
 timeout: 3
 branch:
   include:
