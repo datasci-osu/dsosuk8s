@@ -1,2 +1,2 @@
 # Source: templates/deploy.yaml
-name: defaultstorage
+size: 2Gi

@@ -1,6 +1,6 @@
 questions:
-- variable: name
-  default: "defaultstorage"
-  description: "Name for the storage drive."
+- variable: size
+  default: "2Gi"
+  description: "Size of the storage drive."
   type: string
-  label: "Name: "
+  label: "Size: "

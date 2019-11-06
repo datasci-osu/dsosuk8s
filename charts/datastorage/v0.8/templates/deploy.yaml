@@ -1,24 +1,24 @@
 apiVersion: apps/v1beta2
 kind: Deployment
 metadata:
-  name: nfs-{{required "Valid name entry required." .Values.name }}-dep
+  name: nfs-{{ .Release.Name }}-dep
 spec:
   replicas: 1
   selector:
     matchLabels:
-      app: nfs-{{ .Values.name }}-pod
+      app: nfs-{{ .Release.Name }}-pod
   strategy:
     type: Recreate
   template:
     metadata:
       labels:
-        app: nfs-{{ .Values.name }}-pod
+        app: nfs-{{ .Release.Name }}-pod
         testlabel: test-{{ .Release.Name }}
     spec:
       volumes:
-      - name: pvol-{{ .Values.name }}
+      - name: pvol-{{ .Release.Name }}
         persistentVolumeClaim:
-          claimName: pvclaim-{{ .Values.name }}
+          claimName: pvclaim-{{ .Release.Name }}
       containers:
       - name: nfs
         image: oneilsh/ktesting-nfsserver3
@@ -27,18 +27,18 @@ spec:
             add: ["SYS_ADMIN", "SETPCAP"]
         volumeMounts:
         - mountPath: "/nfsshare"   # it seems the shared dir must be a volume mount, see https://github.com/kubernetes/kubernetes/issues/19593#issuecomment-417106013
-          name: pvol-{{ .Values.name }}
+          name: pvol-{{ .Release.Name }}
 
 ---
 
 apiVersion: v1
 kind: PersistentVolumeClaim
 metadata:
-  name: pvclaim-{{ .Values.name }}
+  name: pvclaim-{{ .Release.Name }}
 spec:
   accessModes: 
   - ReadWriteOnce
   resources: 
     requests: 
-      storage: 2Gi
+      storage: {{ .Values.size }}
   
