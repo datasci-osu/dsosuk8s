@@ -11,7 +11,8 @@ spec:
     type: Recreate
   template:
     metadata:
-      name: nfsclient-{{ .Release.Name }}-pod
+      labels:
+        app: nfsclient-{{ .Release.Name }}-pod
     spec:
       containers:
       - name: nfsclient-{{ .Release.Name }}-con

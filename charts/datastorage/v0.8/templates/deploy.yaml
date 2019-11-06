@@ -13,7 +13,6 @@ spec:
     metadata:
       labels:
         app: nfs-{{ .Release.Name }}-pod
-        testlabel: test-{{ .Release.Name }}
     spec:
       volumes:
       - name: pvol-{{ .Release.Name }}
