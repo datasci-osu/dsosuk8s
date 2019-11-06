@@ -1,2 +1,2 @@
 # Source: templates/deploy.yaml
-size: 2Gi
+size: 4Gi
