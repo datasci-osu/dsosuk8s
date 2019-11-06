@@ -1,0 +1,4 @@
+name: NFS Client
+description: Consume storage created by datastorage app.
+version: 0.8
+maintainer: github.com/oneilsh

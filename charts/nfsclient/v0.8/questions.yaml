@@ -1,0 +1,11 @@
+questions:
+- variable: datastorage
+  default: "datastoragename"
+  description: "Name of data storage app to use."
+  type: string
+  label: "Data Storage Name: "
+- variable: targetdir
+  default: /mnt/nfsshare
+  description: "Where to mount storage."
+  type: string
+  label: "Target Dir: "

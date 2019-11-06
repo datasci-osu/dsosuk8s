@@ -1,0 +1,6 @@
+name: nfsclient
+version: 0.8
+appVersion: 0.8
+description: Consume storage created by datastorage app.
+icon: catalogIcon-drive.svg
+engine: gotpl

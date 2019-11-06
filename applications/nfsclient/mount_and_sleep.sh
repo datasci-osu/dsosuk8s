@@ -3,7 +3,8 @@
 # exit with error if any command fails
 set -e
 
-mount $NFS_SVC:/ /mnt/nfsmount
+mkdir -p $TARGET_DIR
+mount $NFS_SVC:/ $TARGET_DIR
 
 while true; do
 	echo -e '\n'
