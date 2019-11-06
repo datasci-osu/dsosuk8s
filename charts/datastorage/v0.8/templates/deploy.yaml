@@ -2,7 +2,6 @@ apiVersion: apps/v1beta2
 kind: Deployment
 metadata:
   name: nfs-{{required "Valid name entry required." .Values.name }}-dep
-  test: test-{{ .Release.Name }}
 spec:
   replicas: 1
   selector:
@@ -14,6 +13,7 @@ spec:
     metadata:
       labels:
         app: nfs-{{ .Values.name }}-pod
+        testlabel: test-{{ .Release.Name }}
     spec:
       volumes:
       - name: pvol-{{ .Values.name }}
