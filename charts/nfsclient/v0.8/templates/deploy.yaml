@@ -1,0 +1,26 @@
+apiVersion: apps/v1beta2
+kind: Deployment
+metadata:
+  name: nfsclient-{{ .Release.Name }}-dep
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: nfsclient-{{ .Release.Name }}-pod
+  strategy:
+    type: Recreate
+  template:
+    metadata:
+      name: nfsclient-{{ .Release.Name }}-pod
+    spec:
+      containers:
+      - name: nfsclient-{{ .Release.Name }}-con
+        image: oneilsh/ktesting-nfsclient
+        env:
+        - name: NFS_SVC
+          value: {{ .Values.datastorage }}
+        - name: TARGET_DIR
+          value: {{ .Values.targetdir }}
+        securityContext:
+          capabilities:
+            add: ["SYS_ADMIN", "SETPCAP"]
