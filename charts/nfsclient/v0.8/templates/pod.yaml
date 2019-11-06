@@ -8,7 +8,7 @@ spec:
     image: oneilsh/ktesting-nfsclient
     env:
     - name: NFS_SVC
-      value: nfs-{{ .Values.datastorage }}-nfs-svc
+      value: {{ .Values.datastorage }}
     - name: TARGET_DIR
       value: {{ .Values.targetdir }}
     securityContext:
