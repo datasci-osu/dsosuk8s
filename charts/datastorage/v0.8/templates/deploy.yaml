@@ -2,6 +2,7 @@ apiVersion: apps/v1beta2
 kind: Deployment
 metadata:
   name: nfs-{{required "Valid name entry required." .Values.name }}-dep
+  test: test-{{ metadata.labels.io.cattle.field/appId }}
 spec:
   replicas: 1
   selector:
@@ -39,5 +40,5 @@ spec:
   - ReadWriteOnce
   resources: 
     requests: 
-      storage: 3Gi
+      storage: 2Gi
   
