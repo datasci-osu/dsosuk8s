@@ -28,7 +28,7 @@ stages:
   steps:
   - runScriptConfig:
       image: node:latest
-      shellScript: echo test > /mnt/shared/testing.txt
+      shellScript: '''echo test > /mnt/shared/testing.txt'''
 - name: readfile
   steps:
   - runScriptConfig:
