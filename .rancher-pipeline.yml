@@ -24,16 +24,6 @@ stages:
         targetdir: /mnt/shared
       name: client2
       targetNamespace: deploy
-- name: createfile
-  steps:
-  - runScriptConfig:
-      image: node:latest
-      shellScript: touch /mnt/shared/testing.txt
-- name: readfile
-  steps:
-  - runScriptConfig:
-      image: node:latest
-      shellScript: ls -lah /mnt/shared/testing.txt
 timeout: 3
 branch:
   include:
