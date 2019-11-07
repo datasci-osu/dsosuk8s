@@ -8,4 +8,4 @@ questions:
   default: /mnt/nfsshare
   description: "Where to mount storage."
   type: string
-  label: "Target Dir: "
+  label: "Target Directory: "
