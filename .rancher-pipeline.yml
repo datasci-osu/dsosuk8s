@@ -24,6 +24,16 @@ stages:
         targetdir: /mnt/shared
       name: client2
       targetNamespace: deploy
+- name: another_client
+  steps:
+  - applyAppConfig:
+      catalogTemplate: cattle-global-data:oneilsh-nfsclient
+      version: "0.8"
+      answers:
+        datastorage: lskjdf
+        targetdir: /mnt/mydir
+      name: client3
+      targetNamespace: deploy
 timeout: 3
 branch:
   include:
