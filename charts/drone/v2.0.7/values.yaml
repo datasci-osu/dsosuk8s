@@ -115,7 +115,7 @@ server:
   ## If not set, it will be autofilled with the cluster host.
   ## Host shoud be just the hostname.
   ##
-  # host: "drone.domain.io"
+  host: "drone2.dsosu-rancher.blue"
 
   ## protocol should be http or https
   protocol: http
