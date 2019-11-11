@@ -1,0 +1,17 @@
+name: ds-jupyterlab
+version: 0.1.1
+appVersion: 0.9
+description: JupyerLab with Python, Julia, R Support (no RStudio)
+icon: file://../icon.svg
+keywords:
+- lab
+- python
+- R
+- julia
+home: https://github.com/oneilsh/ktesting
+sources:
+  - https://github.com/oneilsh/ktesting
+maintainers:
+- name: Shawn
+  email: oneilsh@gmail.com
+engine: gotpl
