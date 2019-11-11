@@ -20,14 +20,14 @@ jupyterhub:
     #fsGid: 0
     #cmd: ['start-singleuser.sh']
 
-    #profileList:
-    #  - display_name: "DataScience Notebook"
-    #    description: "Python, Julia, R Notebooks."
-    #    default: true
-    #  - display_name: "Original Hub Interface"
-    #    description: "Same as DataScience Notebook, but the traditional JupyterHub interface."
-    #    kubespawner_override:
-    #      default_url: "/tree"
+    profileList:
+      - display_name: "DataScience Notebook"
+        description: "Python, Julia, R Notebooks."
+        default: true
+      - display_name: "Original Hub Interface"
+        description: "Same as DataScience Notebook, but the traditional JupyterHub interface."
+        kubespawner_override:
+          default_url: "/tree"
     
     #storage:
     #  type: "static"
