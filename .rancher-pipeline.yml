@@ -6,34 +6,13 @@ stages:
       version: "0.8"
       name: studentvol
       targetNamespace: deploy
-- name: clients
+- name: jlab
   steps:
   - applyAppConfig:
-      catalogTemplate: cattle-global-data:oneilsh-nfsclient
-      version: "0.8"
-      answers:
-        datastorage: studentvol
-        targetdir: /mnt/shared
-      name: client1
-      targetNamespace: deploy
-  - applyAppConfig:
-      catalogTemplate: cattle-global-data:oneilsh-nfsclient
-      version: "0.8"
-      answers:
-        datastorage: studentvol
-        targetdir: /mnt/shared
-      name: client2
-      targetNamespace: deploy
-- name: another_client
-  steps:
-  - applyAppConfig:
-      catalogTemplate: cattle-global-data:oneilsh-nfsclient
-      version: "0.8"
-      answers:
-        datastorage: lskjdf
-        targetdir: /mnt/mydir
-      name: client3
-      targetNamespace: deploy
+      catalogTemplate: p-x4c2f:oneilsh-ktesting-ds-jupyterlab
+      version: 0.1.1
+      name: ds-jupyterlab
+      targetNamespace: jhubtests
 timeout: 3
 branch:
   include:
