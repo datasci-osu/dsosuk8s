@@ -1,0 +1,6 @@
+name: drive
+version: 0.8
+appVersion: 0.8
+description: Spawns an NFS server for use by applications.
+icon: file://../icon.svg
+engine: gotpl

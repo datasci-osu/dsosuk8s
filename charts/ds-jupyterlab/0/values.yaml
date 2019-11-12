@@ -67,15 +67,6 @@ jupyterhub:
         
         c.JupyterHub.authenticator_class = DummyExtraAuthenticator
 
-      mountNfs: |
-        c.KubeSpawner.lifecycle_hooks = {
-          "postStart": {
-            "exec": {
-              "command": ["mount", "studentvol:/", "/home"]
-            }   
-          }
-        }
-
 #nfs-server-provisioner:
 #  #persistence: 
 #  #  enabled: true

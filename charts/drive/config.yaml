@@ -1,0 +1,4 @@
+name: Drive
+description: Spawns an NFS server for use by applications. 
+version: 0.8
+maintainer: github.com/oneilsh
