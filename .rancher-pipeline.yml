@@ -1,18 +1,3 @@
-stages:
-- name: server
-  steps:
-  - applyAppConfig:
-      catalogTemplate: cattle-global-data:oneilsh-ktesting-drive
-      version: "0.8"
-      name: studentvol
-      targetNamespace: dev
-- name: jlab
-  steps:
-  - applyAppConfig:
-      catalogTemplate: cattle-global-data:oneilsh-ktesting-ds-jupyterlab
-      version: 0.1.1
-      name: jlab
-      targetNamespace: dev
 timeout: 3
 branch:
   include:
