@@ -13,8 +13,7 @@ metadata:
   {{- end }}
 spec:
   rules:
-    {{- range $host := .Values.ingress.hosts }}
-    - host: {{ $host | quote }}
+    - host: {{ .Release.Name }}.{{ Release.Namespace }}.{{ .Values.ingress.domain }}
       http:
         paths:
           - path: {{ $.Values.hub.baseUrl }}{{ $.Values.ingress.pathSuffix }}

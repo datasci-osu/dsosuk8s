@@ -46,8 +46,7 @@ jupyterhub:
 
   ingress:
     enabled: true
-    hosts:
-      - jlab.dsosu.us
+    domain: dsosu.us
         #pathSuffix: '*'
     #annotations: 
     #  kubernetes.io/ingress.class: nginx

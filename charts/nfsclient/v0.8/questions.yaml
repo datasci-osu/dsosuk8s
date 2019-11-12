@@ -1,7 +1,7 @@
 questions:
 - variable: datastorage
   default: "datastoragename"
-  description: "Name of data storage app to use."
+  description: "Name of drive application to use."
   type: string
   label: "Data Storage Name: "
 - variable: targetdir
