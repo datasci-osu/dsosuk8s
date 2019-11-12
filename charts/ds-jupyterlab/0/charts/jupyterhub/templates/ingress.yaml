@@ -13,14 +13,13 @@ metadata:
   {{- end }}
 spec:
   rules:
-    - host: {{ $.Release.Name }}.{{ $.Release.Namespace }}.{{ $.Values.ingress.domain }}
+    - host: {{ .Release.Name }}.{{ .Release.Namespace }}{{ .Values.ingress.domain }}
       http:
         paths:
           - path: {{ $.Values.hub.baseUrl }}{{ $.Values.ingress.pathSuffix }}
             backend:
               serviceName: proxy-public
               servicePort: 80
-    {{- end }}
   {{- if .Values.ingress.tls }}
   tls:
     {{- .Values.ingress.tls | toYaml | trimSuffix "\n" | nindent 4 }}
