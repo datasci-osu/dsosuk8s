@@ -1,3 +1,0 @@
-[submodule "charts/ds-jupyterlab/0/charts/jupyterhub"]
-	path = charts/ds-jupyterlab/0/charts/jupyterhub
-	url = https://github.com/oneilsh/z2jh-oneilsh.git
