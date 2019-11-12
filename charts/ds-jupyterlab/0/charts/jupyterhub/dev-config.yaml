@@ -1,0 +1,63 @@
+proxy:
+  secretToken: 97141abb55ea5321867979cb57bb2e6a86a2f4d6bb166fca45aedb07c212c42d
+  service:
+    type: NodePort
+    nodePorts:
+      http: 31212
+  chp:
+    resources:
+      requests:
+        memory: 0
+        cpu: 0
+  networkPolicy:
+    enabled: true
+
+hub:
+  cookieSecret: 1470700e01f77171c2c67b12130c25081dfbdf2697af8c2f2bd05621b31100bf
+  db:
+    type: sqlite-memory
+  resources:
+    requests:
+      memory: 0
+      cpu: 0
+  services:
+    test:
+      admin: true
+      apiToken: 0cc05feaefeeb29179e924ffc6d3886ffacf0d1a28ab225f5c210436ffc5cfd5
+  networkPolicy:
+    enabled: true
+
+
+singleuser:
+  storage:
+    type: none
+  memory:
+    guarantee: null
+  networkPolicy:
+    enabled: true
+    # Block all egress apart from DNS and jupyter.org
+    # CIDR must match the allowed URL in test_singleuser_netpol
+    egress:
+      - ports:
+        ## port 53 is the default port for DNS queries
+        - port: 53
+          protocol: UDP
+      - to:
+        ## nslookup jupyter.org
+        ## - 104.28.9.110
+        ## - 104.28.8.110
+        - ipBlock:
+            cidr: 104.28.9.110/32
+        - ipBlock:
+            cidr: 104.28.8.110/32
+
+prePuller:
+  hook:
+    enabled: false
+
+scheduling:
+  userScheduler:
+    enabled: true
+
+debug:
+  enabled: true
