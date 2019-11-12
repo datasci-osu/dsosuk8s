@@ -1,4 +1,6 @@
 jupyterhub:
+  rbac:
+    enabled: false   # seems to be needed for rancher pipelines, maybe not a good idea, testing
   proxy:
     secretToken: "78767972dd3d0db5a98fb56554f4484daa57bc35bd73dc61aafebed8ac9fe3df"
   singleuser:
