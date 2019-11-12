@@ -2,25 +2,17 @@ stages:
 - name: server
   steps:
   - applyAppConfig:
-      catalogTemplate: p-x4c2f:oneilsh-ktesting-datastorage
+      catalogTemplate: cattle-global-data:oneilsh-ktesting-drive
       version: "0.8"
       name: studentvol
-      targetNamespace: jhubtests
+      targetNamespace: dev
 - name: jlab
   steps:
   - applyAppConfig:
-      catalogTemplate: p-x4c2f:oneilsh-ktesting-ds-jupyterlab
+      catalogTemplate: cattle-global-data:oneilsh-ktesting-ds-jupyterlab
       version: 0.1.1
-      name: ds-jupyterlab
-      targetNamespace: jhubtests
-  - applyAppConfig:
-      catalogTemplate: p-x4c2f:oneilsh-ktesting-nfsclient
-      version: "0.8"
-      answers:
-        datastorage: studentvol
-        targetdir: /mnt/studentvol
-      name: client1
-      targetNamespace: jhubtests
+      name: jlab
+      targetNamespace: dev
 timeout: 3
 branch:
   include:
