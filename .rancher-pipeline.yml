@@ -1,5 +1,10 @@
-timeout: 3
-branch:
-  include:
-  - master
+stages:
+- name: jhubtest
+  steps:
+  - applyAppConfig:
+      catalogTemplate: cattle-global-data:oneilsh-ktesting-ds-jupyterlab
+      version: 0.1.1
+      name: jhubt
+      targetNamespace: dev
+timeout: 60
 notification: {}
