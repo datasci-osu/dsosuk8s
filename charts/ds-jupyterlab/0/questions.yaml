@@ -3,7 +3,7 @@ categories:
 questions:
 - variable: jupyterhub.singleuser.memory.limit
   default: "2G"
-  description: "Memory limit per student."
+  description: "Memory limit, per student."
   type: string
   label: "Memory Limit"
 - variable: jupyterhub.singleuser.memory.guarantee
@@ -15,7 +15,7 @@ questions:
   # may have to set them as strings and do some parsing within the template (how do we do this without forking the jupyerhub base??)
 - variable: kustomize.cpu.limit
   default: "2"
-  description: "CPU limit per student."
+  description: "CPU limit, per student."
   type: string
   label: "CPU Limit"
   #- variable: jupyterhub.singleuser.cpu.guarantee
