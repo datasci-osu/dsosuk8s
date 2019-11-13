@@ -44,7 +44,7 @@ hub:
   extraVolumeMounts: []
   image:
     name: jupyterhub/k8s-hub
-    tag: '0.9-484ce8e'
+    tag: '0.8.2'
   resources:
     requests:
       cpu: 200m
