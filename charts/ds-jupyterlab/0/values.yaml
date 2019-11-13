@@ -53,6 +53,9 @@ jupyterhub:
 
   hub:
     baseUrl: /
+    image:
+      name: oneilsh/ktesting-hub
+      tag: 'latest'
     #extraConfig:
       # authsetting: |
       #   from jupyterhub.auth import DummyAuthenticator
