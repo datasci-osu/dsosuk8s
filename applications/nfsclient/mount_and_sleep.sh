@@ -3,6 +3,7 @@
 # exit with error if any command fails
 set -e
 
+
 mkdir -p $TARGET_DIR
 mount $NFS_SVC:/ $TARGET_DIR
 
