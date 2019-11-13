@@ -1,4 +1,3 @@
 dependencies:
   - name: jupyterhub
-    version: 1.0.1dev
     repository: file://charts
