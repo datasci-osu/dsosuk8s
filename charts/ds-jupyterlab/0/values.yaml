@@ -9,7 +9,7 @@ jupyterhub:
       limit: 0.5
       gaurantee: 1.0
     image:
-      name: jupyter/base-notebook
+      name: oneilsh/ktesting-datascience-notebook
       tag: latest
     defaultUrl: "/lab"
     #extraEnv:
