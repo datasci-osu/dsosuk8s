@@ -9,8 +9,8 @@ jupyterhub:
       limit: 0.5
       gaurantee: 1.0
     image:
-      name: jupyter/datascience-notebook
-      tag: 82d1d0bf0867
+      name: oneilsh/datascience-notebook
+      tag: latest
     defaultUrl: "/lab"
     #extraEnv:
     #  #NB_USER: "{username}"
