@@ -54,21 +54,12 @@ spec:
       serviceAccountName: hub
       {{- end }}
       securityContext:
+        runAsUser: {{ .Values.hub.uid }}
         fsGroup: {{ .Values.hub.fsGid }}
-      {{- if or .Values.hub.imagePullSecret.enabled .Values.hub.image.pullSecrets }}
+      {{- if .Values.hub.imagePullSecret.enabled }}
       imagePullSecrets:
-        {{- if .Values.hub.imagePullSecret.enabled }}
         - name: hub-image-credentials
-        {{ else }}
-        {{- range .Values.hub.image.pullSecrets }}
-        - name: {{ . }}
-        {{- end }}
-        {{- end }}
-      {{- end }}
-      {{- if .Values.hub.initContainers }}
-      initContainers:
-        {{- .Values.hub.initContainers | toYaml | trimSuffix "\n" | nindent 8 }}
-      {{- end }}
+      {{- end }}  
       containers:
         {{- if .Values.hub.extraContainers }}
         {{- .Values.hub.extraContainers | toYaml | trimSuffix "\n" | nindent 8 }}
@@ -78,7 +69,7 @@ spec:
           command:
             - jupyterhub
             - --config
-            - /etc/jupyterhub/jupyterhub_config.py
+            - /srv/jupyterhub_config.py
             {{- if .Values.debug.enabled }}
             - --debug
             {{- end }}
@@ -103,15 +94,6 @@ spec:
             {{- end }}
             {{- end }}
           volumeMounts:
-            - mountPath: /etc/jupyterhub/jupyterhub_config.py
-              subPath: jupyterhub_config.py
-              name: config
-            - mountPath: /usr/local/lib/python3.6/dist-packages/z2jh.py
-              subPath: z2jh.py
-              name: config
-            - mountPath: /etc/jupyterhub/cull_idle_servers.py
-              subPath: cull_idle_servers.py
-              name: config
             - mountPath: /etc/jupyterhub/config/
               name: config
             - mountPath: /etc/jupyterhub/secret/
@@ -128,13 +110,7 @@ spec:
             {{- end }}
           resources:
             {{- .Values.hub.resources | toYaml | trimSuffix "\n" | nindent 12 }}
-          {{- with .Values.hub.image.pullPolicy }}
-          imagePullPolicy: {{ . }}
-          {{- end }}
-          securityContext:
-            runAsUser: {{ .Values.hub.uid }}
-            # Don't allow any process to execute as root inside the container
-            allowPrivilegeEscalation: false
+          imagePullPolicy: {{ .Values.hub.imagePullPolicy }}
           env:
             - name: PYTHONUNBUFFERED
               value: "1"
@@ -194,19 +170,3 @@ spec:
           ports:
             - containerPort: 8081
               name: hub
-          ## livenessProbe notes:
-          ## We don't know how long hub database upgrades could take
-          ## so having a liveness probe could be a bit risky unless we put
-          ## a initialDelaySeconds value with long enough margin for that
-          ## to not be an issue. If it is too short, we could end up aborting
-          ## database upgrades midway or ending up in an infinite restart
-          ## loop.
-          # livenessProbe:
-          #   initialDelaySeconds: 30
-          #   httpGet:
-          #     path: {{ .Values.hub.baseUrl }}hub/health
-          #     port: hub
-          readinessProbe:
-            httpGet:
-              path: {{ .Values.hub.baseUrl }}hub/health
-              port: hub

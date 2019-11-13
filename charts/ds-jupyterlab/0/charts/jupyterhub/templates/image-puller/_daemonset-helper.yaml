@@ -48,22 +48,14 @@ spec:
       {{- end }}
       terminationGracePeriodSeconds: 0
       automountServiceAccountToken: false
-      {{- if or .Values.singleuser.imagePullSecret.enabled .Values.singleuser.image.pullSecrets }}
+      {{- if .Values.singleuser.imagePullSecret.enabled }}
       imagePullSecrets:
-        {{- if .Values.singleuser.imagePullSecret.enabled }}
         - name: {{ if .hook -}} hook- {{- end -}} singleuser-image-credentials
-        {{ else }}
-        {{- range .Values.singleuser.image.pullSecrets }}
-        - name: {{ . }}
-        {{- end }}
-        {{ end }}
       {{- end }}
       initContainers:
         - name: image-pull-singleuser
           image: {{ .Values.singleuser.image.name }}:{{ .Values.singleuser.image.tag }}
-          {{- with .Values.singleuser.image.pullPolicy }}
-          imagePullPolicy: {{ . }}
-          {{- end }}
+          imagePullPolicy: IfNotPresent
           command:
             - /bin/sh
             - -c
@@ -73,6 +65,7 @@ spec:
         {{- if $container.kubespawner_override.image }}
         - name: image-pull-singleuser-profilelist-{{ $k }}
           image: {{ $container.kubespawner_override.image }}
+          imagePullPolicy: IfNotPresent
           command:
             - /bin/sh
             - -c
@@ -83,9 +76,7 @@ spec:
         {{- if not .Values.singleuser.cloudMetadata.enabled }}
         - name: image-pull-metadata-block
           image: {{ .Values.singleuser.networkTools.image.name }}:{{ .Values.singleuser.networkTools.image.tag }}
-          {{- with .Values.singleuser.networkTools.image.pullPolicy }}
-          imagePullPolicy: {{ . }}
-          {{- end }}
+          imagePullPolicy: IfNotPresent
           command:
             - /bin/sh
             - -c
@@ -94,9 +85,7 @@ spec:
         {{- range $k, $v := .Values.prePuller.extraImages }}
         - name: image-pull-{{ $k }}
           image: {{ $v.name }}:{{ $v.tag }}
-          {{- with $v.pullPolicy }}
-          imagePullPolicy: {{ . }}
-          {{- end }}
+          imagePullPolicy: {{ $v.policy | default "IfNotPresent" }}
           command:
             - /bin/sh
             - -c
@@ -105,9 +94,7 @@ spec:
         {{- range $k, $container := .Values.singleuser.extraContainers }}
         - name: image-pull-singleuser-extra-container-{{ $k }}
           image: {{ $container.image }}
-          {{- with $container.imagePullPolicy }}
-          imagePullPolicy: {{ . }}
-          {{- end }}
+          imagePullPolicy: IfNotPresent
           command:
             - /bin/sh
             - -c

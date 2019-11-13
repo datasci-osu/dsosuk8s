@@ -44,9 +44,7 @@ spec:
       containers:
         - name: nginx
           image: "{{ .Values.proxy.nginx.image.name }}:{{ .Values.proxy.nginx.image.tag }}"
-          {{- with .Values.proxy.nginx.image.pullPolicy }}
-          imagePullPolicy: {{ . }}
-          {{- end }}
+          imagePullPolicy: {{ .Values.proxy.nginx.image.pullPolicy }}
           resources:
             {{- .Values.proxy.nginx.resources | toYaml | trimSuffix "\n" | nindent 12 }}
           args:
@@ -88,9 +86,7 @@ spec:
               protocol: TCP
         - name: kube-lego
           image: "{{ .Values.proxy.lego.image.name }}:{{ .Values.proxy.lego.image.tag }}"
-          {{- with .Values.proxy.lego.image.pullPolicy }}
-          imagePullPolicy: {{ . }}
-          {{- end }}
+          imagePullPolicy: {{ .Values.proxy.lego.image.pullPolicy }}
           resources:
             {{- .Values.proxy.lego.resources | toYaml | trimSuffix "\n" | nindent 12 }}
           env:

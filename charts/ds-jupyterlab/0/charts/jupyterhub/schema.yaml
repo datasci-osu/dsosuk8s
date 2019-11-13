@@ -152,18 +152,6 @@ properties:
               v1.11.1
               zhy270a
               ```
-          pullSecrets:
-            type: list
-            description: |
-              Use an existing kubernetes secret to pull the custom image.
-              
-              ```yaml
-              # example existing pull secret.
-              singleuser:
-                image:
-                  pullSecrets:
-                    - gcr-pull
-              ```
       db:
         type: object
         properties:
@@ -288,21 +276,6 @@ properties:
 
           See the [Kubernetes docs](https://kubernetes.io/docs/concepts/overview/working-with-objects/labels/)
           to learn more about labels.
-      initContainers:
-        type: list
-        description: |
-          list of initContainers to be run with hub pod. See [Kubernetes Docs](https://kubernetes.io/docs/concepts/workloads/pods/init-containers/)
-          
-          ```yaml
-          hub:
-            initContainers:
-              - name: init-myservice
-                image: busybox:1.28
-                command: ['sh', '-c', 'command1']
-              - name: init-mydb
-                image: busybox:1.28
-                command: ['sh', '-c', 'command2']
-          ```
       extraEnv:
         type: object
         description: |
@@ -422,24 +395,7 @@ properties:
           annotations:
             type: object
             description: |
-              Kubernetes annotations to apply to the hub service.
-      pdb:
-        type: object
-        description: |
-          Set the Pod Disruption Budget for the hub pod.
-
-          See [the Kubernetes
-          documentation](https://kubernetes.io/docs/concepts/workloads/pods/disruptions/)
-          for more details about disruptions.
-        properties:
-          enabled:
-            type: boolean
-            description: |
-              Whether PodDisruptionBudget is enabled for the hub pod.
-          minAvailable:
-            type: integer
-            description: |
-              Minimum number of pods to be available during the voluntary disruptions.
+              Kuberentes annotations to apply to the hub service.
 
   proxy:
     type: object
@@ -596,23 +552,6 @@ properties:
               hosts:
                 - <your-domain-name>
               ```   
-      pdb:
-        type: object
-        description: |
-          Set the Pod Disruption Budget for the proxy pod.
-
-          See [the Kubernetes
-          documentation](https://kubernetes.io/docs/concepts/workloads/pods/disruptions/)
-          for more details about disruptions.
-        properties:
-          enabled:
-            type: boolean
-            description: |
-              Whether PodDisruptionBudget is enabled for the proxy pod.
-          minAvailable:
-            type: integer
-            description: |
-              Minimum number of pods to be available during the voluntary disruptions.
     required:
       - secretToken
   auth:
@@ -798,18 +737,6 @@ properties:
 
               See the [Kubernetes docs](https://kubernetes.io/docs/concepts/containers/images/#updating-images)
               for more info.
-          pullSecrets:
-            type: list
-            description: |
-              Use an existing kubernetes secret to pull the custom image.
-              
-              ```yaml
-              # example existing pull secret
-              singleuser:
-                image:
-                  pullSecrets:
-                    - gcr-pull
-              ```
       profileList:
         type: list
         description: |
@@ -950,23 +877,6 @@ properties:
                 type:
                   - string
                   - "null"
-          pdb:
-            type: object
-            description: |
-              Set the Pod Disruption Budget for the user scheduler.
-
-              See [the Kubernetes
-              documentation](https://kubernetes.io/docs/concepts/workloads/pods/disruptions/)
-              for more details about disruptions.
-            properties:
-              enabled:
-                type: boolean
-                description: |
-                  Whether PodDisruptionBudget is enabled for the user scheduler.
-              minAvailable:
-                type: integer
-                description: |
-                  Minimum number of pods to be available during the voluntary disruptions.
       podPriority:
         type: object
         description: |
@@ -1111,8 +1021,8 @@ properties:
         description: |
           Enable the creation of a Kubernetes Ingress to proxy-public service.
 
-          See [Advanced Topics — Zero to JupyterHub with Kubernetes
-          0.7.0 documentation](https://zero-to-jupyterhub.readthedocs.io/en/stable/advanced.html#ingress)
+          See [Advanced Topics — Zero to JupyterHub with Kubernetes 0.7.0 documentation]
+          (https://zero-to-jupyterhub.readthedocs.io/en/stable/advanced.html#ingress)
           for more details.
       annotations:
         type: object
