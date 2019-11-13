@@ -56,18 +56,18 @@ jupyterhub:
     #image:
     #  name: oneilsh/ktesting-hub
     #  tag: 'latest'
-    #extraConfig:
-      # authsetting: |
-      #   from jupyterhub.auth import DummyAuthenticator
-      #   from tornado import gen
+    extraConfig:
+      authsetting: |
+        from jupyterhub.auth import DummyAuthenticator
+        from tornado import gen
 
-      #   class DummyExtraAuthenticator(DummyAuthenticator):
-      #     
-      #     @gen.coroutine
-      #     def pre_spawn_start(self, user, spawner):
-      #       spawner.environment['NB_USER'] = user.name
-      #   
-      #   c.JupyterHub.authenticator_class = DummyExtraAuthenticator
+        class DummyExtraAuthenticator(DummyAuthenticator):
+          
+          @gen.coroutine
+          def pre_spawn_start(self, user, spawner):
+            spawner.environment['NB_USER'] = user.name
+        
+        c.JupyterHub.authenticator_class = DummyExtraAuthenticator
 
 #nfs-server-provisioner:
 #  #persistence: 
