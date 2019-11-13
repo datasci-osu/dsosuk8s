@@ -1,2 +1,2 @@
-FROM jupyter/datascience-notebook:82d1d0bf0867
+FROM jupyter/datascience-notebook:45f07a14b422
 
