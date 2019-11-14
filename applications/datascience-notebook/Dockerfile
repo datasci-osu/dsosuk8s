@@ -16,3 +16,4 @@ RUN jupyter labextension install jupyterlab-topbar-extension \
 RUN pip install nbreuse
 
 COPY start.sh /usr/local/bin/
+RUN chmod +x /usr/local/bin/start.sh

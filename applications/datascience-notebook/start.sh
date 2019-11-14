@@ -41,6 +41,8 @@ run-hooks /usr/local/bin/start-notebook.d
 # Handle special flags if we're root
 if [ $(id -u) == 0 ] ; then
 
+    echo "Running custom start.sh"
+
     # Only attempt to change the jovyan username if it exists
     if id jovyan &> /dev/null ; then
         echo "Set username to: $NB_USER"
