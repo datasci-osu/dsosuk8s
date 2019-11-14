@@ -1,7 +1,7 @@
 #!/bin/bash
 # Copyright (c) Jupyter Development Team.
 # Distributed under the terms of the Modified BSD License.
-
+ 
 set -e
 
 # Exec the specified command or fall back on bash
@@ -47,6 +47,7 @@ if [ $(id -u) == 0 ] ; then
     if id jovyan &> /dev/null ; then
         echo "Set username to: $NB_USER"
         usermod -d /home/$NB_USER -l $NB_USER jovyan
+        echo "Done setting username."
     fi
     
     
@@ -57,7 +58,8 @@ if [ $(id -u) == 0 ] ; then
         # (it could be mounted, and we shouldn't create it if it already exists)
         if [[ ! -e "/home/$NB_USER" ]]; then
             echo "Relocating home dir to /home/$NB_USER"
-            mv /home/jovyan "/home/$NB_USER"
+	    bash
+	    mv /home/jovyan "/home/$NB_USER" 
 	    echo "Done relocating."
         fi
         # if workdir is in /home/jovyan, cd to /home/$NB_USER

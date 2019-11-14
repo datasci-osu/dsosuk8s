@@ -16,4 +16,6 @@ RUN jupyter labextension install jupyterlab-topbar-extension \
 
 COPY start.sh /usr/local/bin/
 
+RUN rm -rf /home/jovyan/.cache/yarn
+
 USER $NB_USER
