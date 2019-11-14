@@ -26,7 +26,7 @@ jupyterhub:
     #  CHOWN_EXTRA_OPTS: '-R'
     uid: 0
     fsGid: 0
-    cmd: ["--allow-root"] # this should tack this onto the default startup command...
+    cmd: ["start-notebook.sh", "--allow-root"]
 
     profileList:
       - display_name: "DataScience Notebook"
