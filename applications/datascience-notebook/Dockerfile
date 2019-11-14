@@ -13,7 +13,7 @@ RUN jupyter labextension install jupyterlab-topbar-extension \
                              jupyterlab-logout \
                              jupyterlab-theme-toggle
 
-RUN pip install nbreuse
 
 COPY start.sh /usr/local/bin/
-RUN chmod +x /usr/local/bin/start.sh
+
+USER $NB_USER
