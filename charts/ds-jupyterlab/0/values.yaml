@@ -21,7 +21,6 @@ jupyterhub:
       tag: latest
     defaultUrl: "/lab"
     extraEnv:
-      NB_USER: "{username}"
       CHOWN_HOME: "yes"
       CHOWN_EXTRA_OPTS: '-R'
     uid: 0
@@ -65,17 +64,19 @@ jupyterhub:
     #  name: oneilsh/ktesting-hub
     #  tag: 'latest'
     extraConfig:
-      #authsetting: |
-      #  from jupyterhub.auth import DummyAuthenticator
-      #  from tornado import gen
+      authsetting: |
+        from jupyterhub.auth import DummyAuthenticator
+        from tornado import gen
 
-      #  class DummyExtraAuthenticator(DummyAuthenticator):
+        class DummyExtraAuthenticator(DummyAuthenticator):
           
-      #    @gen.coroutine
-      #    def pre_spawn_start(self, user, spawner):
-      #      spawner.environment['NB_USER'] = user.name
+          @gen.coroutine
+          def pre_spawn_start(self, user, spawner):
+            spawner.environment['NB_USER'] = user.name
+            spawner.environment['NB_UID'] = 1000
+
         
-      #  c.JupyterHub.authenticator_class = DummyExtraAuthenticator
+        c.JupyterHub.authenticator_class = DummyExtraAuthenticator
 
 #nfs-server-provisioner:
 #  #persistence: 
