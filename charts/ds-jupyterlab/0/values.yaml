@@ -18,7 +18,7 @@ jupyterhub:
       gaurantee: 1.0
     image:
       name: oneilsh/ktesting-datascience-notebook
-      tag: 68be87fa
+      tag: latest
       pullPolicy: Always
     defaultUrl: "/lab"
     extraEnv:
