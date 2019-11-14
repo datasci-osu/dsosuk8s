@@ -20,10 +20,10 @@ jupyterhub:
       name: oneilsh/ktesting-datascience-notebook
       tag: latest
     defaultUrl: "/lab"
-    #extraEnv:
-    #  #NB_USER: "{username}"
-    #  CHOWN_HOME: "yes"
-    #  CHOWN_EXTRA_OPTS: '-R'
+    extraEnv:
+      NB_USER: "{username}"
+      CHOWN_HOME: "yes"
+      CHOWN_EXTRA_OPTS: '-R'
     uid: 0
     fsGid: 0
     cmd: ["start-notebook.sh", "--allow-root"]
