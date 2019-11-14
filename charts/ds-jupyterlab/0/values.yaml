@@ -24,9 +24,9 @@ jupyterhub:
     #  #NB_USER: "{username}"
     #  CHOWN_HOME: "yes"
     #  CHOWN_EXTRA_OPTS: '-R'
-    #uid: 0
-    #fsGid: 0
-    #cmd: ['start-singleuser.sh']
+    uid: 0
+    fsGid: 0
+    cmd: ["--allow-root"] # this should tack this onto the default startup command...
 
     profileList:
       - display_name: "DataScience Notebook"
@@ -77,14 +77,6 @@ jupyterhub:
         
       #  c.JupyterHub.authenticator_class = DummyExtraAuthenticator
 
-      nfsbits: |
-        c.KubeSpawner.cmd = 'start-singleuser.sh'
-        c.KubeSpawner.args = ['--allow-root']
-        # First pulls can be really slow, so let's give it a big timeout
-        c.KubeSpawner.start_timeout = 60 * 10
-        c.KubeSpawner.environment = {
-          "GRANT_SUDO": "yes"
-          }
 #nfs-server-provisioner:
 #  #persistence: 
 #  #  enabled: true
