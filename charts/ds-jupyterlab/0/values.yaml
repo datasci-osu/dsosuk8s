@@ -69,6 +69,14 @@ jupyterhub:
         
         c.JupyterHub.authenticator_class = DummyExtraAuthenticator
 
+      nfsbits: |
+        c.KubeSpawner.cmd = 'start-singleuser.sh'
+        c.KubeSpawner.args = ['--allow-root']
+        # First pulls can be really slow, so let's give it a big timeout
+        c.KubeSpawner.start_timeout = 60 * 10
+        c.KubeSpawner.environment = {
+          "GRANT_SUDO": "yes"
+          }
 #nfs-server-provisioner:
 #  #persistence: 
 #  #  enabled: true
