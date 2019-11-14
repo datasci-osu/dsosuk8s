@@ -28,6 +28,9 @@ jupyterhub:
     fsGid: 0
     cmd: ["start-notebook.sh", "--allow-root"]
 
+
+    storage:
+      type: none
     profileList:
       - display_name: "DataScience Notebook"
         description: "Python, Julia, R Notebooks."
