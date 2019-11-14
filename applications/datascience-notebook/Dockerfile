@@ -14,3 +14,5 @@ RUN jupyter labextension install jupyterlab-topbar-extension \
                              jupyterlab-theme-toggle
 
 RUN pip install nbreuse
+
+COPY start.sh /usr/local/bin/
