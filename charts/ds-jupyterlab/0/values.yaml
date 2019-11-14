@@ -19,6 +19,7 @@ jupyterhub:
     image:
       name: oneilsh/ktesting-datascience-notebook
       tag: latest
+      pullPolicy: Always
     defaultUrl: "/lab"
     extraEnv:
       CHOWN_HOME: "yes"
