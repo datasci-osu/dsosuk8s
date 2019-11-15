@@ -68,6 +68,8 @@ jupyterhub:
     #  name: oneilsh/ktesting-hub
     #  tag: 'latest'
     extraConfig:
+      priv: |
+        c.KubeSpawner.privileged = True
       authsetting: |
         from jupyterhub.auth import DummyAuthenticator
         from tornado import gen

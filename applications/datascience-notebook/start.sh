@@ -58,7 +58,6 @@ if [ $(id -u) == 0 ] ; then
         # (it could be mounted, and we shouldn't create it if it already exists)
         if [[ ! -e "/home/$NB_USER" ]]; then
             echo "Relocating home dir to /home/$NB_USER"
-	    bash
 	    mv /home/jovyan "/home/$NB_USER" 
 	    echo "Done relocating."
         fi
