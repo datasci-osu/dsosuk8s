@@ -69,7 +69,18 @@ jupyterhub:
     #  tag: 'latest'
     extraConfig:
       priv: |
-        c.KubeSpawner.privileged = True
+        #c.KubeSpawner.privileged = True
+        from kubernetes import client
+        def modify_pod_hook(spawner, pod):
+            pod.spec.containers[0].security_context = client.V1SecurityContext(
+                privileged=True,
+                capabilities=client.V1Capabilities(
+                    add=['SYS_ADMIN']
+                )
+            )
+            return pod
+        c.KubeSpawner.modify_pod_hook = modify_pod_hook
+
       authsetting: |
         from jupyterhub.auth import DummyAuthenticator
         from tornado import gen
