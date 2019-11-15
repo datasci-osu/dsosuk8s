@@ -20,9 +20,7 @@ spec:
           claimName: pvclaim-{{ .Release.Name }}
       containers:
       - name: nfs
-        image: oneilsh/ktesting-nfsserver3
-        tag: latest
-        imagePullPolicy: Always
+        image: oneilsh/ktesting-nfsserver3:latest
         securityContext:
           capabilities:
             add: ["SYS_ADMIN", "SETPCAP"]
