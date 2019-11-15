@@ -15,16 +15,8 @@ trap "shutdown" SIGTERM
 ####
 
 echo "Export points:"
-echo "$export_base *(rw,sync,insecure,fsid=0,no_subtree_check,no_root_squash)" | tee /etc/exports
+echo "$export_base *(rw,sync,insecure,fsid=0,no_subtree_check)" | tee /etc/exports
 
-read -a exports <<< "${@}"
-for export in "${exports[@]}"; do
-    src=`echo "$export" | sed 's/^\///'` # trim the first '/' if given in export path
-    src="$export_base$src"
-    mkdir -p $src
-    chmod 777 $src
-    echo "$src *(rw,sync,insecure,no_subtree_check)" | tee -a /etc/exports
-done
 
 echo -e "\n- Initializing nfs server.."
 rpcbind
