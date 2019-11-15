@@ -23,15 +23,13 @@ for export in "${exports[@]}"; do
     src="$export_base$src"
     mkdir -p $src
     chmod 777 $src
-    echo "$src *(rw,sync,insecure,no_subtree_check,no_root_squash)" | tee -a /etc/exports
+    echo "$src *(rw,sync,insecure,no_subtree_check)" | tee -a /etc/exports
 done
 
 echo -e "\n- Initializing nfs server.."
 rpcbind
 service nfs-kernel-server start
 
-echo -e "\n- Running node app.."
-node /app.js
 
 echo "- Nfs server is up and running.."
 

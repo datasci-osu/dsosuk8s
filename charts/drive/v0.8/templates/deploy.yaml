@@ -21,6 +21,8 @@ spec:
       containers:
       - name: nfs
         image: oneilsh/ktesting-nfsserver3
+        tag: latest
+        imagePullPolicy: Always
         securityContext:
           capabilities:
             add: ["SYS_ADMIN", "SETPCAP"]
