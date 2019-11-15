@@ -17,7 +17,14 @@ RUN jupyter labextension install jupyterlab-topbar-extension \
 COPY start.sh /usr/local/bin/
 
 RUN rm -rf /home/jovyan/.cache/yarn
-RUN apt install nfs-common nfs-kernel-server
+
+RUN apt-get update \
+ && apt-get install -yq --no-install-recommends \
+    nfs-common \
+    nfs-kernel-server \
+    vim \
+    htop \
+ && apt-get clean && rm -rf /var/lib/apt/lists/*
 
 
 USER $NB_USER
