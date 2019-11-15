@@ -53,6 +53,7 @@ if [ $(id -u) == 0 ] ; then
     
     # handle home and working directory if the username changed
     # SHAWN: it seems like this block should come before the one below, but on upstream it doesnt?
+    # TODO: see why this is
     if [[ "$NB_USER" != "jovyan" ]]; then
         # changing username, make sure homedir exists
         # (it could be mounted, and we shouldn't create it if it already exists)

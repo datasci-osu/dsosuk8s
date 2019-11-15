@@ -19,6 +19,10 @@ metadata:
   {{- end }}
 spec:
   rules:
+    # TODO: in helm v2, .Release.Name must be unique cluster-wide, so using both release name and
+    # namespace for identification isn't necessary. In future versions of rancher + helm3 this should
+    # be enabled. We may then want to identify applications by path, rather than subdomain, to avoid
+    # getting crazy deep subdomains (e.g. as bad as app.namespace.cluster.dsinfra.org.edu)
     - host: {{ .Release.Name }}.{{ .Release.Namespace }}.{{ .Values.ingress.domain }}
       http:
         paths:

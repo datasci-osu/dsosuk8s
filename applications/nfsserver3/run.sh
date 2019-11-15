@@ -15,6 +15,10 @@ trap "shutdown" SIGTERM
 ####
 
 echo "Export points:"
+# TODO: check on security for exports; we're root squashing (good), 
+# and local kube dns won't resolve outside of namespace (good), but
+# it may still be possible to address by nfssvc.namespace.svc.cluster.local - 
+# this is probably ok (even preferred) if allowed within project, but not between projects. 
 echo "$export_base *(rw,sync,insecure,fsid=0,no_subtree_check)" | tee /etc/exports
 
 

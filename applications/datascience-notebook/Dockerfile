@@ -2,6 +2,7 @@ FROM jupyter/datascience-notebook:45f07a14b422
 
 USER root
 
+# TODO: see if these are necessary
 RUN pip install wheel
 RUN pip install jupyterhub
 
