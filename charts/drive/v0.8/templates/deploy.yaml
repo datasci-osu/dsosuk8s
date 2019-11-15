@@ -21,6 +21,7 @@ spec:
       containers:
       - name: nfs
         image: oneilsh/ktesting-nfsserver3:latest
+        imagePullPolicy: Always # specifying :latest should do this as well, but i'm feeling paranoid
         securityContext:
           capabilities:
             add: ["SYS_ADMIN", "SETPCAP"]
