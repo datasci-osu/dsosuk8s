@@ -29,6 +29,7 @@ jupyterhub:
     storage:
       type: none
     extraEnv:
+      NFS_HOME_SVC: ""
       CHOWN_HOME: "yes"
       CHOWN_EXTRA_OPTS: '-R'
     uid: 0

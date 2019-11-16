@@ -15,8 +15,6 @@ RUN jupyter labextension install jupyterlab-topbar-extension \
                              jupyterlab-theme-toggle
 
 
-COPY start.sh /usr/local/bin/
-
 RUN rm -rf /home/jovyan/.cache/yarn
 
 RUN apt-get update \
@@ -27,5 +25,6 @@ RUN apt-get update \
     htop \
  && apt-get clean && rm -rf /var/lib/apt/lists/*
 
+COPY start.sh /usr/local/bin/
 
 USER $NB_USER
