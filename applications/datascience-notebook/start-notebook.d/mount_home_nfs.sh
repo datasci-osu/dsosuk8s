@@ -4,7 +4,7 @@ set -e
 
 echo "Checking for /home mount request"
 
-if [[ -z $NFS_HOME_SVC ]]; then 
+if [[ ! -z $NFS_HOME_SVC ]]; then 
   echo "NFS /home mount requested from $NFS_HOME_SVC"
 
   echo "Temporarily relocating /home/jovyan"
