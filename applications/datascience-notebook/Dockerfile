@@ -26,6 +26,8 @@ RUN apt-get update \
  && apt-get clean && rm -rf /var/lib/apt/lists/*
 
 COPY start.sh /usr/local/bin/
-COPY ./start-notebook.d/. /usr/local/bin/
+
+RUN mkdir -p /usr/local/bin/start-notebook.d
+COPY ./start-notebook.d/. /usr/local/bin/start-notebook.d/
 
 USER $NB_USER
