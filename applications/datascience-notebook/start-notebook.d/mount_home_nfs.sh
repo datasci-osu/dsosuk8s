@@ -16,8 +16,10 @@ if [[ ! -z $NFS_HOME_SVC ]]; then
   echo "Done mounting NFS to /home"
 
   echo "Relocting jovyan from /tmp back to /home"
+  ls -lah /home
   sudo -u nobody mv /tmp/jovyan /home
   echo "Done relocting from /tmp back to /home"
+  ls -lah /home
 
   # handle home and working directory if the username changed
   # SHAWN: it seems like this block should come before the one below, but on upstream it doesnt?
@@ -27,9 +29,7 @@ if [[ ! -z $NFS_HOME_SVC ]]; then
       # (it could be mounted, and we shouldn't create it if it already exists)
       if [[ ! -e "/home/$NB_USER" ]]; then
           echo "Relocating home dir to /home/$NB_USER"
-	  ls -lah /home
           sudo -u nobody mv /home/jovyan "/home/$NB_USER" 
-	  ls -lah /home
           echo "Done relocating."
       fi
       # if workdir is in /home/jovyan, cd to /home/$NB_USER
