@@ -25,6 +25,8 @@ spec:
         securityContext:
           capabilities:
             add: ["SYS_ADMIN", "SETPCAP"]
+          runAsUser: 0
+          fsGroup: 0
         volumeMounts:
         - mountPath: "/nfsshare"   # it seems the shared dir must be a volume mount, see https://github.com/kubernetes/kubernetes/issues/19593#issuecomment-417106013
           name: pvol-{{ .Release.Name }}
