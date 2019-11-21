@@ -5,7 +5,7 @@ set -e
 
 
 mkdir -p $TARGET_DIR
-mount $NFS_SVC:/ $TARGET_DIR
+mount -o nolock $NFS_SVC:/ $TARGET_DIR
 
 while true; do
 	echo -e '\n'

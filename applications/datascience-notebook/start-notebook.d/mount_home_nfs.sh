@@ -9,17 +9,16 @@ if [[ ! -z $NFS_HOME_SVC ]]; then
 
   echo "Temporarily relocating /home/jovyan"
   mv /home/jovyan /tmp
-  echo "Done relocting /home/jovyan to /tmp"
+  echo "Done relocting /home/jovyan to /tmp" 
   
+
   echo "Mounting NFS to /home"
   mount -o soft $NFS_HOME_SVC:/ /home
   echo "Done mounting NFS to /home"
 
   echo "Relocting jovyan from /tmp back to /home"
-  ls -lah /home
   sudo -u nobody mv /tmp/jovyan /home
   echo "Done relocting from /tmp back to /home"
-  ls -lah /home
 
   # handle home and working directory if the username changed
   # SHAWN: it seems like this block should come before the one below, but on upstream it doesnt?

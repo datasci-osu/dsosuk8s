@@ -50,6 +50,7 @@ if [ $(id -u) == 0 ] ; then
         echo "Done setting username."
     fi
     
+    
   # handle home and working directory if the username changed
   # SHAWN: it seems like this block should come before the one below, but on upstream it doesnt?
   # TODO: see why this is
