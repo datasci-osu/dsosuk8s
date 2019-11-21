@@ -2,6 +2,8 @@
 set -e
  
 export_base="/nfsshare/"
+chown nobody:nogroup $export_base
+chmod 755 $export_base
 
 ### Handle `docker stop` for graceful shutdown
 function shutdown {
