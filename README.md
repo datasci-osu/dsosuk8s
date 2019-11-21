@@ -88,4 +88,23 @@ Starting `minikube` is relatively easy with `minikube start`, but this script ad
   * side note: why do this? kubernetes can be made to look for images locally rather than dockerhub or another remote repo if we specify `imagePullPolicy: Never` in the pod spec.
 * Lastly, sets the date properly within the VM to fix a bug with image pushing.
 
+#### manifests
+
+This directory contains kubernets .yaml manifest files and potentially other things, mostly used for testing or development where helm or rancher
+charts aren't a good fit. 
+
+#### charts
+
+This directory contains [rancher charts](https://rancher.com/docs/rancher/v2.x/en/catalog/custom/creating/), which contain different 
+versions of helm charts along with some extra information used by rancher (including GUI option design), 
+turning each chart into a rancher "app". Because this directory is named `charts`, this repo can be imported as a [custom catalog](https://rancher.com/docs/rancher/v2.x/en/catalog/custom/adding/) in
+rancher. 
+
+#### `.rancher-pipeline.yaml`
+
+Rancher provides a very basic CI/CD feature known as "pipelines", where rancher takes actions on things like commits to the git repo. 
+Configuration for these is written in this .yaml file by the rancher UI. 
+While a nice feature, they are currently not used by this project - juptyerhub deployments don't appear to be compatible with rancher
+pipelines (since jupyterhub wants to create cluster-wide ClusterRoles, which aren't allowed by pipelines), and until we're running
+an in-cluster image repo the turnaround is really slow, at which point we may as well look into more featureful CI/CD tools. 
 
