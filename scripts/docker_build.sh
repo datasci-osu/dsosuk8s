@@ -17,15 +17,18 @@ echo -e "\e[33mChecking build $TARGETDIR, looking for tag $IMAGENAME:$TAG.\e[0m"
 
 if ! grep -q -E 'build:[[:blank:]+]true' $TARGETDIR/ops/build_options.txt; then
   echo -e "\e[31mbuild: true not set in ops/build_options.txt for $TARGETDIR, skipping. \e[0m\n"
-  exit
+  exit 1
 fi
 
 if ! grep -q "$TAG" <(docker image ls); then
+  echo "Didn't find $TAG in:"
+  docker image ls
   echo -e "\e[32mBuilding $IMAGENAME:$TAG.\e[0m"
   docker build --rm=false -t $IMAGENAME:$TAG -f $TARGETDIR/Dockerfile $TARGETDIR
   docker tag $IMAGENAME:$TAG $IMAGENAME:latest
   echo -e "\e[32mBuilt $IMAGENAME:$TAG.\e[0m\n"
 else
   echo -e "\e[31m$TARGETDIR present, not building. \e[0m\n"
+  exit 1
 fi
 
