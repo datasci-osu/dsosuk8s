@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 
-if [[ ( $# != 1 ) && ( $# != 2 ) ]]; then
+if [[ $# != 1 ]]; then
   echo "Usage: docker_build.sh <directory_containing_dockerfile>"
   echo "Will only build if the image has changed (determined by md5summing the directory, sans the ops folder)"
   exit

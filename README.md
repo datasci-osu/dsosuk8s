@@ -45,4 +45,47 @@ This directory contains build and push scripts, and a few others for managing th
 abandoned minikube for now, as I ran into some likely bugs with `docker-desktop` for mac that was preventing me from building images
 inside the minikube VM, which is what I really wanted it for.)
 
+#### `docker_build.sh` et al.
+
+The `docker_build.sh` script takes as an argument a path to an `application-name` folder above to build. It computes the md5sum of that folders
+contents (sans the `ops` folder and its contents), using the first 8 characters as the tag we're looking to build. If 
+`ops/build_options.txt` does not specify `build: true`, *or* if an image
+with that tag already exists (in whichever machine running docker is setup, usually this will be the local machine, but could be minikube or
+something else; see minikube scripts below), then it skips the build and exits one (for flow-control use by other scripts). 
+If not, the image is built an tagged (and exit 0).
+
+The `docker_build_all.sh` script does what it says - it loops over the directories in `applications` and calls `docker_build.sh` on each.
+
+#### `docker_push.sh` et al.
+
+This script assumes that one is logged into a docker image repo such as DockerHub (with `docker login`). It runs similarly to 
+`docker_build.sh`, taking a path to an application directory. 
+
+Before pushing, it checks to see if `push: true` is set in `ops`, and it checks to see if the tag (determined again by the md5sum of the folder
+contents sans `ops`) is already present in the image repo; if either are the case the push is skipped (and the script exits 1), if not the 
+push is triggered (and the script exits 0). 
+
+Note that the script calls `docker manifest` see if the tag is already present in the repo, which requires that `"experimental": "enabled"`
+be set in `~/.docker/config.json` of the host running docker. 
+
+#### `helm_setup.sh`
+
+This is just a quick script that installs the server-side `helm` components into the current kubernetes cluster with `kubectl`, following
+the security patch recommended at [zero-to-jupyterhub-](https://zero-to-jupyterhub.readthedocs.io/en/latest/setup-jupyterhub/setup-helm.html). 
+
+#### `minikube_sourceme_start.sh` and `minikube_sourceme_stop.sh`
+
+Minikube is an application that runs a single-node kubernetes cluster inside of a VM on the local machine, installation instructions 
+[here](https://kubernetes.io/docs/tasks/tools/install-minikube/). 
+
+Starting `minikube` is relatively easy with `minikube start`, but this script adds a few extra niceties:
+
+* ensures that addons for ingress, default-storageclass, registry, and storage-provisioner are enabled
+* creates the VM with a specified kubernetes version (1.15.5), since kubernetes 1.16 isn't backward compatabible and not all of the files and dependencies in this repo have been migrated to support it
+* creates the VM with 4 cores and 4G RAM for more horsepower to build images
+* grabs the minikube VM's IP and adds it to the local /etc/host as `kubernetes.local` - this should allow local testing of ingress without a loadbalancer, but does require `sudo` to edit /etc/hosts (note, you may need to add an entry `kubernetes.local  127.0.0.1` to start with, need to test)
+* sets up docker to run the VM's docker so that builds and pushes happen within the VM
+  * side note: why do this? kubernetes can be made to look for images locally rather than dockerhub or another remote repo if we specify `imagePullPolicy: Never` in the pod spec.
+* Lastly, sets the date properly within the VM to fix a bug with image pushing.
+
 
