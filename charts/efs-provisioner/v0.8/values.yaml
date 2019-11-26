@@ -1,0 +1,4 @@
+efs-filesystem-id: ""
+efs-region: "us-west-2"
+efs-provisioner-name: "default-efs-provisioner"
+
