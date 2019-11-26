@@ -1,13 +1,7 @@
----
 apiVersion: v1
-kind: ConfigMap
+kind: ServiceAccount
 metadata:
   name: efs-provisioner
-data:
-  file.system.id: {{ .Values.efsFilesystemId }}
-  aws.region: {{ .Values.efsRegion }}
-  provisioner.name: {{ .Values.efsProvisionerName }}
-  dns.name: ""
 ---
 kind: Deployment
 apiVersion: extensions/v1beta1
@@ -22,6 +16,7 @@ spec:
       labels:
         app: efs-provisioner
     spec:
+      serviceAccount: efs-provisioner
       containers:
         - name: efs-provisioner
           image: quay.io/external_storage/efs-provisioner:latest
@@ -53,25 +48,5 @@ spec:
       volumes:
         - name: pv-volume
           nfs:
-            server: {{ .Values.efsFilesystemId }}.efs.{{ .Values.efsRegion }}.amazonaws.com
-            path: /
----
-kind: StorageClass
-apiVersion: storage.k8s.io/v1
-metadata:
-  name: aws-efs
-provisioner: example.com/aws-efs
----
-kind: PersistentVolumeClaim
-apiVersion: v1
-metadata:
-  name: efs
-  annotations:
-    volume.beta.kubernetes.io/storage-class: "aws-efs"
-spec:
-  accessModes:
-    - ReadWriteMany
-  resources:
-    requests:
-      storage: 1Mi
----
+            server: fs-47a2c22e.efs.us-west-2.amazonaws.com
+            path: /persistentvolumes

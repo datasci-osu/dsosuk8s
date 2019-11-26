@@ -1,21 +1,17 @@
-efs-filesystem-id: ""
-efs-region: "us-west-2"
-efs-provisioner-name: "default-efs-provisioner"
 questions:
-
-- variable: efs-filesystem-id
+- variable: efsFilesystemId
   default: ""
   description: "EFS Filesystem ID, e.g. fs-47a2c22e"
   type: string
   label: "Filesystem ID: "
   required: true
-- variable: efs-region
+- variable: efsRegion
   default: us-west-2
   description: "AWS Region of the cluster"
   type: string
   label: "Region: "
   required: true
-- variable: efs-provisioner-name
+- variable: efsProvisionerName
   default: default-efs-provisioner
   description: "Name of the provisioner"
   type: string
