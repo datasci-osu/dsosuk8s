@@ -1,14 +1,21 @@
 #!/bin/bash
 set -e
- 
+
+addgroup --gid 101 dsadmins
+adduser --no-create-home --uid 1001 --gid 101 --disabled-password --disabled-login --gecos "" dsadmin
+
 export_base="/nfsshare/"
-chown nobody:nogroup $export_base
-chmod 755 $export_base
+chown dsadmin:dsadmins $export_base
+chmod 775 $export_base
 
 ### Handle `docker stop` for graceful shutdown
 function shutdown {
     echo "- Shutting down nfs-server.."
     service nfs-kernel-server stop
+    # need to ensure unexport to get EBS vols to detach in kubernetes?
+    # ref: https://github.com/kubernetes/kubernetes/issues/52906#issuecomment-331639298
+    rm -rf /etc/exports
+    exportfs -Fu $export_base
     echo "- Nfs server is down"
     exit 0
 }

@@ -8,8 +8,8 @@ if [[ ( $# != 1 ) && ( $# != 2 ) ]]; then
   exit
 fi
 
-if ! grep -q '"experimental" : "enabled"' ~/.docker/config.json; then
-  echo 'Error: "experimental" : "enabled" must be set in ~/.docker/config.json (to check for already existing images)'
+if ! grep -q '"experimental": "enabled"' ~/.docker/config.json; then
+  echo 'Error: "experimental": "enabled" must be set in ~/.docker/config.json (to check for already existing images)'
   exit
 fi
 

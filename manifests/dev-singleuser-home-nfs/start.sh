@@ -1,8 +1,11 @@
 #!/bin/bash
 # Copyright (c) Jupyter Development Team.
 # Distributed under the terms of the Modified BSD License.
- 
+
 set -e
+
+echo "This is the default start.sh, *except* for swapping blocks A and B below" 
+echo "(original order seems like a bug, unless /home/NB_USER is already mounted in or NB_USER is set to the default of jovyan)"
 
 # Exec the specified command or fall back on bash
 if [ $# -eq 0 ]; then
@@ -10,7 +13,7 @@ if [ $# -eq 0 ]; then
 else
     cmd=( "$@" )
 fi
- 
+
 run-hooks () {
     # Source scripts or run executable files in a directory
     if [[ ! -d "$1" ]] ; then
@@ -41,57 +44,50 @@ run-hooks /usr/local/bin/start-notebook.d
 # Handle special flags if we're root
 if [ $(id -u) == 0 ] ; then
 
-    echo "Running custom start.sh"
-
     # Only attempt to change the jovyan username if it exists
     if id jovyan &> /dev/null ; then
         echo "Set username to: $NB_USER"
         usermod -d /home/$NB_USER -l $NB_USER jovyan
-        echo "Done setting username."
     fi
-    
-    
-  # handle home and working directory if the username changed
-  # SHAWN: it seems like this block should come before the one below, but on upstream it doesnt?
-  # TODO: see why this is
-  if [[ "$NB_USER" != "jovyan" ]]; then
-      # changing username, make sure homedir exists
-      # (it could be mounted, and we shouldn't create it if it already exists)
-      if [[ ! -e "/home/$NB_USER" ]]; then
-          echo "Relocating home dir to /home/$NB_USER"
-          cp -r /home/jovyan "/home/$NB_USER" 
-          echo "Done relocating."
-      fi
-      # if workdir is in /home/jovyan, cd to /home/$NB_USER
-      if [[ "$PWD/" == "/home/jovyan/"* ]]; then
-          newcwd="/home/$NB_USER/${PWD:13}"
-          echo "Setting CWD to $newcwd"
-          cd "$newcwd"
-          echo "Done setting CWD."
-      fi
-  fi
 
+    ####### block A
+    # handle home and working directory if the username changed
+    if [[ "$NB_USER" != "jovyan" ]]; then
+        # changing username, make sure homedir exists
+        # (it could be mounted, and we shouldn't create it if it already exists)
+        if [[ ! -e "/home/$NB_USER" ]]; then
+            echo "Relocating home dir to /home/$NB_USER"
+            mv /home/jovyan "/home/$NB_USER"
+        fi
+        # if workdir is in /home/jovyan, cd to /home/$NB_USER
+        if [[ "$PWD/" == "/home/jovyan/"* ]]; then
+            newcwd="/home/$NB_USER/${PWD:13}"
+            echo "Setting CWD to $newcwd"
+            cd "$newcwd"
+        fi
+    fi
+    ####### end block A
 
+    ####### block B
     # Handle case where provisioned storage does not have the correct permissions by default
     # Ex: default NFS/EFS (no auto-uid/gid)
     if [[ "$CHOWN_HOME" == "1" || "$CHOWN_HOME" == 'yes' ]]; then
         echo "Changing ownership of /home/$NB_USER to $NB_UID:$NB_GID with options '${CHOWN_HOME_OPTS}'"
         chown $CHOWN_HOME_OPTS $NB_UID:$NB_GID /home/$NB_USER
-	echo "Done changing ownership."
     fi
     if [ ! -z "$CHOWN_EXTRA" ]; then
         for extra_dir in $(echo $CHOWN_EXTRA | tr ',' ' '); do
             echo "Changing ownership of ${extra_dir} to $NB_UID:$NB_GID with options '${CHOWN_EXTRA_OPTS}'"
             chown $CHOWN_EXTRA_OPTS $NB_UID:$NB_GID $extra_dir
-	    echo "Done changing ownership (CHOWN_EXTRA)."
         done
     fi
+    ####### end block B
+
 
     # Change UID of NB_USER to NB_UID if it does not match
     if [ "$NB_UID" != $(id -u $NB_USER) ] ; then
         echo "Set $NB_USER UID to: $NB_UID"
         usermod -u $NB_UID $NB_USER
-	echo "Done setting $NB_USER UID."
     fi
 
     # Set NB_USER primary gid to NB_GID (after making the group).  Set
@@ -100,14 +96,12 @@ if [ $(id -u) == 0 ] ; then
         echo "Add $NB_USER to group: $NB_GID"
         groupadd -g $NB_GID -o ${NB_GROUP:-${NB_USER}}
         usermod  -g $NB_GID -aG 100 $NB_USER
-	echo "Done adding $NB_USER to group."
     fi
 
     # Enable sudo if requested
     if [[ "$GRANT_SUDO" == "1" || "$GRANT_SUDO" == 'yes' ]]; then
         echo "Granting $NB_USER sudo access and appending $CONDA_DIR/bin to sudo PATH"
         echo "$NB_USER ALL=(ALL) NOPASSWD:ALL" > /etc/sudoers.d/notebook
-	echo "Done granting sudo."
     fi
 
     # Add $CONDA_DIR/bin to sudo secure_path
@@ -118,7 +112,6 @@ if [ $(id -u) == 0 ] ; then
     run-hooks /usr/local/bin/before-notebook.d
     echo "Executing the command: ${cmd[@]}"
     exec sudo -E -H -u $NB_USER PATH=$PATH XDG_CACHE_HOME=/home/$NB_USER/.cache PYTHONPATH=${PYTHONPATH:-} "${cmd[@]}"
-    echo "Done executing."
 else
     if [[ "$NB_UID" == "$(id -u jovyan)" && "$NB_GID" == "$(id -g jovyan)" ]]; then
         # User is not attempting to override user/group via environment
@@ -133,7 +126,6 @@ else
                 echo "jovyan:x:$(id -u):$(id -g):,,,:/home/jovyan:/bin/bash" >> /tmp/passwd
                 cat /tmp/passwd > /etc/passwd
                 rm /tmp/passwd
-		echo "Done adding passwd file entry."
             else
                 echo 'Container must be run with group "root" to update passwd file'
             fi
