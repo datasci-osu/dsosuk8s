@@ -38,6 +38,7 @@ kind: PersistentVolumeClaim
 metadata:
   name: pvclaim-{{ .Release.Name }}
 spec:
+  storageClassName: default
   accessModes: 
   - ReadWriteOnce
   resources: 
