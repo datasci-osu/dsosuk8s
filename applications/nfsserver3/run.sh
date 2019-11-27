@@ -28,7 +28,7 @@ echo "Export points:"
 # and local kube dns won't resolve outside of namespace (good), but
 # it may still be possible to address by nfssvc.namespace.svc.cluster.local - 
 # this is probably ok (even preferred) if allowed within project, but not between projects. 
-echo "$export_base *(rw,sync,insecure,fsid=0,no_subtree_check)" | tee /etc/exports
+echo "$export_base *(rw,sync,insecure,fsid=0,no_subtree_check,no_root_squash)" | tee /etc/exports
 
 
 echo -e "\n- Initializing nfs server.."

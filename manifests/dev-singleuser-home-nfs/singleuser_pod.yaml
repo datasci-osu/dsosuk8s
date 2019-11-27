@@ -26,6 +26,8 @@ spec:
     env:
       - name: NFS_SVC
         value: "nfsdrive"
+      - name: NB_USER
+        value: juser
     securityContext:
       runAsUser: 0
       capabilities:

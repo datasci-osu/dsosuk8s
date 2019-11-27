@@ -65,3 +65,8 @@ echo -e "\e[33mwatch kubectl get all -n $DIRNAME\e[0m"
 echo ""
 echo -e "\e[32mOr get a shell to the pod\e[0m"
 echo -e "\e[33mkubectl exec -it pod/singleuser-pod -n $DIRNAME bash\e[0m"
+echo ""
+echo -e "\e[32mOr, if the notebook server is running, access it via port-forwarding:\e[0m"
+echo -e "\e[33mkubectl port-forward pod/singleuser-pod 8888:8888 -n $DIRNAME\e[0m"
+echo -e "\e[32mAnd then follow the link provided by kubectl logs (http://127.0.0.1:8888/?token=f7154d...)\e[0m"
+
