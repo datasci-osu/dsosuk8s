@@ -10,7 +10,7 @@ echo "Checking for nfs mount request"
 if [[ ! -z $NFS_SVC ]]; then
   # the container starts with only the user jovyan (UID 1000) and group users (GID 100)
   # we start by creating an admin-level user and group (user may not be necessary, group is)
-  # still TODO: get dsadmins group added to users logging in if they are jupyterhub admins (controlled by jupyterhub seperately)
+  # still TODO: get dsadmins group added to users logging in, if they are listed as jupyterhub admins (controlled by jupyterhub seperately)
   addgroup --gid 101 dsadmins
   adduser --no-create-home --uid 1001 --gid 101 --disabled-password --disabled-login --gecos "" dsadmin
   adduser dsadmin users
@@ -25,7 +25,7 @@ if [[ ! -z $NFS_SVC ]]; then
   #rm -rf /home/jovyan /home/$NB_USER /home/admin_config            # just for debugging, clean out previous writes and start fresh 
 
   # set UID to psuedorandom number in range 2000 -- 2^30 using some bash and modulus tricks
-  # TODO: use a scheme that picks a random number not in use within $ADMIN_HOME_DIR/automanaged/etc_passwd_additions (below) to avoid UID collisions
+  # TODO: use a scheme that picks a random number not in use within $ADMIN_HOME_DIR/automanaged/etc_passwd_additions (below) to avoid UID collisions, incredibly rare though they may be
   BIG=1073741824
   PSEUDO=$(md5sum <<< "$NB_USER")
   NB_UID=$(( (((0x${PSEUDO%% *} % $BIG) + $BIG) % $BIG) + 2000))
@@ -40,7 +40,7 @@ if [[ ! -z $NFS_SVC ]]; then
     chown 1000:dsadmins /tmp/jovyan
     chmod -R 770 /tmp/jovyan                        # make sure we have group read on everything, some aren't in the .npm cache dir
     # re-own inner contents
-    chown -R 1000:100 /tmp/jovyan/.??*                        # chown dotfiles, TODO: won't work with .a or other single-letter dotfiles
+    chown -R 1000:100 /tmp/jovyan/.??*                        # chown dotfiles, TODO: this simple cmd won't work with .a or other single-letter dotfiles (not a problem in current docker image, but just to be safe)
     chown -R 1000:100 /tmp/jovyan/*                           # chown others
     echo 'unset XDG_RUNTIME_DIR' >> /tmp/jovyan/.bashrc       # this junk: https://github.com/jupyter/notebook/issues/1318
 
@@ -50,7 +50,7 @@ if [[ ! -z $NFS_SVC ]]; then
   # all done - remove /tmp staging  
   rm -rf /tmp/jovyan            # clean up /tmp staging
 
-  # same thing as above, for the actual user (TODO: split various parts of this script out, reduce redundancy)
+  # same thing as above, for the actual user (TODO: split various parts of this big script out to subscripts and reduce redundancy)
   if [[ ! -d /home/$NB_USER ]]; then
     chown $NB_UID:dsadmins /tmp/$NB_USER 
     chmod -R 770 /tmp/$NB_USER                      
