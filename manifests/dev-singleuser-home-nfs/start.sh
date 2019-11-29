@@ -4,8 +4,8 @@
 
 set -e
 
-echo "this script is a modification of the default jupyter-stack base-notebook start.sh - \
-  we make the assumption the container is started as root calls out to scripts \
+echo "this script is a modification of the default jupyter-stack base-notebook start.sh; \
+  we make the assumption the container is started as root; this calls out to scripts \
   in /usr/local/etc/start-notebook.d/ to do various setups before spawning the notebook \
   server as the user."
 

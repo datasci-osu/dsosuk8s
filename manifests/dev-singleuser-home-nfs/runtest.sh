@@ -49,7 +49,7 @@ fi
 # the pod definition mounts the configmaps to the right location in the filesystem - this way 
 # we don't have to rebuild/repush/repull the image every time
 kubectl create configmap --dry-run start --from-file=./start.sh --output yaml | kubectl apply -n $DIRNAME -f - 
-kubectl create configmap --dry-run mount-nfs --from-file=./mount_nfs.sh --output yaml | kubectl apply -n $DIRNAME -f -
+kubectl create configmap --dry-run start-notebook-d --from-file=./start-notebook.d --output yaml | kubectl apply -n $DIRNAME -f -
 
 # delete and recreate pod to get the new configmaps 
 # (it may be enough to just apply, but in case something changed in the singleuser_pod.yaml

@@ -9,17 +9,16 @@ spec:
    - name: start-vol
      configMap:
        name: start
-   - name: mount-nfs-vol
+   - name: start-notebook-d-vol
      configMap:
-       name: mount-nfs
+       name: start-notebook-d
   containers:
   - name: jh-container
     image: oneilsh/ktesting-base-notebook:latest
     imagePullPolicy: Always
     volumeMounts:
-    - mountPath: /usr/local/bin/start-notebook.d/mount_nfs.sh
-      subPath: mount_nfs.sh
-      name: mount-nfs-vol
+    - mountPath: /usr/local/bin/start-notebook.d/
+      name: start-notebook-d-vol
     - mountPath: /usr/local/bin/start.sh
       subPath: start.sh
       name: start-vol
