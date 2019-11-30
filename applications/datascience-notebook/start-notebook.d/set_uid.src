@@ -5,5 +5,5 @@ BIG=1073741824
 PSEUDO=$(md5sum <<< "$NB_USER")
 NB_UID=$(( (((0x${PSEUDO%% *} % $BIG) + $BIG) % $BIG) + 2000))
 
-echo "Attempting adduser $NB_USER with UID $NB_UID"
-adduser --shell /bin/bash --no-create-home --uid $NB_UID --gecos "" --group users --gid 100 $NB_UID
+#echo "Attempting adduser $NB_USER with UID $NB_UID"
+#adduser --shell /bin/bash --no-create-home --uid $NB_UID --gecos "" --group users --gid 100 $NB_UID

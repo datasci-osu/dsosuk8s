@@ -69,9 +69,11 @@ jupyterhub:
           @gen.coroutine
           def pre_spawn_start(self, user, spawner):
             spawner.environment['NB_USER'] = user.name
+            #spawner.environment['ADMIN_USERS'] = ",".join(c.Authenticator.admin_users)
             #spawner.environment['NB_UID'] = "1000"
             #spawner.environment['GRANT_SUDO'] = "yes"
         
         c.JupyterHub.authenticator_class = DummyExtraAuthenticator
-
+        c.Authenticator.admin_users = {'oneils'}
+        c.JupyterHub.admin_access = True
 
