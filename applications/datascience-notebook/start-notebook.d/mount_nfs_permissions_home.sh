@@ -19,6 +19,15 @@ if [[ ! -z $NFS_SVC_HOME ]]; then
   source /usr/local/bin/start-notebook.d/check_jovyan.src
   source /usr/local/bin/start-notebook.d/check_admin_config.src
 
+  # ADMIN_USER is set by the chart's values.yaml depending on whether the user is listed as an admin in jupyterhub
+  # everything should be setup before we try to do this (or else "user not found" error)
+  if [ "$ADMIN_USER" = "True" ]; then
+    adduser $NB_USER dsadmins
+  fi
+  # no matter what add users group; these need to be done to get the entries in /etc/groups, that way permissions
+  # work properly (UID/GID in /etc/passwd isn't enough)
+  adduser $NB_USER users
+
   # go the new dir rather than leaving CWD to be the no-longer existing original
   cd /home/$NB_USER
 fi

@@ -6,10 +6,3 @@ addgroup --gid 101 dsadmins
 adduser --no-create-home --uid 1001 --gid 101 --disabled-password --disabled-login --gecos "" dsadmin
 adduser dsadmin users
 
-# ADMIN_USER is set by the chart's values.yaml depending on whether the user is listed as an admin in jupyterhub
-if [ "$ADMIN_USER" = "True" ]; then
-  adduser $NB_USER dsadmins
-fi
-
-
-
