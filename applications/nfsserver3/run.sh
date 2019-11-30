@@ -14,6 +14,7 @@ function shutdown {
     service nfs-kernel-server stop
     # need to ensure unexport to get EBS vols to detach in kubernetes?
     # ref: https://github.com/kubernetes/kubernetes/issues/52906#issuecomment-331639298
+    # nevermind, doesn't seem to work; still doesn't hurt to clean up I suppose
     rm -rf /etc/exports
     exportfs -Fu $export_base
     echo "- Nfs server is down"
