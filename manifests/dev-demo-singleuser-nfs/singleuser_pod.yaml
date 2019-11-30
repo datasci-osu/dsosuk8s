@@ -1,0 +1,32 @@
+apiVersion: v1
+kind: Pod
+metadata:
+  name: singleuser-pod
+  labels:
+    app: jh
+spec:
+  volumes:
+   - name: start-vol
+     configMap:
+       name: start
+   - name: mount-nfs-vol
+     configMap:
+       name: mount-nfs
+  containers:
+  - name: jh-container
+    image: oneilsh/ktesting-base-notebook:latest
+    imagePullPolicy: Always
+    volumeMounts:
+    - mountPath: /usr/local/bin/start-notebook.d/mount_nfs.sh
+      subPath: mount_nfs.sh
+      name: mount-nfs-vol
+    - mountPath: /usr/local/bin/start.sh
+      subPath: start.sh
+      name: start-vol
+    env:
+      - name: NFS_SVC
+        value: "nfsdrive"
+    securityContext:
+      runAsUser: 0
+      capabilities:
+        add: ["SYS_ADMIN"]

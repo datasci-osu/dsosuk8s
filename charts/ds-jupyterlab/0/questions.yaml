@@ -1,6 +1,11 @@
 categories:
 - DataScience
 questions:
+- variable: jupyterhub.singleuser.extraEnv.NFS_SVC_HOME
+  default: ""
+  description: "Drive to use for home folders."
+  type: string
+  label: "/home Drive"
 - variable: jupyterhub.singleuser.memory.limit
   default: "2G"
   description: "Memory limit, per student."

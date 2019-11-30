@@ -1,4 +1,4 @@
-apiVersion: apps/v1beta2
+apiVersion: apps/v1
 kind: Deployment
 metadata:
   name: nfs-{{ .Release.Name }}-dep
@@ -20,10 +20,13 @@ spec:
           claimName: pvclaim-{{ .Release.Name }}
       containers:
       - name: nfs
-        image: oneilsh/ktesting-nfsserver3
+        image: oneilsh/ktesting-nfsserver3:latest
+        imagePullPolicy: Always # specifying :latest should do this as well, but i'm feeling paranoid
         securityContext:
           capabilities:
             add: ["SYS_ADMIN", "SETPCAP"]
+          runAsUser: 0
+          fsGroup: 0
         volumeMounts:
         - mountPath: "/nfsshare"   # it seems the shared dir must be a volume mount, see https://github.com/kubernetes/kubernetes/issues/19593#issuecomment-417106013
           name: pvol-{{ .Release.Name }}

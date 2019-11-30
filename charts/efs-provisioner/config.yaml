@@ -1,0 +1,4 @@
+name: EFS-Provisioner
+description: Spawns an EFS Provisioner based on https://github.com/kubernetes-incubator/external-storage/tree/master/aws/efs
+version: 0.8
+maintainer: github.com/oneilsh

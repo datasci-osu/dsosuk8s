@@ -1,0 +1,6 @@
+# move things to /tmp to work on since we'll be NFS mounting over /home
+# make a copy of the jovyan home to $NB_USER HOME
+
+mv /home/jovyan /tmp/jovyan                                    
+cp -r /tmp/jovyan /tmp/$NB_USER                                # keep a token jovyan around for debugging/testing
+
