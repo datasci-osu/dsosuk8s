@@ -67,7 +67,7 @@ jupyterhub:
         class DummyExtraAuthenticator(DummyAuthenticator):
           
           @gen.coroutine
-          def pre_spawn_start(self, user, spawner)
+        def pre_spawn_start(self, user, spawner):
             # for use by scripts in start-notebook.d
             # NB_USER is the username logged in with
             # ADMIN_USER is "True" if they're an admin, "False" otherwise
