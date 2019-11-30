@@ -1,5 +1,5 @@
 # mount the NFS, soft mount in case the server hiccups (to prevent user pods from going zombie), but 10 second timeout to prevent potential issues (based on recs for EFS, which I'd guess generalize? https://docs.aws.amazon.com/efs/latest/ug/mounting-fs-nfs-mount-settings.html)
 
-mount -o soft,timeo=100 $NFS_SVC:/ /home
+mount -o soft,timeo=100 $NFS_SVC_HOME:/ /home
 #rm -rf /home/jovyan /home/$NB_USER /home/admin_config            # just for debugging, clean out previous writes and start fresh 
 
