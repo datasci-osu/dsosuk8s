@@ -69,7 +69,7 @@ jupyterhub:
           @gen.coroutine
           def pre_spawn_start(self, user, spawner):
             spawner.environment['NB_USER'] = user.name
-            spawner.environment['ADMIN_USER'] = user.admin
+            spawner.environment['ADMIN_USER'] = str(user.admin)
             #spawner.environment['NB_UID'] = "1000"
             #spawner.environment['GRANT_SUDO'] = "yes"
         
