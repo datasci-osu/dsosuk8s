@@ -30,8 +30,8 @@ jupyterhub:
       type: none
     extraEnv:
       NFS_HOME_SVC: ""
-      CHOWN_HOME: "yes"
-      CHOWN_HOME_OPTS: '-R'
+      #CHOWN_HOME: "yes"
+      #CHOWN_HOME_OPTS: '-R'
     uid: 0
     fsGid: 0
 
@@ -69,8 +69,9 @@ jupyterhub:
           @gen.coroutine
           def pre_spawn_start(self, user, spawner):
             spawner.environment['NB_USER'] = user.name
-            spawner.environment['NB_UID'] = "1000"
-            spawner.environment['GRANT_SUDO'] = "yes"
+            #spawner.environment['NB_UID'] = "1000"
+            #spawner.environment['GRANT_SUDO'] = "yes"
         
         c.JupyterHub.authenticator_class = DummyExtraAuthenticator
+
 

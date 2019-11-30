@@ -1,0 +1,18 @@
+# sets permissions for user directory for 'classroom' access - admins read/write everywhere, users read/write in their home dirs only and explicit shared spaces
+# see detailed nodes in check_jovyan.sh (which does the same thing, but for the default "jovyan" user
+
+if [[ ! -d /home/$NB_USER ]]; then
+  chown $NB_UID:dsadmins /tmp/$NB_USER 
+  chmod -R 770 /tmp/$NB_USER                      
+  
+  chown -R $NB_UID:100 /tmp/$NB_USER/.??* 
+  chown -R $NB_UID:100 /tmp/$NB_USER/* 
+  
+  echo 'unset XDG_RUNTIME_DIR' >> /tmp/$NB_USER/.bashrc 
+
+  cp -a /tmp/$NB_USER /home
+fi
+  
+rm -rf /tmp/$NB_USER
+
+
