@@ -4,6 +4,7 @@ This repo is a heavy work in progress, containing customized kubernetes-based ju
 
 ## Prereqs
 
+
 This repo assumes the local machine has installed [`kubectl`](https://kubernetes.io/docs/tasks/tools/install-kubectl/), 
 the local [`helm` client](https://helm.sh/docs/intro/install/), and `docker` (on mac, [`docker-desktop`](https://hub.docker.com/editions/community/docker-ce-desktop-mac)).
 
