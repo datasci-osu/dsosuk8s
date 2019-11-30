@@ -66,16 +66,16 @@ jupyterhub:
 
         class DummyExtraAuthenticator(DummyAuthenticator):
           
-        @gen.coroutine
-        def pre_spawn_start(self, user, spawner):
-            # for use by scripts in start-notebook.d
-            # NB_USER is the username logged in with
-            # ADMIN_USER is "True" if they're an admin, "False" otherwise
-            spawner.environment['NB_USER'] = user.name
-            spawner.environment['ADMIN_USER'] = str(user.admin)
-            # below for debugging
-            #spawner.environment['NB_UID'] = "1000"
-            #spawner.environment['GRANT_SUDO'] = "yes"
+            @gen.coroutine
+            def pre_spawn_start(self, user, spawner):
+                # for use by scripts in start-notebook.d
+                # NB_USER is the username logged in with
+                # ADMIN_USER is "True" if they're an admin, "False" otherwise
+                spawner.environment['NB_USER'] = user.name
+                spawner.environment['ADMIN_USER'] = str(user.admin)
+                # below for debugging
+                #spawner.environment['NB_UID'] = "1000"
+                #spawner.environment['GRANT_SUDO'] = "yes"
         
         c.JupyterHub.authenticator_class = DummyExtraAuthenticator
         c.Authenticator.admin_users = {'oneils'}
