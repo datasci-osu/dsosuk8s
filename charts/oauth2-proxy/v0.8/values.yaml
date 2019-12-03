@@ -7,4 +7,6 @@ oauth2-proxy:
       path: /
       hosts:
       - oauth2.dsosu.us
-    httpScheme: http
+    httpScheme: https
+    extraArgs:
+      http-address: "0.0.0.0:4180"
