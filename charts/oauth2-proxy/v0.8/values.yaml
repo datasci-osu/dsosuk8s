@@ -4,7 +4,7 @@ oauth2-proxy:
     existingSecret: ""
     ingress:
       enabled: true
-      path: /
+      path: /oauth2
       hosts:
       - oauth2.dsosu.us
     httpScheme: https
