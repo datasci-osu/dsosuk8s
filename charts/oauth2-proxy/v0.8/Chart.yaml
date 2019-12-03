@@ -1,0 +1,6 @@
+name: oauth2-proxy
+version: 0.8
+appVersion: 4.0.0
+description: Proxy for oauth2 connections built on https://github.com/helm/charts/tree/master/stable/oauth2-proxy.
+icon: file://../icon.svg
+engine: gotpl

@@ -1,0 +1,7 @@
+questions:
+- variable: oauth2-proxy.config.existingSecret
+  default: ""
+  description: "Name of secret (Resources -> Secrets) containing values for clientSecret, clientId, and cookieSecret. Create cookieSecret with 'openssl rand -base64 32', others come from oauth provider."
+  type: string
+  label: "Secret Name: "
+  required: true

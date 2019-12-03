@@ -1,0 +1,4 @@
+name: OAuth2-Proxy
+description: Proxy for Oauth2, based on https://github.com/helm/charts/tree/master/stable/oauth2-proxy.
+version: 0.8
+maintainer: github.com/oneilsh

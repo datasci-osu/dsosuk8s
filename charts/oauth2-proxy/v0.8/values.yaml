@@ -1,0 +1,9 @@
+
+oauth2-proxy:
+  config:
+    existingSecret: ""
+    ingress:
+      enabled: true
+      path: /
+      hosts:
+      - oauth2.dsosu.us
