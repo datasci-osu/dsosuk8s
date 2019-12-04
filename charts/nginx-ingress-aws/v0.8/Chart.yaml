@@ -1,0 +1,6 @@
+name: nginx-ingress-aws
+version: 0.8
+appVersion: 0.26.1
+description: Nginx ingress controller built on https://github.com/helm/charts/blob/master/stable/nginx-ingress, with patch for AWS per https://github.com/kubernetes/ingress-nginx/blob/master/deploy/aws/l7/service-l7.yaml. 
+icon: file://../icon.png
+engine: gotpl

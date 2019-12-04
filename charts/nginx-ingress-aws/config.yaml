@@ -1,0 +1,4 @@
+name: nginx-ingress-aws
+description: Nginx Ingress Controller, based on https://github.com/helm/charts/tree/master/stable/nginx-ingress with patch for AWS.
+version: 0.8
+maintainer: github.com/oneilsh
