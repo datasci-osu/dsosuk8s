@@ -12,5 +12,5 @@ oauth2-proxy:
       whitelist-domain: .dsosu.us
       cookie-domain: .dsosu.us
       http-address: 0.0.0.0:4180
-    #service:
-    #  port: 443
+    service:
+      port: 443
