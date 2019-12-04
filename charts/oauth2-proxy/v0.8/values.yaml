@@ -11,5 +11,6 @@ oauth2-proxy:
     extraArgs:
       whitelist-domain: .dsosu.us
       cookie-domain: .dsosu.us
-    service:
-      port: 443
+      http-address: 0.0.0.0:4180
+    #service:
+    #  port: 443
