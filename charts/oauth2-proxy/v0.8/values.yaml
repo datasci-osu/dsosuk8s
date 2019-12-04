@@ -7,7 +7,11 @@ oauth2-proxy:
       path: /oauth2
       hosts:
       - oauth2.dsosu.us
-    httpScheme: https
+      annotations:
+        ingress.kubernetes.io/ssl-proxy-headers: "X-Forwarded-Proto: https"
+        ingress.kubernetes.io/ssl-redirect: "true"
+        kubernetes.io/ingress.class: traefik
+  httpScheme: https
     extraArgs:
       whitelist-domain: .dsosu.us
       cookie-domain: .dsosu.us
