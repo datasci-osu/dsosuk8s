@@ -7,7 +7,9 @@ oauth2-proxy:
       path: /oauth2
       hosts:
       - oauth2.dsosu.us
-    httpScheme: http
+    httpScheme: https
     extraArgs:
       whitelist-domain: .dsosu.us
       cookie-domain: .dsosu.us
+    service:
+      port: 443
