@@ -12,5 +12,19 @@ oauth2-proxy:
       whitelist-domain: .dsosu.us
       cookie-domain: .dsosu.us
       http-address: 0.0.0.0:4180
-    service:
-      port: 443
+      #provider: oidc
+      redirect-url: https://oauth2.dsosu.us/oauth2/callback
+      #oidc-issuer-url: https://dex.example.org/
+      cookie-secure: false
+      email-domain: "*"
+      #cookie-domain: .example.org
+      pass-access-token: true
+      pass-authorization-header: true
+      skip-provider-button: false
+      #whitelist-domain: .example.org
+      #http-address: 0.0.0.0:4180
+      set-authorization-header: true
+      set-xauthrequest: true
+      skip-auth-preflight: false
+    #service:
+    #  port: 443
