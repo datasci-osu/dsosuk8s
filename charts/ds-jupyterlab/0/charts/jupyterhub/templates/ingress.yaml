@@ -32,7 +32,7 @@ spec:
             backend:
               serviceName: proxy-public
               servicePort: 80
-      host: eksdevc.dsosu.us
+      host: "eksdevc.dsosu.us"
   {{- if .Values.ingress.tls }}
   tls:
     {{- .Values.ingress.tls | toYaml | trimSuffix "\n" | nindent 4 }}
