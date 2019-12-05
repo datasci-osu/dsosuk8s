@@ -28,7 +28,7 @@ spec:
     #- host: {{ .Release.Name }}.{{ .Release.Namespace }}.{{ .Values.ingress.domain }}
     - http:
         paths:
-          - path: /{{ .Release.Namespace }}/{{ .Release.Name }}{{ $.Values.hub.baseUrl }}{{ $.Values.ingress.pathSuffix }}
+          - path: {{ $.Values.hub.baseUrl }}{{ $.Values.ingress.pathSuffix }}/{{ .Release.Namespace }}/{{ .Release.Name }}
             backend:
               serviceName: proxy-public
               servicePort: 80
