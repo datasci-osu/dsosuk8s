@@ -1,12 +1,10 @@
 nginx-ingress:
   controller:
     config:
-      use-proxy-protocol: "False"
-      use-forwarded-headers: "True"
+      use-proxy-protocol: "false"
+      use-forwarded-headers: "true"
       proxy-real-ip-cidr: "0.0.0.0/0" # restrict this to the IP addresses of ELB 
-      #ssl-redirect: "true"
-      # per https://github.com/nginxinc/kubernetes-ingress/issues/358#issuecomment-418973875
-      redirect-to-https: "True"
+      force-ssl-redirect: "true"
       proxy-connect-timeout: "3600s"
       proxy-read-timeout: "3600s"
     service:
