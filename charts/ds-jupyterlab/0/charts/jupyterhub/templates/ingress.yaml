@@ -28,7 +28,8 @@ spec:
     #- host: {{ .Release.Name }}.{{ .Release.Namespace }}.{{ .Values.ingress.domain }}
     - http:
         paths:
-          - path: {{ $.Values.hub.baseUrl }}{{ $.Values.ingress.pathSuffix }}/{{ .Release.Namespace }}/{{ .Release.Name }}
+          # assumes assumes {{ $.Values.hub.baseUrl }}{{ $.Values.ingress.pathSuffix }} ends with a / (which is default)
+          - path: {{ $.Values.hub.baseUrl }}{{ $.Values.ingress.pathSuffix }}{{ .Release.Namespace }}/{{ .Release.Name }}
             backend:
               serviceName: proxy-public
               servicePort: 80
