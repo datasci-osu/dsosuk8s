@@ -4,6 +4,7 @@ nginx-ingress:
       use-proxy-protocol: "false"
       use-forwarded-headers: "true"
       proxy-real-ip-cidr: "0.0.0.0/0" # restrict this to the IP addresses of ELB 
+      ssl-redirect: true
     service:
       annotations:
         service.beta.kubernetes.io/aws-load-balancer-ssl-cert: arn:aws:acm:XX-XXXX-X:XXXXXXXXX:certificate/XXXXXXXX-XXXX-XXXX-XXXX-XXXXXXXXXX
