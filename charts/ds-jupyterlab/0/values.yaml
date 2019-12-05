@@ -6,9 +6,10 @@ jupyterhub:
   
   scheduling:
     userScheduler:
-      # TODO: userScheduler wants some cluster-wide priveledges to work, turning off for now
-      # this will likely result in less efficient resource utilization, cost undetermined
-      enabled: false 
+      enabled: true
+    userPods:
+      nodeAffinity:
+        matchNodePurpose: require
   proxy:
     # TODO: don't hard code this; either generate psuedo-randomly, or ask user for salt and generate
     secretToken: "78767972dd3d0db5a98fb56554f4484daa57bc35bd73dc61aafebed8ac9fe3df"
@@ -38,7 +39,7 @@ jupyterhub:
 
   ingress:
     enabled: true
-    domain: dsosu.us
+    #domain: dsosu.us
 
   hub:
     baseUrl: /
