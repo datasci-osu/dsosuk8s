@@ -208,5 +208,5 @@ spec:
           #     port: hub
           readinessProbe:
             httpGet:
-              path: {{ .Values.hub.baseUrl }}hub/health
+              path: /{{ .Release.Namespace }}/{{ .Release.Name }}/{{ .Values.hub.baseUrl }}hub/health
               port: hub
