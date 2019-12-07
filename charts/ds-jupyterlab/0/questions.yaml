@@ -17,13 +17,13 @@ questions:
   description: "Memory gaurantee per student."
   type: string
   label: "Memory Gaurantee"
-- variable: jupyterhub.singleuser.cpu.limit
-  default: 1
-  description: "CPU limit per student."
-  type: int
-  label: "CPU Limit"
+  #- variable: jupyterhub.singleuser.cpu.limit
+  #default: 1
+  #description: "CPU limit per student."
+  #type: int
+  #label: "CPU Limit"
 - variable: jupyterhub.hub.extraEnv.ADMIN_USERS
-  default: "oneilsh, smithj"
+  default: "oneils, smithj"
   type: string
   label: "Admins"
   description: "Usernames with administrator access, comma-separated"
