@@ -29,7 +29,7 @@ questions:
   description: "Usernames with administrator access, comma-separated"
   required: true
 - variable: keysalt
-  type: password
+  type: string
   label: "Token Salt"
   description: "This is used to secure internal traffic. A few random characters will do - you won't even need to remember them (but don't share them!)"
   required: true
