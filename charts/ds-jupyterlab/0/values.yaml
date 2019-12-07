@@ -6,7 +6,7 @@ jupyterhub:
   
   scheduling:
     userScheduler:
-      enabled: true
+      enabled: false
     userPods:
       nodeAffinity:
         matchNodePurpose: require
@@ -82,6 +82,7 @@ jupyterhub:
         admin_users_comma_sep = os.environ["ADMIN_USERS"]  # grab admin usernames from environment variable set in questions.yaml
         print(admin_users_comma_sep)
         admin_users = set([entry.strip() for entry in admin_users_comma_sep.split(",")]) # split it into a set to use
+        print(admin_users)
         c.Authenticator.admin_users = admin_users
         c.JupyterHub.admin_access = True
 
