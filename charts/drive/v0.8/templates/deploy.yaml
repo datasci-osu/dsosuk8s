@@ -15,7 +15,7 @@ spec:
         app: nfs-{{ .Release.Name }}-pod
     spec:
       nodeSelector:
-        volatile: false   # require non-volatile nodes (won't be autoscaled out frequently, as this will disrupt service to this drive)
+        volatile: "false"   # require non-volatile nodes (won't be autoscaled out frequently, as this will disrupt service to this drive)
       volumes:
       - name: pvol-{{ .Release.Name }}
         persistentVolumeClaim:

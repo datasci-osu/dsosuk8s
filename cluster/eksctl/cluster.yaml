@@ -39,7 +39,7 @@ nodeGroups:
     labels: 
       role: jhcontrolplane
       # the "volatile" flag indicates whether nodes may come and go frequently - for the control plane, this is false
-      volatile: false
+      volatile: "false"
     tags:
       nodegroup-role: jhcontrolplane
 
@@ -52,7 +52,7 @@ nodeGroups:
     ###availabilityZones: ["us-west-2a", "us-west-2b", "us-west-2c"]
     labels: 
       role: workers
-      volatile: true
+      volatile: "true"
       hub.jupyter.org/node-purpose: user
     taints:
       hub.jupyter.org/dedicated: user:NoSchedule
