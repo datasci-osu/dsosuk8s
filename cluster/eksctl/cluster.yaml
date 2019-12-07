@@ -27,7 +27,7 @@ nodeGroups:
     instanceType: t3.large
     availabilityZones: ["us-west-2b"]
     minSize: 2
-    maxSize: 3
+    maxSize: 2
     desiredCapacity: 2
     volumeSize: 20
     # to allow ssh into the nodes
@@ -38,6 +38,8 @@ nodeGroups:
     #  sourceSecurityGroupIds: ["sg-00241fbb12c607007"]
     labels: 
       role: jhcontrolplane
+      # the "volatile" flag indicates whether nodes may come and go frequently - for the control plane, this is false
+      volatile: false
     tags:
       nodegroup-role: jhcontrolplane
 
@@ -50,6 +52,7 @@ nodeGroups:
     ###availabilityZones: ["us-west-2a", "us-west-2b", "us-west-2c"]
     labels: 
       role: workers
+      volatile: true
       hub.jupyter.org/node-purpose: user
     taints:
       hub.jupyter.org/dedicated: user:NoSchedule
