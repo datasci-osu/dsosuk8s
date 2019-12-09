@@ -27,7 +27,7 @@ jupyterhub:
       tag: latest
       pullPolicy: Always
     defaultUrl: "/lab"
-    #cmd: ["start-singleuser.sh"]  # don't think I need to add --allow-root... 
+    cmd: ["start-singleuser.sh", "--allow-root"]  # don't think I need to add --allow-root... 
     storage:
       type: none
     extraEnv:
