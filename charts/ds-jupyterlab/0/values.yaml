@@ -6,10 +6,10 @@ jupyterhub:
   
   scheduling:
     userScheduler:
-      enabled: false
-    #userPods:
-    #  nodeAffinity:
-    #    matchNodePurpose: require
+      enabled: true
+    userPods:
+      nodeAffinity:
+        matchNodePurpose: require
   proxy:
     # don't hard code this; either generate psuedo-randomly, or ask user for salt and generate (did the latter)
     secretToken: "78767972dd3d0db5a98fb56554f4484daa57bc35bd73dc61aafebed8ac9fe3df"
@@ -44,7 +44,7 @@ jupyterhub:
     #domain: dsosu.us
 
   hub:
-    #baseUrl: /ummm/
+    baseUrl: /ummm/
     
     image:
       name: jupyterhub/k8s-hub
@@ -52,8 +52,10 @@ jupyterhub:
       #tag: '0.9-484ce8e'   # recent version for DummyAuth and and other features
 
     extraConfig:
-      baseUrl: |
-        c.JupyterHub.base_url = "/hrm/"
+      # this doesn't work (proxy secret too) because the proxy is a separate container and doesn't know about
+      # config set in the hub's config; they both read it from the chart
+      #baseUrl: |
+      #  c.JupyterHub.base_url = "/hrm/"
 
       nfspriv: |
         from kubernetes import client
