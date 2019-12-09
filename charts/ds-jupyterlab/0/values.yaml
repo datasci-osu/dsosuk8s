@@ -44,7 +44,7 @@ jupyterhub:
     #domain: dsosu.us
 
   hub:
-    baseUrl: /
+    baseUrl: /ummm/
     
     image:
       name: jupyterhub/k8s-hub
