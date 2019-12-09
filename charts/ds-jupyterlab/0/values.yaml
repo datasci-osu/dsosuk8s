@@ -5,8 +5,8 @@ jupyterhub:
       password: dummy
   
   scheduling:
-    userScheduler:
-      enabled: false
+    #userScheduler:
+    #  enabled: false
     userPods:
       nodeAffinity:
         matchNodePurpose: require
