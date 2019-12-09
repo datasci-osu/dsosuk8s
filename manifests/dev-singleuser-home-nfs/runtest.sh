@@ -32,6 +32,9 @@ fi
 # no warning is created if it already exists
 kubectl create namespace $DIRNAME --dry-run -o yaml | kubectl apply -f -
 
+# set the context in case it's different, seems like helm install --namespace wn't 
+kubectl config set-context --current --namespace $DIRNAME
+
 # if a drive is not running, start one (but don't wait on helm upgrade to do nothing, too slow,
 # instead just check to see if one is already running)
 # name the release with the dirname as well since helm release names must be unique cluster-wide

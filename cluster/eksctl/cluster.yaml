@@ -23,7 +23,7 @@ nodeGroups:
   # this jhcontrolplane will be used for jupyterhub core components (https://zero-to-jupyterhub.readthedocs.io/en/latest/administrator/optimization.html#using-a-dedicated-node-pool-for-users)
   # the other, workers, is for jh user pods
   # t3.large is EBS optimized - note that EACH NODE CAN SUPPORT A MAX OF 28 EBS ATTACHMENTS (actually 27; https://docs.aws.amazon.com/AWSEC2/latest/UserGuide/volume_limits.html)
-  - name: jhcontrolplane
+  - name: jhcontrolplane2
     instanceType: t3.large
     availabilityZones: ["us-west-2b"]
     minSize: 2
@@ -42,6 +42,20 @@ nodeGroups:
       volatile: "false"
     tags:
       nodegroup-role: jhcontrolplane
+    preBootstrapCommands:
+        # enables docker bridge network so binderhub stuff works
+        # see https://gist.github.com/tobemedia/2144d74d232ccce8972613e8ae13b054
+        # and https://discourse.jupyter.org/t/binder-deployed-in-aws-eks-domain-name-resolution-errors/766
+        # Replicate what --enable-docker-bridge does in /etc/eks/bootstrap.sh
+        # Enabling the docker bridge network. We have to disable live-restore as it
+        # prevents docker from recreating the default bridge network on restart
+        # modprope nfs and nfsd lets hosts (and containers) serve nfs
+       - "cp /etc/docker/daemon.json /etc/docker/daemon_backup.json"
+       - "echo -e '.bridge=\"docker0\" | .\"live-restore\"=false' >  /etc/docker/jq_script"
+       - "jq -f /etc/docker/jq_script /etc/docker/daemon_backup.json | tee /etc/docker/daemon.json"
+       - "systemctl restart docker"
+       - "modprobe nfs"
+       - "modprobe nfsd"
 
   - name: workers
     instanceType: t2.medium
@@ -58,4 +72,18 @@ nodeGroups:
       hub.jupyter.org/dedicated: user:NoSchedule
     tags:
       nodegroup-role: workers
+    preBootstrapCommands:
+        # enables docker bridge network so binderhub stuff works
+        # see https://gist.github.com/tobemedia/2144d74d232ccce8972613e8ae13b054
+        # and https://discourse.jupyter.org/t/binder-deployed-in-aws-eks-domain-name-resolution-errors/766
+        # Replicate what --enable-docker-bridge does in /etc/eks/bootstrap.sh
+        # Enabling the docker bridge network. We have to disable live-restore as it
+        # prevents docker from recreating the default bridge network on restart
+        # modprope nfs and nfsd lets hosts (and containers) serve nfs
+       - "cp /etc/docker/daemon.json /etc/docker/daemon_backup.json"
+       - "echo -e '.bridge=\"docker0\" | .\"live-restore\"=false' >  /etc/docker/jq_script"
+       - "jq -f /etc/docker/jq_script /etc/docker/daemon_backup.json | tee /etc/docker/daemon.json"
+       - "systemctl restart docker"
+       - "modprobe nfs"
+       - "modprobe nfsd"
 
