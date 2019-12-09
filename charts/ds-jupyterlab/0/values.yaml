@@ -48,7 +48,8 @@ jupyterhub:
     
     image:
       name: jupyterhub/k8s-hub
-      tag: '0.9-484ce8e'   # recent version for DummyAuth and and other features
+      tag: 0.9.0-alpha.1.088.1350ad7
+      #tag: '0.9-484ce8e'   # recent version for DummyAuth and and other features
 
     extraConfig:
       baseUrl: |
