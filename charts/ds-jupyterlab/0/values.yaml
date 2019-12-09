@@ -28,7 +28,6 @@ jupyterhub:
       pullPolicy: Always
     defaultUrl: "/lab"
     cmd: ["start-notebook.sh"]  # this should be the default anyway
-
     storage:
       type: none
     extraEnv:

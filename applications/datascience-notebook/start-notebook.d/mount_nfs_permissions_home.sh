@@ -6,6 +6,7 @@ set -e
 
 echo "Checking for nfs mount request"
 
+
 # if an NFS mount is being specified for /home...
 if [[ ! -z $NFS_SVC_HOME ]]; then
   cd /tmp
