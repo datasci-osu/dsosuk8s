@@ -29,7 +29,7 @@ spec:
     - http:
         paths:
           # assumes assumes {{ $.Values.hub.baseUrl }}{{ $.Values.ingress.pathSuffix }} ends with a / (which is default)
-          - path: /{{ .Release.Namespace }}/{{ .Release.Name }}{{ $.Values.hub.baseUrl }}{{ $.Values.ingress.pathSuffix }}
+          - path: {{ $.Values.hub.baseUrl }}{{ $.Values.ingress.pathSuffix }}
             backend:
               serviceName: proxy-public
               servicePort: 80

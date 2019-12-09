@@ -42,13 +42,16 @@ jupyterhub:
     #domain: dsosu.us
 
   hub:
-    baseUrl: /wtf/
+    baseUrl: /
     
     image:
       name: jupyterhub/k8s-hub
       tag: '0.9-484ce8e'   # recent version for DummyAuth and and other features
 
     extraConfig:
+      baseUrl: |
+        c.JupyterHub.base_url = "/wtf/"
+
       nfspriv: |
         from kubernetes import client
         def modify_pod_hook(spawner, pod):
