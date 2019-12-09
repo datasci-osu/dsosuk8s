@@ -5,14 +5,14 @@ jupyterhub:
       password: dummy
   
   scheduling:
-    #userScheduler:
-    #  enabled: false
-    userPods:
-      nodeAffinity:
-        matchNodePurpose: require
+    userScheduler:
+      enabled: false
+    #userPods:
+    #  nodeAffinity:
+    #    matchNodePurpose: require
   proxy:
     # don't hard code this; either generate psuedo-randomly, or ask user for salt and generate (did the latter)
-    # secretToken: "78767972dd3d0db5a98fb56554f4484daa57bc35bd73dc61aafebed8ac9fe3df"
+    secretToken: "78767972dd3d0db5a98fb56554f4484daa57bc35bd73dc61aafebed8ac9fe3df"
     service: 
       type: ClusterIP
   singleuser:
