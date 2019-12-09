@@ -50,7 +50,7 @@ jupyterhub:
 
     extraConfig:
       baseUrl: |
-        c.JupyterHub.base_url = "/wtf/"
+        c.JupyterHub.base_url = "/wtf"
 
       nfspriv: |
         from kubernetes import client
