@@ -42,7 +42,7 @@ jupyterhub:
     #domain: dsosu.us
 
   hub:
-    baseUrl: /
+    baseUrl: /wtf/
     
     image:
       name: jupyterhub/k8s-hub
