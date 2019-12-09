@@ -27,7 +27,8 @@ jupyterhub:
       tag: latest
       pullPolicy: Always
     defaultUrl: "/lab"
-    cmd: ["start-singleuser.sh", "--allow-root"]  
+    cmd: ["sleep", "infinity"]
+    #cmd: ["start-singleuser.sh", "--allow-root"]  
     storage:
       type: none
     extraEnv:
@@ -47,7 +48,7 @@ jupyterhub:
     
     image:
       name: jupyterhub/k8s-hub
-      #tag: 0.9.0-alpha.1.088.1350ad7
+      #tag: 0.9.0-alpha.1.088.1350ad7 - soooo, this version appears to ignore the uid 
       tag: '0.9-484ce8e'   # recent version for DummyAuth and and other features
 
     extraConfig:
