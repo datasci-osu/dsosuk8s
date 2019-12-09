@@ -39,6 +39,8 @@ jupyterhub:
 
   ingress:
     enabled: true
+    hosts:
+    - eksdevd.dsosu.us
     #domain: dsosu.us
 
   hub:

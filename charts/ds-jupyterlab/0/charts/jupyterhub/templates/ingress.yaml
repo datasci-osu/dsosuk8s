@@ -19,21 +19,15 @@ metadata:
   {{- end }}
 spec:
   rules:
-    # TODO: in helm v2, .Release.Name must be unique cluster-wide, so using both release name and
-    # namespace for identification isn't necessary. In future versions of rancher + helm3 this should
-    # be enabled. We may then want to identify applications by path, rather than subdomain, to avoid
-    # getting crazy deep subdomains (e.g. as bad as app.namespace.cluster.dsinfra.org.edu)
-    # using default host, which should match anything and be handled by the ingress controller; we just need the CNAME (e.g. cluster4.dsosu.us) to point to the ELB, then we can 
-    # hopefully contact this service at cluster4.dsosu.us/namespace/releasename
-    #- host: {{ .Release.Name }}.{{ .Release.Namespace }}.{{ .Values.ingress.domain }}
-    - http:
+    {{- range $host := .Values.ingress.hosts }}
+    - host: {{ $host | quote }}
+      http:
         paths:
-          # assumes assumes {{ $.Values.hub.baseUrl }}{{ $.Values.ingress.pathSuffix }} ends with a / (which is default)
           - path: {{ $.Values.hub.baseUrl }}{{ $.Values.ingress.pathSuffix }}
             backend:
               serviceName: proxy-public
               servicePort: 80
-      host: "eksdevd.dsosu.us"
+    {{- end }}
   {{- if .Values.ingress.tls }}
   tls:
     {{- .Values.ingress.tls | toYaml | trimSuffix "\n" | nindent 4 }}
