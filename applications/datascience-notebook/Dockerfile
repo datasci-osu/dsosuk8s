@@ -1,10 +1,10 @@
-FROM jupyter/datascience-notebook:45f07a14b422
+FROM jupyter/datascience-notebook:7a0c7325e470
 
 USER root
 
 # TODO: see if these are necessary
-RUN pip install wheel
-RUN pip install jupyterhub
+#RUN pip install wheel
+#RUN pip install jupyterhub
 
 #RUN jupyter labextension install theme-dark-extension
 
