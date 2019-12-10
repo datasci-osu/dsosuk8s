@@ -8,6 +8,7 @@ nginx-ingress:
       ssl-redirect: "true"
       proxy-connect-timeout: "3600s"
       proxy-read-timeout: "3600s"
+      proxy-send-timeout: "3600s"
     service:
       annotations:
         service.beta.kubernetes.io/aws-load-balancer-ssl-cert: arn:aws:acm:XX-XXXX-X:XXXXXXXXX:certificate/XXXXXXXX-XXXX-XXXX-XXXX-XXXXXXXXXX
