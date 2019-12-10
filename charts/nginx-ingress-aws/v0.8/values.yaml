@@ -6,9 +6,9 @@ nginx-ingress:
       proxy-real-ip-cidr: "0.0.0.0/0" # restrict this to the IP addresses of ELB 
       force-ssl-redirect: "true"
       ssl-redirect: "true"
-      proxy-connect-timeout: "3600s"
-      proxy-read-timeout: "3600s"
-      proxy-send-timeout: "3600s"
+      proxy-connect-timeout: "3600"
+      proxy-read-timeout: "3600"
+      proxy-send-timeout: "3600"
     service:
       annotations:
         service.beta.kubernetes.io/aws-load-balancer-ssl-cert: arn:aws:acm:XX-XXXX-X:XXXXXXXXX:certificate/XXXXXXXX-XXXX-XXXX-XXXX-XXXXXXXXXX
