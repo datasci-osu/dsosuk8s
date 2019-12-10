@@ -38,6 +38,8 @@ jupyterhub:
 
   ingress:
     enabled: true
+    annotations:
+      nginx.org/websocket-services: "proxy-public"
     hosts:
     - eksdevd.dsosu.us
     #domain: dsosu.us
