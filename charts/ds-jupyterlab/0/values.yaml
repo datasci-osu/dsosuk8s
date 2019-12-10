@@ -11,6 +11,9 @@ jupyterhub:
       nodeAffinity:
         matchNodePurpose: require
   proxy:
+    https:
+      enabled: true
+      type: offload
     service:
       annotations:
         service.beta.kubernetes.io/aws-load-balancer-ssl-cert: arn:aws:acm:us-west-2:395703310923:certificate/0844814e-a1cd-4e64-9f3a-03a60f11e741
