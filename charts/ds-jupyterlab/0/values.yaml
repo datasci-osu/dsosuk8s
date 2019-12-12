@@ -15,6 +15,9 @@ jupyterhub:
     secretToken: "78767972dd3d0db5a98fb56554f4484daa57bc35bd73dc61aafebed8ac9fe3df"
     service: 
       type: ClusterIP
+    https:
+      enabled: true
+      type: offload
   singleuser:
     memory:
       limit: 1G
