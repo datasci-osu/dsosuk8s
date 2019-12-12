@@ -1,0 +1,4 @@
+name: nginx-ingress
+description: Nginx Ingress Controller, based on https://github.com/nginxinc/kubernetes-ingress/tree/master/deployments/helm-chart as Rancher chart.
+version: 0.8
+maintainer: github.com/oneilsh
