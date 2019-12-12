@@ -31,7 +31,7 @@ questions:
   default: "0.5"
   description: "CPU gaurantee per student."
   type: string
-  label: "CPU Limit"
+  label: "CPU Gaurantee"
 
 - variable: jupyterhub.singleuser.cpu.limit
   default: "1"

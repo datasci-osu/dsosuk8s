@@ -44,7 +44,7 @@ jupyterhub:
     annotations:
       nginx.org/websocket-services: "proxy-public"
     hosts:
-    - doesntmatter.com   # if we force ssl, which we should
+    - eksdevd.dsosu.us 
     tls:
     - hosts:
       - eksdevd.dsosu.us
