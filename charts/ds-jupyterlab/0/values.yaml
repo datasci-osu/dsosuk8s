@@ -44,11 +44,10 @@ jupyterhub:
     annotations:
       nginx.org/websocket-services: "proxy-public"
     hosts:
-    - eksdevd.dsosu.us
+    - doesntmatter.com   # if we force ssl, which we should
     tls:
     - hosts:
       - eksdevd.dsosu.us
-    #domain: dsosu.us
 
   hub:
     baseUrl: /ummm/
@@ -92,13 +91,11 @@ jupyterhub:
             # below for debugging
             #spawner.environment['NB_UID'] = "1000"
             #spawner.environment['GRANT_SUDO'] = "yes"
-        
+       
+        # read admin user list from provided values 
         c.JupyterHub.authenticator_class = DummyExtraAuthenticator
-        #admin_users_comma_sep = os.environ["ADMIN_USERS"]  # grab admin usernames from environment variable set in questions.yaml
-        #print(admin_users_comma_sep)
-        #admin_users = set([entry.strip() for entry in admin_users_comma_sep.split(",")]) # split it into a set to use
-        #print(admin_users)
-        admin_users = {"oneils", "smithj"}
+        admin_users_comma_sep = os.environ["ADMIN_USERS"]  # grab admin usernames from environment variable set in questions.yaml
+        admin_users = set([entry.strip() for entry in admin_users_comma_sep.split(",")]) # split it into a set to use
         c.Authenticator.admin_users = admin_users
         c.JupyterHub.admin_access = True
 
