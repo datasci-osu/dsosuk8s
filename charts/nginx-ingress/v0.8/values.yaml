@@ -1,8 +1,5 @@
 nginx-ingress:
   controller:
-    defaultTLS:
-      cert: ""
-      key: ""
     wildcardTLS:
       cert: ""
       key: ""
