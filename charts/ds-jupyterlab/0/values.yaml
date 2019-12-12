@@ -10,6 +10,19 @@ jupyterhub:
     userPods:
       nodeAffinity:
         matchNodePurpose: require
+    corePods:
+      nodeAffinity:
+        matchNodePurpose: require
+    userPlaceholder:
+      enabled: true
+      replicas: 5
+
+  cull:
+    enabled: true
+    timeout: 3600    # cull inactive servers after this long
+    every: 600       # how often to check 
+    maxAge: 0        # cull servers this old, even if active (0 disables)
+
   proxy:
     # TODO: don't hard code this; either generate psuedo-randomly, or ask user for salt and generate
     secretToken: "78767972dd3d0db5a98fb56554f4484daa57bc35bd73dc61aafebed8ac9fe3df"

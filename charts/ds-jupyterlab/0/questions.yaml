@@ -15,18 +15,6 @@ questions:
   description: "Usernames with administrator access, comma-separated. Admins can add more users in the UI."
   required: true
 
-- variable: jupyterhub.singleuser.memory.guarantee
-  default: "0.5G"
-  description: "Memory gaurantee per student."
-  type: string
-  label: "Memory Gaurantee"
-
-- variable: jupyterhub.singleuser.memory.limit
-  default: "1G"
-  description: "Memory limit, per student."
-  type: string
-  label: "Memory Limit"
-
 - variable: jupyterhub.singleuser.cpu.gaurantee
   default: "0.5"
   description: "CPU gaurantee per student."
@@ -39,12 +27,72 @@ questions:
   type: string
   label: "CPU Limit"
 
+- variable: jupyterhub.singleuser.memory.guarantee
+  default: "0.5G"
+  description: "Memory gaurantee per student."
+  type: string
+  label: "Memory Gaurantee"
+
+- variable: jupyterhub.singleuser.memory.limit
+  default: "1G"
+  description: "Memory limit, per student."
+  type: string
+  label: "Memory Limit"
+
 - variable: jupyterhub.proxy.secretToken
   description: "Required for security. Generate with `openssl rand -hex 32`."
   type: string
   label: "Secret Token: "
   required: true
 
+- variable: jupyterhub.ingress.hosts[0]
+  description: "Hostname for hub (e.g. myhub.myorg.edu, or just myorg.edu)"
+  type: string
+  label: "Host: "
+  default: "eksdevd.dsosu.us"
+  required: true
+
+- variable: jupyterhub.ingress.tls[0].hosts[0]
+  description: "TLS Hostname for hub (set as same as Host)"
+  type: string
+  label: "TLS Host: "
+  default: "eksdevd.dsosu.us"
+  required: true
+
+- variable: jupyterhub.hub.baseUrl
+  description: "URL as base of hub. If not /, should start and end with /, e.g. /jupyterhub/"
+  type: string
+  label: "URL: "
+  default: "/my-jupyterhub/"
+  required: true
+
+- variable: jupyterhub.scheduling.userPlaceholder.replicas
+  description: "Number of user placeholders to create - see https://zero-to-jupyterhub.readthedocs.io/en/latest/administrator/optimization.html."
+  type: int
+  label: "Placeholders: "
+  default: 5
+  required: true
+
+- variable: jupyterhub.cull.enabled
+  description: "Should inactive user servers be shut down? (Browser window open = activity; checked every 10 mins)"
+  type: boolean
+  label: "Enable Culling: "
+  default: true
+  required: true
+
+- variable: jupyterhub.cull.timeout
+  description: "How long should a user server be inactive before it is shut down (seconds)?"
+  type: int
+  label: "Inactive Timeout: "
+  default: 3600
+  required: true
+
+- variable: jupyterhub.cull.maxAge
+  description: "Shutdown even active servers after this long (seconds, 0 to disable). "
+  type: int
+  label: "Max Server Age: "
+  default: 28800
+  required: true
 
 #- variable: keysalt
 #  type: string
