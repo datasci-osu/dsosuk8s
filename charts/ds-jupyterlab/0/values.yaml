@@ -44,7 +44,7 @@ jupyterhub:
     annotations:
       nginx.org/websocket-services: "proxy-public"
     tls:
-      hosts:
+    - hosts:
       - eksdevd.dsosu.us
     #domain: dsosu.us
 
