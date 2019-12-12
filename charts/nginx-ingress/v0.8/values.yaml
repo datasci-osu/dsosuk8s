@@ -9,7 +9,7 @@ nginx-ingress:
       entries:
         client-max-body-size: "1000m"
         ssl-redirect: "True"
-        error-log-level: "debug"
-    nginxDebug: true
-    logLevel: 3
+        #error-log-level: "debug"
+    #nginxDebug: true
+    logLevel: 2
 
