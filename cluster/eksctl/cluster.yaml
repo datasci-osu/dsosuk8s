@@ -23,7 +23,7 @@ nodeGroups:
   # this jhcontrolplane will be used for jupyterhub core components (https://zero-to-jupyterhub.readthedocs.io/en/latest/administrator/optimization.html#using-a-dedicated-node-pool-for-users)
   # the other, workers, is for jh user pods
   # t3.large is EBS optimized - note that EACH NODE CAN SUPPORT A MAX OF 28 EBS ATTACHMENTS (actually 27; https://docs.aws.amazon.com/AWSEC2/latest/UserGuide/volume_limits.html)
-  - name: jhcontrolplane2
+  - name: jhcontrolplane3
     instanceType: t3.large
     availabilityZones: ["us-west-2b"]
     minSize: 2
@@ -40,6 +40,7 @@ nodeGroups:
       role: jhcontrolplane
       # the "volatile" flag indicates whether nodes may come and go frequently - for the control plane, this is false
       volatile: "false"
+      hub.jupyter.org/node-purpose: core
     tags:
       nodegroup-role: jhcontrolplane
     preBootstrapCommands:
