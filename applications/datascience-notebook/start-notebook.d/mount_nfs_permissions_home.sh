@@ -22,9 +22,14 @@ if [[ ! -z $NFS_SVC_HOME ]]; then
 
   # ADMIN_USER is set by the chart's values.yaml depending on whether the user is listed as an admin in jupyterhub
   # everything should be setup before we try to do this (or else "user not found" error)
+  # this is being lazy and doing this after we know all these variables exist, should go net to relavent sections
   if [ "$ADMIN_USER" = "True" ]; then
     adduser $NB_USER dsadmins
+    PYTHONHOME=$ADMIN_HOME_DIR/python_libs
   fi
+  echo "PYTHONINFO"
+  echo $PYTHONPATH
+  echo $PYTHONHOME 
   # no matter what add users group; these need to be done to get the entries in /etc/groups, that way permissions
   # work properly (UID/GID in /etc/passwd isn't enough)
   adduser $NB_USER users

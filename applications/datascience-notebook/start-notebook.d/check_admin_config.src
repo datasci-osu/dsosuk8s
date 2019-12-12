@@ -4,21 +4,31 @@
 
 # if no setting for location for config info, set one
 if [[ -z $ADMIN_HOME_DIR ]]; then
-  ADMIN_HOME_DIR=/home/admin_config
+  export ADMIN_HOME_DIR=/home/admin_config
 fi
 
 # if the dir doesn't exist, create it, write permissions only for admins, just read for others (to source/read things from there, but not cd and look around)
 if [[ ! -d $ADMIN_HOME_DIR ]]; then
   mkdir -p $ADMIN_HOME_DIR/automanaged
+  mkdir -p $ADMIN_HOME_DIR/python_libs
   chown -R dsadmin:dsadmins $ADMIN_HOME_DIR
   chmod -R 774 $ADMIN_HOME_DIR
 fi
 
+# this seems a little fragile...
+PYTHONPATH=`python -c 'import sys; print(":".join([x for x in sys.path if x.strip() != ""]))'`
+PYTHONVERSION=`python -c 'import sys; v = sys.version_info; print("python" + str(v[0]) + "." + str(v[1]))'`
+PYTHONPATH=$ADMIN_HOME_DIR/python_libs/lib/$PYTHONVERSION/site-packages:$PYTHONPATH
+PATH=$ADMIN_HOME_DIR/python_libs/bin:$PATH
+
+
 # if a class-specific /etc/passwd entry doesn't exist, add it
 # here's where entries for /etc/passwd will be appended; but we can't put them directly in /etc/passwd because changes there don't 
 # persist
-# TODO: if lots of people log in for the first time simultaneously, will the NFS be able handle the simultaneous appends? if not some sort of central service to handle this could be setup...
+# if lots of people log in for the first time simultaneously, will the NFS be able handle the simultaneous appends? if not some sort of central service to handle this could be setup...
+# or I'll just add a little random sleepytime :)
 if ! grep -E "^$NB_USER:" $ADMIN_HOME_DIR/automanaged/etc_passwd_additions; then
+  sleep `awk 'BEGIN{print 5*rand()}'`   # sleep for a random amount between 1 and 5 seconds
   echo "$NB_USER:x:$NB_UID:100:,,,:/home/$NB_USER:/bin/bash" >> $ADMIN_HOME_DIR/automanaged/etc_passwd_additions
 fi
 

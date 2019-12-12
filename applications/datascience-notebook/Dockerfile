@@ -19,11 +19,13 @@ RUN rm -rf /home/jovyan/.cache/yarn
 
 RUN apt-get update \
  && apt-get install -yq --no-install-recommends \
+    htop \
     nfs-common \
     nfs-kernel-server \
+    svn \
     vim \
-    htop \
  && apt-get clean && rm -rf /var/lib/apt/lists/*
+
 
 COPY start.sh /usr/local/bin/
 
