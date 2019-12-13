@@ -72,7 +72,7 @@ echo 'Defaults env_keep +="HOSTNAME \
 			   JUPYTERHUB_OAUTH_CALLBACK_URL \
 			   JUPYTERHUB_API_TOKEN \
 			   MINICONDA_VERSION \
-			   JUPYTER_IMAGE_SPEC
+			   JUPYTER_IMAGE_SPEC \
                            "' >> /etc/sudoers
 
 cat /etc/sudoers
