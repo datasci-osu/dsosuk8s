@@ -40,9 +40,11 @@ run-hooks () {
 run-hooks /usr/local/bin/start-notebook.d
 
 # Add $CONDA_DIR/bin to sudo secure_path
-# (also in the default start.sh, because the process is run below with sudo -u $NB_USER, it needs access to where jupyter is installed)
+# (copied from the default start.sh, because the process is run below with sudo -u $NB_USER, it needs access to where jupyter is installed)
 sed -r "s#Defaults\s+secure_path=\"([^\"]+)\"#Defaults secure_path=\"\1:$CONDA_DIR/bin\"#" /etc/sudoers | grep secure_path > /etc/sudoers.d/path
 
-
+echo "##################"
+cat /etc/sudoers
+echo "##################"
 echo "Executing the command: ${cmd[@]}"
 exec sudo -E -H -u $NB_USER PATH=$PATH XDG_CACHE_HOME=/home/$NB_USER/.cache PYTHONPATH=${PYTHONPATH:-} "${cmd[@]}"
