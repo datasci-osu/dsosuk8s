@@ -75,7 +75,7 @@ echo 'Defaults env_keep +="HOSTNAME \
 			   JUPYTER_IMAGE_SPEC
                            "' >> /etc/sudoers
 
-
+cat /etc/sudoers
 echo "Executing the command: ${cmd[@]}"
 # exec sudo -E -H -u $NB_USER PATH=$PATH XDG_CACHE_HOME=/home/$NB_USER/.cache PYTHONPATH=${PYTHONPATH:-} "${cmd[@]}"
 exec sudo -E -H -u $NB_USER PATH=$PATH XDG_CACHE_HOME=/home/$NB_USER/.cache PYTHONPATH=${PYTHONPATH:-} "${cmd[@]}"
