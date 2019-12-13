@@ -18,3 +18,5 @@ export PATH=$ADMIN_HOME_DIR/python_libs/lib/$PYTHONVERSION/bin:$PATH
 #### hub_local bin $PATH addition
 #############################################
 export PATH=$ADMIN_HOME_DIR/bin:$PATH
+
+touch $HOME/.leroy_was_here
