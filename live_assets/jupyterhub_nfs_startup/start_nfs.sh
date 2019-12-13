@@ -3,14 +3,7 @@
 # Distributed under the terms of the Modified BSD License.
 
 set -e
-
-echo "this script is a modification of the default jupyter-stack base-notebook start.sh; \
-  we make the assumption the container is started as root; this calls out to scripts \
-  in /usr/local/etc/start-notebook.d/ to do various setups before spawning the notebook \
-  server as the user."
-
-echo "This is the default start.sh, *except* for swapping blocks A and B below" 
-echo "(original order seems like a bug, unless /home/NB_USER is already mounted in or NB_USER is set to the default of jovyan)"
+      
 
 # Exec the specified command or fall back on bash
 if [ $# -eq 0 ]; then
@@ -32,7 +25,7 @@ run-hooks () {
                 source "$f"
                 ;;
             *)
-                if [[ -x "$f" ]] ; then
+                if [[ -x "$f" ]] && [[ ! -d "$f" ]]; then
                     echo "$0: running $f"
                     "$f"
                 else
