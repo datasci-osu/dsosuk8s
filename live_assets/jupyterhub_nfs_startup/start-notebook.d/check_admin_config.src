@@ -24,26 +24,26 @@ if [[ ! -d $ADMIN_HOME_DIR/automanaged ]] ; then
   chmod -R 774 $ADMIN_HOME_DIR/automanaged
 fi
 
-#if [[ ! -d $ADMIN_HOME_DIR/bin ]] ; then
-#  cp -r /usr/local/bin/start-notebook.d/templates/bin $ADMIN_HOME_DIR/bin
-#  echo "This dir is automatically added to everyone's $PATH via the autosourced_by_bashrcs file" > $ADMIN_HOME_DIR/bin/readme.txt
-#  chown -R dsadmin:dsadmins $ADMIN_HOME_DIR/bin
-#  chmod -R 775 $ADMIN_HOME_DIR/bin/*
-#  chmod 774 $ADMIN_HOME_DIR/bin $ADMIN_HOME_DIR/bin/readme.txt
-#fi
-#
-#if [[ ! -f $ADMIN_HOME_DIR/autosourced_by_bashrcs ]] ; then
-#  cp -r /usr/local/bin/start-notebook.d/templates/autosourced_by_bashrcs $ADMIN_HOME_DIR/autosourced_by_bashrcs
-#  chown dsadmin:dsadmins $ADMIN_HOME_DIR/autosourced_by_bashrcs
-#  chmod 774 $ADMIN_HOME_DIR/autosourced_by_bashrcs
-#fi
+if [[ ! -d $ADMIN_HOME_DIR/bin ]] ; then
+  cp -r /usr/local/bin/start-notebook.d/templates/bin $ADMIN_HOME_DIR/bin
+  echo "This dir is automatically added to everyone's $PATH via the autosourced_by_bashrcs file" > $ADMIN_HOME_DIR/bin/readme.txt
+  chown -R dsadmin:dsadmins $ADMIN_HOME_DIR/bin
+  chmod -R 775 $ADMIN_HOME_DIR/bin/*
+  chmod 774 $ADMIN_HOME_DIR/bin $ADMIN_HOME_DIR/bin/readme.txt
+fi
+
+if [[ ! -f $ADMIN_HOME_DIR/autosourced_by_bashrcs ]] ; then
+  cp -r /usr/local/bin/start-notebook.d/templates/autosourced_by_bashrcs $ADMIN_HOME_DIR/autosourced_by_bashrcs
+  chown dsadmin:dsadmins $ADMIN_HOME_DIR/autosourced_by_bashrcs
+  chmod 774 $ADMIN_HOME_DIR/autosourced_by_bashrcs
+fi
 
 PYTHONVERSION=`python -c 'import sys; v = sys.version_info; print("python" + str(v[0]) + "." + str(v[1]))'`
 if [[ ! -d $ADMIN_HOME_DIR/python_libs/lib/$PYTHONVERSION/site-packages ]] ; then
   mkdir -p $ADMIN_HOME_DIR/python_libs/lib/$PYTHONVERSION/site-packages
   echo "Hub-wide python packages can be installed here, but note that you must use $ADMIN_HOME_DIR/bin/hubpip to make the installations work properly." > $ADMIN_HOME_DIR/python_libs/readme.txt
-  chown -R dsadmin:dsadmins $ADMIN_HOME_DIR/python_libs/lib/$PYTHONVERSION/site-packages
-  chmod -R 774 $ADMIN_HOME_DIR/python_libs/lib/$PYTHONVERSION/site-packages
+  chown -R dsadmin:dsadmins $ADMIN_HOME_DIR/python_libs/
+  chmod -R 774 $ADMIN_HOME_DIR/python_libs/
 fi
 
 
