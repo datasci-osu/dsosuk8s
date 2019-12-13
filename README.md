@@ -15,13 +15,13 @@ The `konfig` plugin in particular makes managing kubeconfig files for different 
 
 ## Contents
 
-### applications
+### docker_images
 
 This directory contains docker image definitions. There's a special structure used by the build scripts (in `scripts`, below):
 
 ```
-applications/
-  application-name/
+docker_images/
+  image-name/
     ops/
       build_options.txt
     image_name.txt
@@ -55,7 +55,7 @@ with that tag already exists (in whichever machine running docker is setup, usua
 something else; see minikube scripts below), then it skips the build and exits one (for flow-control use by other scripts). 
 If not, the image is built an tagged (and exit 0).
 
-The `docker_build_all.sh` script does what it says - it loops over the directories in `applications` and calls `docker_build.sh` on each.
+The `docker_build_all.sh` script does what it says - it loops over the directories in `docker_images` and calls `docker_build.sh` on each.
 
 #### `docker_push.sh` et al.
 
@@ -89,7 +89,7 @@ Starting `minikube` is relatively easy with `minikube start`, but this script ad
   * side note: why do this? kubernetes can be made to look for images locally rather than dockerhub or another remote repo if we specify `imagePullPolicy: Never` in the pod spec.
 * Lastly, sets the date properly within the VM to fix a bug with image pushing.
 
-#### manifests
+#### kubernetes_dev
 
 This directory contains kubernets .yaml manifest files and potentially other things, mostly used for testing or development where helm or rancher
 charts aren't a good fit. 
