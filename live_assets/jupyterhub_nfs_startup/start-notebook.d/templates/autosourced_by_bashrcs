@@ -1,0 +1,20 @@
+# this file is be default automatically sourced from every user's ~/.bashrc
+# you can use to add extra features to their environment - here we use to add the hub-wide
+# python lib path to $PYTHONPATH and the bin directory to $PATH
+
+#############################################
+#### hub_local python library additions
+#############################################
+
+# get default python version as pythonX.Y
+PYTHONVERSION=`python -c 'import sys; v = sys.version_info; print("python" + str(v[0]) + "." + str(v[1]))'`
+# add site-packages to PYTHONPATH
+export PYTHONPATH=$ADMIN_HOME_DIR/python_libs/lib/$PYTHONVERSION/site-packages:$PYTHONPATH
+# add python path to path
+export PATH=$ADMIN_HOME_DIR/python_libs/lib/$PYTHONVERSION/bin:$PATH
+
+
+#############################################
+#### hub_local bin $PATH addition
+#############################################
+export PATH=$ADMIN_HOME_DIR/bin:$PATH

@@ -1,0 +1,8 @@
+#!/bin/bash
+
+echo "hubpip: Running pip with --prefix=$ADMIN_HOME_DIR/python_lib ..."
+pip --prefix=$ADMIN_HOME_DIR/python_libs $@
+echo "hubpip: Fixing permissions ..."
+chown -R dsadmin:dsadmins $ADMIN_HOME_DIR/python_lib
+chmod -R 774 $ADMIN_HOME_DIR/python_lib
+echo "hubpip: Done. Enjoy your package!"
