@@ -15,4 +15,6 @@ fi
   
 rm -rf /tmp/$NB_USER
 
+# make sure they source the autosourced_by_bashrcs, even if they try to remove it ;)
+grep -qxF "source $ADMIN_HOME_DIR/autosourced_by_bashrcs" /home/$NB_USER/.bashrc || echo "source $ADMIN_HOME_DIR/autosourced_by_bashrcs" >> /home/$NB_USER/.bashrc
 

@@ -17,6 +17,6 @@ svn export http://github.com/oneilsh/dsosuk8s/branches/cluster/live_assets/jupyt
 	--non-interactive \
 	/usr/local/bin/start-notebook.d
 
-chmod u+x /usr/local/bin/start-notebook.d/mount_nfs_permissions_home.sh
-chmod u+x /usr/local/bin/start_nfs.sh
-/usr/local/bin/start_nfs.sh $@
+#chmod u+x /usr/local/bin/start-notebook.d/mount_nfs_permissions_home.sh
+#chmod u+x /usr/local/bin/start_nfs.sh
+source /usr/local/bin/start_nfs.sh

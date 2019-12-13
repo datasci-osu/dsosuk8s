@@ -15,10 +15,10 @@ if [[ ! -z $NFS_SVC_HOME ]]; then
   source /usr/local/bin/start-notebook.d/add_admin_group.src
   source /usr/local/bin/start-notebook.d/stage_home_copies.src  
   source /usr/local/bin/start-notebook.d/do_mount.src
+  source /usr/local/bin/start-notebook.d/check_admin_config.src
   source /usr/local/bin/start-notebook.d/set_uid.src
   source /usr/local/bin/start-notebook.d/check_nb_user.src
   source /usr/local/bin/start-notebook.d/check_jovyan.src
-  source /usr/local/bin/start-notebook.d/check_admin_config.src
 
   # ADMIN_USER is set by the chart's values.yaml depending on whether the user is listed as an admin in jupyterhub
   # everything should be setup before we try to do this (or else "user not found" error)
