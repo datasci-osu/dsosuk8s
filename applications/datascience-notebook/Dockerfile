@@ -22,14 +22,14 @@ RUN apt-get update \
     htop \
     nfs-common \
     nfs-kernel-server \
-    svn \
+    subversion \
     vim \
  && apt-get clean && rm -rf /var/lib/apt/lists/*
 
 
 COPY start.sh /usr/local/bin/
 
-RUN mkdir -p /usr/local/bin/start-notebook.d
-COPY ./start-notebook.d/. /usr/local/bin/start-notebook.d/
+#RUN mkdir -p /usr/local/bin/start-notebook.d
+#COPY ./start-notebook.d/. /usr/local/bin/start-notebook.d/
 
 USER $NB_USER
