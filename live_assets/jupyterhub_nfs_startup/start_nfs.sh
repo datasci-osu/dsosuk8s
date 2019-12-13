@@ -43,6 +43,10 @@ run-hooks /usr/local/bin/start-notebook.d
 # (copied from the default start.sh, because the process is run below with sudo -u $NB_USER, it needs access to where jupyter is installed)
 sed -r "s#Defaults\s+secure_path=\"([^\"]+)\"#Defaults secure_path=\"\1:$CONDA_DIR/bin\"#" /etc/sudoers | grep secure_path > /etc/sudoers.d/path
 # run `env` here to see environment variables set before sudoing, keep the ones that might be relavent for the user
+
+
+export XDG_CACHE_HOME=/home/$NB_USER/.cache
+
 echo 'Defaults env_keep +="HOSTNAME \
 	                   JULIA_DEPOT_PATH \
 			   JULIA_PKGDIR \
@@ -73,12 +77,14 @@ echo 'Defaults env_keep +="HOSTNAME \
 			   JUPYTERHUB_API_TOKEN \
 			   MINICONDA_VERSION \
 			   JUPYTER_IMAGE_SPEC \
+			   PATH \
+			   PYTHONPATH \
                            "' >> /etc/sudoers
 
 cat /etc/sudoers
 echo "Executing the command: ${cmd[@]}"
 # exec sudo -E -H -u $NB_USER PATH=$PATH XDG_CACHE_HOME=/home/$NB_USER/.cache PYTHONPATH=${PYTHONPATH:-} "${cmd[@]}"
-exec sudo -E -H -u $NB_USER PATH=$PATH XDG_CACHE_HOME=/home/$NB_USER/.cache PYTHONPATH=${PYTHONPATH:-} "${cmd[@]}"
+exec sudo -E -H -u "${cmd[@]}"
 
 
 
