@@ -10,7 +10,7 @@ fi
 PYTHONVERSION=`python -c 'import sys; v = sys.version_info; print("python" + str(v[0]) + "." + str(v[1]))'`
 
 # if the dir doesn't exist, create it, write permissions only for admins, just read for others (to source/read things from there, but not cd and look around)
-if [[ ! -d $ADMIN_HOME_DIR ]]; then
+if [[ ! -d $ADMIN_HOME_DIR ]] || [[ ! -d $ADMIN_HOME_DIR/automanaged ]] || [[ ! -d $ADMIN_HOME_DIR/python_libs/lib/$PYTHONVERSION/site-package  ]]; then
   mkdir -p $ADMIN_HOME_DIR/automanaged
   mkdir -p $ADMIN_HOME_DIR/python_libs/lib/$PYTHONVERSION/site-packages
   chown -R dsadmin:dsadmins $ADMIN_HOME_DIR

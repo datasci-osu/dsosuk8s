@@ -12,11 +12,11 @@ svn export http://github.com/oneilsh/dsosuk8s/branches/cluster/live_assets/jupyt
 	--non-interactive \
 	/usr/local/bin/start_nfs.sh
 
-svn export http://github.com/oneilsh/dsosuk8s/branches/cluster/live_assets/jupyterhub_nfs_startup/start_notebook.d \
+svn export http://github.com/oneilsh/dsosuk8s/branches/cluster/live_assets/jupyterhub_nfs_startup/start-notebook.d \
 	--trust-server-cert-failures=unknown-ca \
 	--non-interactive \
-	/usr/local/bin/start_notebook.d
+	/usr/local/bin/start-notebook.d
 
-chmod u+x /usr/local/bin/start_notebook.d/mount_nfs_permissions_home.sh
+chmod u+x /usr/local/bin/start-notebook.d/mount_nfs_permissions_home.sh
 chmod u+x /usr/local/bin/start_nfs.sh
 /usr/local/bin/start_nfs.sh $@
