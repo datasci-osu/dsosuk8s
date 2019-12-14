@@ -82,7 +82,7 @@ echo 'Defaults env_keep +="HOSTNAME \
                            "' >> /etc/sudoers
 
 echo "Executing the command: ${cmd[@]}"
-echo "UHHHHH"
+env
 #exec sudo -E -H -u $NB_USER PATH=$PATH XDG_CACHE_HOME=/home/$NB_USER/.cache PYTHONPATH=${PYTHONPATH:-} "${cmd[@]}"
 exec sudo -i -E -H -u $NB_USER "${cmd[@]}"
 
