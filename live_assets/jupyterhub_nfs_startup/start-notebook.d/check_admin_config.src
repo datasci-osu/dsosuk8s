@@ -36,7 +36,7 @@ fi
 if [[ ! -f $ADMIN_HOME_DIR/autosourced_by_bashrcs ]] ; then
   cp -r /usr/local/bin/start-notebook.d/templates/autosourced_by_bashrcs $ADMIN_HOME_DIR/autosourced_by_bashrcs
   chown dsadmin:dsadmins $ADMIN_HOME_DIR/autosourced_by_bashrcs
-  chmod 775 $ADMIN_HOME_DIR/autosourced_by_bashrcs
+  chmod 664 $ADMIN_HOME_DIR/autosourced_by_bashrcs
 fi
 
 PYTHONVERSION=`python -c 'import sys; v = sys.version_info; print("python" + str(v[0]) + "." + str(v[1]))'`
