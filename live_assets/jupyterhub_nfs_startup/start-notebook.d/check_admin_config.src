@@ -38,8 +38,7 @@ if [[ ! -f $ADMIN_HOME_DIR/autosourced_by_bashrcs ]] ; then
   chmod 774 $ADMIN_HOME_DIR/autosourced_by_bashrcs
 fi
 
-#PYTHONVERSION=`python -c 'import sys; v = sys.version_info; print("python" + str(v[0]) + "." + str(v[1]))'`
-PYTHONVERSION=python3.7
+PYTHONVERSION=`python -c 'import sys; v = sys.version_info; print("python" + str(v[0]) + "." + str(v[1]))'`
 if [[ ! -d $ADMIN_HOME_DIR/python_libs/lib/$PYTHONVERSION/site-packages ]] ; then
   mkdir -p $ADMIN_HOME_DIR/python_libs/lib/$PYTHONVERSION/site-packages
   echo "Hub-wide python packages can be installed here, but note that you must use $ADMIN_HOME_DIR/bin/hubpip to make the installations work properly." > $ADMIN_HOME_DIR/python_libs/readme.txt

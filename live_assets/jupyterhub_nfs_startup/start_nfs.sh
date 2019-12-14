@@ -84,7 +84,7 @@ sed -r "s#Defaults\s+secure_path=\"([^\"]+)\"#Defaults secure_path=\"\1:$CONDA_D
 
 echo "Executing the command: ${cmd[@]}"
 #exec sudo -E -H -u $NB_USER PATH=$PATH XDG_CACHE_HOME=/home/$NB_USER/.cache PYTHONPATH=${PYTHONPATH:-} "${cmd[@]}"
-exec sudo -E -H -u $NB_USER "${cmd[@]}"
+exec sudo -E -H -u $NB_USER PATH=$PATH "${cmd[@]}"
 
 
 
