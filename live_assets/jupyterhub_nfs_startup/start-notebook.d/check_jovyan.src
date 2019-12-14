@@ -15,11 +15,14 @@ if [[ ! -d /home/jovyan ]]; then
 fi
 
 # jovyan should never be an admin
-sed -r -i "/^jovyan$/d" $ADMIN_HOME_DIR/automanaged/etc_group_admins
+if [[ -f $ADMIN_HOME_DIR/automanaged/etc_group_admins ]]; then
+  sed -r -i "/^jovyan$/d" $ADMIN_HOME_DIR/automanaged/etc_group_admins
+fi
 
 # put them in the users group no matter what
-grep -E "^jovyan\$" $ADMIN_HOME_DIR/automanaged/etc_group_users || echo jovyan >> $NB_USER $ADMIN_HOME_DIR/automanaged/etc_group_users
-
+if [[ -f $ADMIN_HOME_DIR/automanaged/etc_group_users ]]; then
+  grep -E "^jovyan\$" $ADMIN_HOME_DIR/automanaged/etc_group_users || echo jovyan >> $NB_USER $ADMIN_HOME_DIR/automanaged/etc_group_users
+fi
 
 # all done - remove /tmp staging  
 rm -rf /tmp/jovyan            # clean up /tmp staging
