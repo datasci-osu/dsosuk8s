@@ -1,15 +1,13 @@
 # add entries from the persisted etc_passwd_additions to the container /etc/passwd
-ADMIN_USERNAME=dsadmin
 cat $ADMIN_HOME_DIR/automanaged/etc_passwd_additions >> /etc/passwd
-echo "$ADMIN_USERNAME:x:1001:101:,,,:/nowhere:/usr/sbin/nologin" >> /etc/passwd
 
 # group entries are persisted in $ADMIN_HOME_DIR/automanaged/{etc_group_admins,etc_group_users} as single-col lists
 # we need to first remove the entries from /etc/group
 sed -i -r '/^users:/d' /etc/group
-sed -i -r '/^dsadmins:/d' /etc/group
+sed -i -r "/^$ADMIN_GROUPNAME:/d" /etc/group
 
-# users are group 100, dsadmins are group 101 
+# users are group 100, admins are group 101 
 USERLIST=`cat $ADMIN_HOME_DIR/automanaged/etc_group_users | tr '\n' ',' | sed -r 's/(^,+)|(,+$)//g' | sed -r 's/,+/,/g'`
 ADMINLIST=`cat $ADMIN_HOME_DIR/automanaged/etc_group_admins | tr '\n' ',' | sed -r 's/(^,+)|(,+$)//g' | sed -r 's/,+/,/g'`
 echo "users:x:100:$USERLIST" >> /etc/group
-echo "dsadmins:x:101:$ADMINLIST,$ADMIN_USERNAME" >> /etc/group
+echo "$ADMIN_GROUPNAME:x:101:$ADMINLIST,$ADMIN_USERNAME" >> /etc/group

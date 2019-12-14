@@ -2,7 +2,7 @@
 # see detailed nodes in check_jovyan.sh (which does the same thing, but for the default "jovyan" user
 
 if [[ ! -d /home/$NB_USER ]]; then
-  chown $NB_UID:dsadmins /tmp/$NB_USER 
+  chown $NB_UID:$ADMIN_GROUPNAME /tmp/$NB_USER 
   chmod -R 770 /tmp/$NB_USER                      
   
   chown -R $NB_UID:100 /tmp/$NB_USER/.??* 
