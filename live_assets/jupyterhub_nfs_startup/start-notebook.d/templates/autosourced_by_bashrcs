@@ -12,8 +12,9 @@ unset XDG_RUNTIME_DIR
 
 # get default python version as pythonX.Y
 PYTHONVERSION=`python -c 'import sys; v = sys.version_info; print("python" + str(v[0]) + "." + str(v[1]))'`
-# add site-packages to PYTHONPATH
+# add site-packages to PYTHONPATH (for python on command-line) and JUPYTER_PATH (for jupyter)
 export PYTHONPATH=$ADMIN_HOME_DIR/python_libs/lib/$PYTHONVERSION/site-packages:$PYTHONPATH
+export JUPYTER_PATH=$ADMIN_HOME_DIR/python_libs/lib/$PYTHONVERSION/site-packages:$JUPYTER_PATH
 # add python path to path
 export PATH=$ADMIN_HOME_DIR/python_libs/bin:$PATH
 
