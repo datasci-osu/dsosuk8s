@@ -20,9 +20,11 @@ fi
 if [[ ! -d $ADMIN_HOME_DIR/automanaged ]] ; then
   mkdir -p $ADMIN_HOME_DIR/automanaged
   echo "This dir managed continuously by hub login processes, please don't edit." > $ADMIN_HOME_DIR/automanaged/readme.txt
+  touch $ADMIN_HOME_DIR/automanaged/etc_group_admins
+  touch $ADMIN_HOME_DIR/automanaged/etc_group_users
   chown -R $ADMIN_USERNAME:$ADMIN_GROUPNAME $ADMIN_HOME_DIR/automanaged
   chmod -R 775 $ADMIN_HOME_DIR/automanaged
-  chmod 664 $ADMIN_HOME_DIR/automanaged/readme.txt
+  chmod 664 $ADMIN_HOME_DIR/automanaged/readme.txt $ADMIN_HOME_DIR/automanaged/etc_group_users $ADMIN_HOME_DIR/automanaged/etc_group_admins
 fi
 
 if [[ ! -d $ADMIN_HOME_DIR/bin ]] ; then
