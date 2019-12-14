@@ -29,8 +29,8 @@ if [[ ! -d $ADMIN_HOME_DIR/bin ]] ; then
   cp -r /usr/local/bin/start-notebook.d/templates/bin $ADMIN_HOME_DIR/bin
   echo "This dir is automatically added to everyone's $PATH via the autosourced_by_bashrcs file" > $ADMIN_HOME_DIR/bin/readme.txt
   chown -R dsadmin:dsadmins $ADMIN_HOME_DIR/bin
-  chmod -R 775 $ADMIN_HOME_DIR/bin/*
-  chmod 664 $ADMIN_HOME_DIR/bin $ADMIN_HOME_DIR/bin/readme.txt
+  chmod -R 775 $ADMIN_HOME_DIR/bin
+  chmod 664 $ADMIN_HOME_DIR/bin/readme.txt
 fi
 
 if [[ ! -f $ADMIN_HOME_DIR/autosourced_by_bashrcs ]] ; then
