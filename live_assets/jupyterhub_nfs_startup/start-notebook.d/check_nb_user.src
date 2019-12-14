@@ -8,8 +8,6 @@ if [[ ! -d /home/$NB_USER ]]; then
   chown -R $NB_UID:100 /tmp/$NB_USER/.??* 
   chown -R $NB_UID:100 /tmp/$NB_USER/* 
   
-  echo 'unset XDG_RUNTIME_DIR' >> /tmp/$NB_USER/.bashrc 
-
   cp -a /tmp/$NB_USER /home
 fi
   

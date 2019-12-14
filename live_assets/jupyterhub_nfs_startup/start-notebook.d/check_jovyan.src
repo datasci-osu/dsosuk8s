@@ -10,7 +10,6 @@ if [[ ! -d /home/jovyan ]]; then
   # re-own inner contents
   chown -R 1000:100 /tmp/jovyan/.??*                        # chown dotfiles, TODO: this simple cmd won't work with .a or other single-letter dotfiles (not a problem in current docker image, but just to be safe)
   chown -R 1000:100 /tmp/jovyan/*                           # chown others
-  echo 'unset XDG_RUNTIME_DIR' >> /tmp/jovyan/.bashrc       # this junk: https://github.com/jupyter/notebook/issues/1318
 
   cp -a /tmp/jovyan /home       # copy em over to the /home mount, -a for archive (like cp -r and preserve ownership and other metadata)
 fi

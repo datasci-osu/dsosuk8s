@@ -2,6 +2,10 @@
 # you can use to add extra features to their environment - here we use to add the hub-wide
 # python lib path to $PYTHONPATH and the bin directory to $PATH
 
+# this is needed to make things work. https://github.com/jupyter/notebook/issues/1318
+unset XDG_RUNTIME_DIR
+
+
 #############################################
 #### hub_local python library additions
 #############################################
@@ -19,4 +23,3 @@ export PATH=$ADMIN_HOME_DIR/python_libs/lib/$PYTHONVERSION/bin:$PATH
 #############################################
 export PATH=$ADMIN_HOME_DIR/bin:$PATH
 
-whoami > $HOME/iam.txt
