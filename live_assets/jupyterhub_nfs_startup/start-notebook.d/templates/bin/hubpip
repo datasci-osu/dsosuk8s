@@ -1,12 +1,12 @@
 #!/bin/bash
 
 if [[ "$#" == "0" ]] || [[ "$1" == "-h" ]]; then
-  echo "Usage: hubpip install somepackage"
-  echo "This just calls \`pip install --prefix=$ADMIN_HOME_DIR/python_lib somepackage\` in case you need to do anything fancy."
+  echo "Usage: hubpip install package1 package2 ..."
+  echo "This just calls \`pip install --prefix=$ADMIN_HOME_DIR/python_lib package1 package2 ...\` in case you need to do anything fancy."
   exit 1
 fi
-echo "hubpip: Running \`pip $1 --prefix=$ADMIN_HOME_DIR/python_lib $2\` ..."
-pip $1 --prefix=$ADMIN_HOME_DIR/python_libs $2
+echo "hubpip: Running \`pip $1 --prefix=$ADMIN_HOME_DIR/python_lib ${@:2}\` ..."
+pip $1 --prefix=$ADMIN_HOME_DIR/python_libs ${@:2}
 echo "hubpip: Fixing permissions ..."
 chown -R dsadmin:dsadmins $ADMIN_HOME_DIR/python_lib
 chmod -R 774 $ADMIN_HOME_DIR/python_lib
