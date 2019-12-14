@@ -10,7 +10,7 @@ echo -e "\e[32mhubpip: Running \`pip $1 --prefix=$ADMIN_HOME_DIR/python_lib ${@:
 pip $1 --prefix=$ADMIN_HOME_DIR/python_libs ${@:2}
 
 echo -e "\e[32mhubpip: Fixing permissions ...\e[0m\n"
-chgrp -R dsadmins $ADMIN_HOME_DIR/python_libs
+chgrp -R dsadmins $ADMIN_HOME_DIR/python_libs 2> /dev/null
 
-chmod -R 774 $ADMIN_HOME_DIR/python_libs
+chmod -R 775 $ADMIN_HOME_DIR/python_libs 2> /dev/null
 echo -e "\e[32mhubpip: Done. Enjoy your package!\e[0m\n"
