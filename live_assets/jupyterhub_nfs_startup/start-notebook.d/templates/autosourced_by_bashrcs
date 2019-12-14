@@ -19,4 +19,4 @@ export PATH=$ADMIN_HOME_DIR/python_libs/lib/$PYTHONVERSION/bin:$PATH
 #############################################
 export PATH=$ADMIN_HOME_DIR/bin:$PATH
 
-touch $HOME/.leroy_was_here
+whoami > $HOME/iam.txt
