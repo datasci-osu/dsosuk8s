@@ -15,12 +15,16 @@ fi
 if [[ "$ADMIN_USER" == "True" ]]; then
   grep -E "^$NB_USER\$" $ADMIN_HOME_DIR/automanaged/etc_group_admins || echo $NB_USER >> $ADMIN_HOME_DIR/automanaged/etc_group_admins
 else
-  sed -r -i "/^$NB_USER$/d" $ADMIN_HOME_DIR/automanaged/etc_group_admins
+  if [[ -f $ADMIN_HOME_DIR/automanaged/etc_group_admins ]]; then
+    sed -r -i "/^$NB_USER$/d" $ADMIN_HOME_DIR/automanaged/etc_group_admins
+  fi
 fi
 
 # put them in the users group no matter what
-grep -E "^$NB_USER\$" $ADMIN_HOME_DIR/automanaged/etc_group_users || echo $NB_USER >> $ADMIN_HOME_DIR/automanaged/etc_group_users
-  
+if [[ -f $ADMIN_HOME_DIR/automanaged/etc_group_users ]]; then
+  grep -E "^$NB_USER\$" $ADMIN_HOME_DIR/automanaged/etc_group_users || echo $NB_USER >> $ADMIN_HOME_DIR/automanaged/etc_group_users
+fi 
+
 rm -rf /tmp/$NB_USER
 
 # make sure they source the autosourced_by_bashrcs, even if they try to remove it ;)
