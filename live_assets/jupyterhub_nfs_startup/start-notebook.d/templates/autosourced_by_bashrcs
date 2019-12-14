@@ -15,7 +15,7 @@ PYTHONVERSION=`python -c 'import sys; v = sys.version_info; print("python" + str
 # add site-packages to PYTHONPATH
 export PYTHONPATH=$ADMIN_HOME_DIR/python_libs/lib/$PYTHONVERSION/site-packages:$PYTHONPATH
 # add python path to path
-export PATH=$ADMIN_HOME_DIR/python_libs/lib/$PYTHONVERSION/bin:$PATH
+export PATH=$ADMIN_HOME_DIR/python_libs/bin:$PATH
 
 
 #############################################
