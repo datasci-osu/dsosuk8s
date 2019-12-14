@@ -16,7 +16,7 @@ PYTHONVERSION=`python -c 'import sys; v = sys.version_info; print("python" + str
 export PYTHONPATH=$ADMIN_HOME_DIR/python_libs/lib/$PYTHONVERSION/site-packages:$PYTHONPATH
 # to get jupyterlab notebooks to pick up the location, we can create a file in ~/.ipython/profile_default/startup; all .py files in here are run when notebooks start
 if [[ ! -f $HOME/.ipython/profile_default/startup/fixpath.py ]]; then
-  mkdir -p $HOME/.ipython/profile_default
+  mkdir -p $HOME/.ipython/profile_default/startup
   echo "import sys; sys.path.insert(0, \"$ADMIN_HOME_DIR/python_libs/lib/$PYTHONVERSION/site-packages\")" > $HOME/.ipython/profile_default/startup/001_fixpath.py
 fi
 # add python path to path
