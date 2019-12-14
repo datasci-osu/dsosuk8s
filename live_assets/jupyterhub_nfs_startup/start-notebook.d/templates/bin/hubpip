@@ -5,9 +5,12 @@ if [[ "$#" == "0" ]] || [[ "$1" == "-h" ]]; then
   echo "This just calls \`pip install --prefix=$ADMIN_HOME_DIR/python_lib package1 package2 ...\` in case you need to do anything fancy."
   exit 1
 fi
-echo "hubpip: Running \`pip $1 --prefix=$ADMIN_HOME_DIR/python_lib ${@:2}\` ..."
+
+echo -e "\e[32mhubpip: Running \`pip $1 --prefix=$ADMIN_HOME_DIR/python_lib ${@:2}\` ...\e[0m\n"
 pip $1 --prefix=$ADMIN_HOME_DIR/python_libs ${@:2}
-echo "hubpip: Fixing permissions ..."
+
+echo -e "\e[32mhubpip: Fixing permissions ...\e[0m\n"
 chown -R dsadmin:dsadmins $ADMIN_HOME_DIR/python_lib
+
 chmod -R 774 $ADMIN_HOME_DIR/python_lib
-echo "hubpip: Done. Enjoy your package!"
+echo -e "\e[32mhubpip: Done. Enjoy your package!\e[0m\n"
