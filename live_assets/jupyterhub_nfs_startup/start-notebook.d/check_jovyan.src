@@ -14,15 +14,11 @@ if [[ ! -d /home/jovyan ]]; then
   cp -a /tmp/jovyan /home       # copy em over to the /home mount, -a for archive (like cp -r and preserve ownership and other metadata)
 fi
 
-# if the user is labeled an admin, put them in the admins group, otherwise remove them
-if [[ "$ADMIN_USER" == "True" ]]; then
-  grep -E "^jovyan\$" $ADMIN_HOME_DIR/automanaged/etc_group_admins || echo jovyan >> $ADMIN_HOME_DIR/automanaged/etc_group_admins
-else
-  sed -r -i "/^jovyan$/d" $ADMIN_HOME_DIR/automanaged/etc_group_admins
-fi
+# jovyan should never be an admin
+sed -r -i "/^jovyan$/d" $ADMIN_HOME_DIR/automanaged/etc_group_admins
 
 # put them in the users group no matter what
-grep -E "^jovyan\$" $ADMIN_HOME_DIR/automanaged/etc_group_users || echo $NB_USER >> $NB_USER $ADMIN_HOME_DIR/automanaged/etc_group_users
+grep -E "^jovyan\$" $ADMIN_HOME_DIR/automanaged/etc_group_users || echo jovyan >> $NB_USER $ADMIN_HOME_DIR/automanaged/etc_group_users
 
 
 # all done - remove /tmp staging  
