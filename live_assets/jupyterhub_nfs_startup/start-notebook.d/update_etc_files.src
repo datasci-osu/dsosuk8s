@@ -6,6 +6,10 @@ cat $ADMIN_HOME_DIR/automanaged/etc_passwd_additions >> /etc/passwd
 sed -i -r '/^users:/d' /etc/group
 sed -i -r "/^$ADMIN_GROUPNAME:/d" /etc/group
 
+# make sure they exist before we try to use them
+ls $ADMIN_HOME_DIR/automanaged/etc_group_users || touch $ADMIN_HOME_DIR/automanaged/etc_group_users
+ls $ADMIN_HOME_DIR/automanaged/etc_group_admins || touch $ADMIN_HOME_DIR/automanaged/etc_group_admins
+
 # users are group 100, admins are group 101 
 USERLIST=`cat $ADMIN_HOME_DIR/automanaged/etc_group_users | tr '\n' ',' | sed -r 's/(^,+)|(,+$)//g' | sed -r 's/,+/,/g'`
 ADMINLIST=`cat $ADMIN_HOME_DIR/automanaged/etc_group_admins | tr '\n' ',' | sed -r 's/(^,+)|(,+$)//g' | sed -r 's/,+/,/g'`
