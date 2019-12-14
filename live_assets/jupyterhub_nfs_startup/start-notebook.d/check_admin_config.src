@@ -1,4 +1,4 @@
-:## We need a place in the /home mount to store info that we'd like to add to /etc/passwd, 
+## We need a place in the /home mount to store info that we'd like to add to /etc/passwd, 
 ## so UIDs can be mapped to usernames for file listing etc.
 ## (and other persistent admin-level config related to the /home mount)
 
