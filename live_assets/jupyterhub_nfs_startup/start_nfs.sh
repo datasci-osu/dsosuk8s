@@ -47,44 +47,44 @@ sed -r "s#Defaults\s+secure_path=\"([^\"]+)\"#Defaults secure_path=\"\1:$CONDA_D
 # export XDG_CACHE_HOME=/home/$NB_USER/.cache
 # run `env` here to see environment variables set before sudoing, keep the ones that might be relavent for the user
 # 
- echo 'Defaults env_keep +="HOSTNAME \
- 	                   JULIA_DEPOT_PATH \
- 			   JULIA_PKGDIR \
- 			   CONDA_DIR \
-			   CONDA_VERSION \
- 			   JUPYTERHUB_ACTIVITY_URL \
- 			   JUPYTERHUB_BASE_URL \
- 			   HUB_PORT \
-# 			   PWD \
- 			   MINICONDA_MD5 \
- 			   PROXY_API_SERVICE_HOST \
- 			   JUPYTERHUB_USER \
- 			   ADMIN_HOME_DIR \
- 			   PROXY_API_PORT_8001_TCP_ADDR \
- 			   PROXY_PUBLIC_PORT \
- 			   ADMIN_USER \
- 			   NB_USER \
- 			   JULIA_VERSION \
- 			   JUPYTERHUB_SERVICE_PREFIX \
- 			   JUPYTERHUB_SERVER_NAME \
- 			   MEM_GUARANTEE \
- 			   JUPYTER_IMAGE \
- 			   MEM_LIMIT \
- 			   JUPYTERHUB_API_URL \
- 			   JUPYTERHUB_HOST \
- 			   JPY_API_TOKEN \
- 			   XDG_CACHE_HOME \
- 			   JUPYTERHUB_OAUTH_CALLBACK_URL \
- 			   JUPYTERHUB_API_TOKEN \
- 			   MINICONDA_VERSION \
- 			   JUPYTER_IMAGE_SPEC \
- 			   PATH \
- 			   PYTHONPATH \
-                            "' >> /etc/sudoers
+# echo 'Defaults env_keep +="HOSTNAME \
+# 	                   JULIA_DEPOT_PATH \
+# 			   JULIA_PKGDIR \
+# 			   CONDA_DIR \
+#			   CONDA_VERSION \
+# 			   JUPYTERHUB_ACTIVITY_URL \
+# 			   JUPYTERHUB_BASE_URL \
+# 			   HUB_PORT \
+## 			   PWD \
+# 			   MINICONDA_MD5 \
+# 			   PROXY_API_SERVICE_HOST \
+# 			   JUPYTERHUB_USER \
+# 			   ADMIN_HOME_DIR \
+# 			   PROXY_API_PORT_8001_TCP_ADDR \
+# 			   PROXY_PUBLIC_PORT \
+# 			   ADMIN_USER \
+# 			   NB_USER \
+# 			   JULIA_VERSION \
+# 			   JUPYTERHUB_SERVICE_PREFIX \
+# 			   JUPYTERHUB_SERVER_NAME \
+# 			   MEM_GUARANTEE \
+# 			   JUPYTER_IMAGE \
+# 			   MEM_LIMIT \
+# 			   JUPYTERHUB_API_URL \
+# 			   JUPYTERHUB_HOST \
+# 			   JPY_API_TOKEN \
+# 			   XDG_CACHE_HOME \
+# 			   JUPYTERHUB_OAUTH_CALLBACK_URL \
+# 			   JUPYTERHUB_API_TOKEN \
+# 			   MINICONDA_VERSION \
+# 			   JUPYTER_IMAGE_SPEC \
+# 			   PATH \
+# 			   PYTHONPATH \
+#                            "' >> /etc/sudoers
 
 echo "Executing the command: ${cmd[@]}"
-#exec sudo -E -H -u $NB_USER PATH=$PATH XDG_CACHE_HOME=/home/$NB_USER/.cache PYTHONPATH=${PYTHONPATH:-} "${cmd[@]}"
-exec sudo -E -H -u $NB_USER PATH=$PATH "${cmd[@]}"
+exec sudo -E -H -u $NB_USER PATH=$PATH XDG_CACHE_HOME=/home/$NB_USER/.cache PYTHONPATH=${PYTHONPATH:-} "${cmd[@]}"
+#exec sudo -E -H -u $NB_USER PATH=$PATH "${cmd[@]}"
 
 
 
