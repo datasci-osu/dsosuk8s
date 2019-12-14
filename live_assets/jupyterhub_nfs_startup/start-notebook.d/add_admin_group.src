@@ -2,7 +2,7 @@
 # we start by creating an admin-level user and group (user may not be necessary, group is)
 # still TODO: get dsadmins group added to users logging in, if they are listed as jupyterhub admins (controlled by jupyterhub seperately)
 
-addgroup --gid 101 dsadmins
-adduser --no-create-home --uid 1001 --gid 101 --disabled-password --disabled-login --gecos "" dsadmin
-adduser dsadmin users
+#addgroup --gid 101 dsadmins
+#adduser --no-create-home --uid 1001 --gid 101 --disabled-password --disabled-login --gecos "" dsadmin
+#adduser dsadmin users
 

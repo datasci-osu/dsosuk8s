@@ -60,9 +60,6 @@ if ! grep -E "^$NB_USER:" $ADMIN_HOME_DIR/automanaged/etc_passwd_additions; then
   echo "$NB_USER:x:$NB_UID:100:,,,:/home/$NB_USER:/bin/bash" >> $ADMIN_HOME_DIR/automanaged/etc_passwd_additions
 fi
 
-# add entries from the persisted etc_passwd_additions to the container /etc/passwd
-cat $ADMIN_HOME_DIR/automanaged/etc_passwd_additions >> /etc/passwd
-
 # set umask (defaulting to rw-rw---- for files and  rwxrwx--- for dirs, so that new files are by 
 # default read/write by 
 # NB_USER:users; thus the group and user are set appropriately, but they are writable by anyone

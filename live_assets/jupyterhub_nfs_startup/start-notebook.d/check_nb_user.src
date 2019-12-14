@@ -10,6 +10,16 @@ if [[ ! -d /home/$NB_USER ]]; then
   
   cp -a /tmp/$NB_USER /home
 fi
+
+# if the user is labeled an admin, put them in the admins group, otherwise remove them
+if [[ "$ADMIN_USER" == "True" ]]; then
+  grep -E "^$NB_USER\$" $ADMIN_HOME_DIR/automanaged/etc_group_admins || echo $NB_USER >> $ADMIN_HOME_DIR/automanaged/etc_group_admins
+else
+  sed -r -i "/^$NB_USER$/d" $ADMIN_HOME_DIR/automanaged/etc_group_admins
+fi
+
+# put them in the users group no matter what
+grep -E "^$NB_USER\$" $ADMIN_HOME_DIR/automanaged/etc_group_users || echo $NB_USER >> $ADMIN_HOME_DIR/automanaged/etc_group_users
   
 rm -rf /tmp/$NB_USER
 
