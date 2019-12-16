@@ -40,7 +40,8 @@ run-hooks () {
 run-hooks /usr/local/bin/start-notebook.d
 
 # Add $CONDA_DIR/bin to sudo secure_path
-# (copied from the default start.sh, because the process is run below with sudo -u $NB_USER, it needs access to where jupyter is installed)
+# (sets the PATH of the sudo to whatever is listed, this sed adds to whatever is there already)
+# there must be a reason to do it this way...
 sed -r "s#Defaults\s+secure_path=\"([^\"]+)\"#Defaults secure_path=\"\1:$CONDA_DIR/bin\"#" /etc/sudoers | grep secure_path > /etc/sudoers.d/path
 
 echo "Executing the command: ${cmd[@]}"

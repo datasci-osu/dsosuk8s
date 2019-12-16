@@ -29,7 +29,11 @@ RUN apt-get update \
 
 COPY start.sh /usr/local/bin/
 
+# the default image has /opt writable by the jovyan user, but anything installed there (e.g. w/ pip install)
+# will disappear once the container goes away, so let's just make it unwritable and avoid accidental installs there
+RUN chown -R root:root /opt
 #RUN mkdir -p /usr/local/bin/start-notebook.d
 #COPY ./start-notebook.d/. /usr/local/bin/start-notebook.d/
+
 
 USER $NB_USER

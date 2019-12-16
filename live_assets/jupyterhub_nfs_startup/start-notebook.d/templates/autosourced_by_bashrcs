@@ -28,3 +28,10 @@ export PATH=$ADMIN_HOME_DIR/python_libs/bin:$PATH
 #############################################
 export PATH=$ADMIN_HOME_DIR/bin:$PATH
 
+
+#############################################
+#### home .local/bin (for pip install --user installs)
+#############################################
+export PATH=$HOME/.local/bin:$PATH
+
+
