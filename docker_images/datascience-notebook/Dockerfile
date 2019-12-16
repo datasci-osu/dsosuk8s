@@ -61,7 +61,7 @@ RUN apt-get clean && \
 RUN pip install git+https://github.com/jupyterhub/jupyter-rsession-proxy
 
 # these are listed in the dockerfile example in https://github.com/jupyterhub/jupyter-server-proxy/blob/master/contrib/rstudio/Dockerfile,
-# but we'd need to tell the spawner to keep them in the spawned container - could do that in the chart, but lets instead add it to autosourced_by_bashrcs
+# but we'd need to tell the spawner to keep them in the spawned command; we could alternatively do it in the start_nfs.sh (set like PATH, PYTHONPATH, etc.)
 ## The desktop package uses /usr/lib/rstudio/bin
 #ENV PATH="${PATH}:/usr/lib/rstudio-server/bin"
 #ENV LD_LIBRARY_PATH="/usr/lib/R/lib:/lib:/usr/lib/x86_64-linux-gnu:/usr/lib/jvm/java-7-openjdk-amd64/jre/lib/amd64/server:/opt/conda/lib/R/lib"
