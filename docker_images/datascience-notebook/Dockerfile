@@ -60,6 +60,9 @@ RUN apt-get clean && \
 
 RUN pip install git+https://github.com/jupyterhub/jupyter-rsession-proxy
 
+# because of some error RE https://github.com/jupyter/docker-stacks/issues/927 
+RUN conda install -c r r-stringi
+
 # these are listed in the dockerfile example in https://github.com/jupyterhub/jupyter-server-proxy/blob/master/contrib/rstudio/Dockerfile,
 # but we'd need to tell the spawner to keep them in the spawned command; we could alternatively do it in the start_nfs.sh (set like PATH, PYTHONPATH, etc.)
 ## The desktop package uses /usr/lib/rstudio/bin
