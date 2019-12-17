@@ -89,7 +89,7 @@ jupyterhub:
 
       authsetting: |
         from nativeauthenticator import NativeAuthenticator
-        #from tornado import gen
+        from tornado import gen
         import os
 
         class NativeExtraAuthenticator(NativeAuthenticator):
