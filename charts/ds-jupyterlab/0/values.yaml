@@ -88,26 +88,25 @@ jupyterhub:
         c.KubeSpawner.modify_pod_hook = modify_pod_hook
 
       authsetting: |
-        #from jupyterhub.auth import DummyAuthenticator
+        from nativeauthenticator import NativeAuthenticator
         #from tornado import gen
         import os
 
-        #class DummyExtraAuthenticator(DummyAuthenticator):
-        #  @gen.coroutine
-        #  def pre_spawn_start(self, user, spawner):
-        #    # for use by scripts in start-notebook.d
-        #    # NB_USER is the username logged in with
-        #    # ADMIN_USER is "True" if they're an admin, "False" otherwise
-        #    spawner.environment['NB_USER'] = user.name
-        #    spawner.environment['ADMIN_USER'] = str(user.admin)
-        #    # below for debugging
-        #    #spawner.environment['NB_UID'] = "1000"
-        #    #spawner.environment['GRANT_SUDO'] = "yes"
+        class NativeExtraAuthenticator(NativeAuthenticator):
+          @gen.coroutine
+          def pre_spawn_start(self, user, spawner):
+            # for use by scripts in start-notebook.d
+            # NB_USER is the username logged in with
+            # ADMIN_USER is "True" if they're an admin, "False" otherwise
+            spawner.environment['NB_USER'] = user.name
+            spawner.environment['ADMIN_USER'] = str(user.admin)
+            # below for debugging
+            #spawner.environment['NB_UID'] = "1000"
+            #spawner.environment['GRANT_SUDO'] = "yes"
        
         ## read admin user list from provided values 
-        #c.JupyterHub.authenticator_class = DummyExtraAuthenticator
+        c.JupyterHub.authenticator_class = NativeExtraAuthenticator
        
-        c.JupyterHub.authenticator_class = 'nativeauthenticator.NativeAuthenticator' 
 
         admin_users_comma_sep = os.environ["ADMIN_USERS"]  # grab admin usernames from environment variable set in questions.yaml
         admin_users = set([entry.strip() for entry in admin_users_comma_sep.split(",")]) # split it into a set to use
