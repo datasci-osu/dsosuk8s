@@ -106,7 +106,8 @@ jupyterhub:
        
         ## read admin user list from provided values 
         c.JupyterHub.authenticator_class = NativeExtraAuthenticator
-       
+        # location in docker image
+        c.JupyterHub.template_paths = ["/home/jovyan/nativeauthenticator/nativeauthenticator/templates/"]       
 
         admin_users_comma_sep = os.environ["ADMIN_USERS"]  # grab admin usernames from environment variable set in questions.yaml
         admin_users = set([entry.strip() for entry in admin_users_comma_sep.split(",")]) # split it into a set to use
