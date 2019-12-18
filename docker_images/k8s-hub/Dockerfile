@@ -4,8 +4,8 @@ FROM jupyterhub/k8s-hub:0.9-484ce8e
 #RUN pip3 install jupyterhub-nativeauthenticator
 
 #  this fork has em
-RUN cd /tmp
+WORKDIR /tmp
 RUN git clone https://github.com/ml-tooling/nativeauthenticator.git
-RUN pip3 install -e nativeauthenticator
+WORKDIR /tmp/nativeauthenticator
+RUN pip3 install -e .
 
-RUN cd /
