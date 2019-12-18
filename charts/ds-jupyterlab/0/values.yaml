@@ -100,6 +100,7 @@ jupyterhub:
             # ADMIN_USER is "True" if they're an admin, "False" otherwise
             spawner.environment['NB_USER'] = user.name
             spawner.environment['ADMIN_USER'] = str(user.admin)
+            print(user)
             # below for debugging
             #spawner.environment['NB_UID'] = "1000"
             #spawner.environment['GRANT_SUDO'] = "yes"
