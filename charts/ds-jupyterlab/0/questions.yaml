@@ -25,15 +25,15 @@ questions:
   required: true
 
 - variable: jupyterhub.singleuser.cpu.gaurantee
-  default: "0.5"
+  default: 0.25
   description: "CPU gaurantee per student."
-  type: string
+  type: float
   label: "CPU Gaurantee"
 
 - variable: jupyterhub.singleuser.cpu.limit
-  default: "1"
+  default: 1.0
   description: "CPU limit per student."
-  type: string
+  type: float
   label: "CPU Limit"
 
 - variable: jupyterhub.singleuser.memory.guarantee

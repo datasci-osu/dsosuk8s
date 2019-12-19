@@ -36,8 +36,8 @@ jupyterhub:
       limit: 1G
       guarantee: 0.5G
     cpu:
-      limit: 0.5
-      gaurantee: 1.0
+      limit: 1.0
+      gaurantee: 0.25
     image:
       name: oneilsh/ktesting-datascience-notebook
       tag: latest
