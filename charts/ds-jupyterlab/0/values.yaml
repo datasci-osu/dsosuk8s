@@ -92,7 +92,7 @@ jupyterhub:
 
         auth_type = os.environ["AUTH_TYPE"]
         
-        if auth_type == "dummy":
+        if auth_type == "native":
           from nativeauthenticator import NativeAuthenticator
           from tornado import gen
 
