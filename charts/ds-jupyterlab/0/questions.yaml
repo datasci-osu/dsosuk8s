@@ -1,6 +1,15 @@
 categories:
 - DataScience
 questions:
+- variable: jupyterhub.hub.extraEnv.AUTH_TYPE
+  default: "native"
+  description: "JupyterHub authenticator to use."
+  label: "Authenticator: "
+  type: enum
+  options:
+  - "native"
+  - "dummy"
+
 - variable: jupyterhub.singleuser.extraEnv.NFS_SVC_HOME
   default: ""
   description: "Drive to use for home folders."

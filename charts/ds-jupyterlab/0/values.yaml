@@ -2,7 +2,7 @@ jupyterhub:
   auth:
     type: dummy
     dummy:
-      password: dummy
+      password: 
   
   scheduling:
     userScheduler:
@@ -88,26 +88,43 @@ jupyterhub:
         c.KubeSpawner.modify_pod_hook = modify_pod_hook
 
       authsetting: |
-        from nativeauthenticator import NativeAuthenticator
-        from tornado import gen
         import os
 
-        class NativeExtraAuthenticator(NativeAuthenticator):
-          @gen.coroutine
-          def pre_spawn_start(self, user, spawner):
-            # for use by scripts in start-notebook.d
-            # NB_USER is the username logged in with
-            # ADMIN_USER is "True" if they're an admin, "False" otherwise
-            spawner.environment['NB_USER'] = user.name
-            spawner.environment['ADMIN_USER'] = str(user.admin)
-            # below for debugging
-            #spawner.environment['NB_UID'] = "1000"
-            #spawner.environment['GRANT_SUDO'] = "yes"
+        auth_type = os.environ["AUTH_TYPE"]
+        
+        if auth_type == "dummy":
+          from nativeauthenticator import NativeAuthenticator
+          from tornado import gen
+
+          class NativeExtraAuthenticator(NativeAuthenticator):
+            @gen.coroutine
+            def pre_spawn_start(self, user, spawner):
+              # for use by scripts in start-notebook.d
+              # NB_USER is the username logged in with
+              # ADMIN_USER is "True" if they're an admin, "False" otherwise
+              spawner.environment['NB_USER'] = user.name
+              spawner.environment['ADMIN_USER'] = str(user.admin)
+              # below for debugging
+              #spawner.environment['NB_UID'] = "1000"
+              #spawner.environment['GRANT_SUDO'] = "yes"
        
-        ## read admin user list from provided values 
-        c.JupyterHub.authenticator_class = NativeExtraAuthenticator
-        # location in docker image
-        c.JupyterHub.template_paths = ["/home/jovyan/nativeauthenticator/nativeauthenticator/templates/"]       
+          ## read admin user list from provided values 
+          c.JupyterHub.authenticator_class = NativeExtraAuthenticator
+          # location in docker image
+          c.JupyterHub.template_paths = ["/home/jovyan/nativeauthenticator/nativeauthenticator/templates/"]       
+
+        else:
+          from jupyterhub.auth import DummyAuthenticator
+          from tornado import gen
+
+          class DummyExtraAuthenticator(DummyAuthenticator):
+            @gen.coroutine
+            def pre_spawn_start(self, user, spawner):
+              spawner.environment['NB_USER'] = user.name
+              spawner.environment['ADMIN_USER'] = str(user.admin)
+       
+          ## read admin user list from provided values 
+          c.JupyterHub.authenticator_class = DummyExtraAuthenticator
 
         admin_users_comma_sep = os.environ["ADMIN_USERS"]  # grab admin usernames from environment variable set in questions.yaml
         admin_users = set([entry.strip() for entry in admin_users_comma_sep.split(",")]) # split it into a set to use
