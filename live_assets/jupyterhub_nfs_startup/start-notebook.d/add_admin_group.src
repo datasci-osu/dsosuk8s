@@ -1,0 +1,10 @@
+# the container starts with only the user jovyan (UID 1000) and group users (GID 100)
+# we start by creating an admin-level user and group (user may not be necessary, group is)
+
+export ADMIN_USERNAME=dsadmin
+export ADMIN_GROUPNAME=dsadmins
+
+addgroup --gid 101 $ADMIN_GROUPNAME
+adduser --no-create-home --uid 1001 --gid 101 --disabled-password --disabled-login --gecos "" $ADMIN_USERNAME
+adduser $ADMIN_USERNAME users
+

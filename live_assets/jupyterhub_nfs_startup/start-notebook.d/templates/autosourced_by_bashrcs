@@ -1,0 +1,36 @@
+# this file is be default automatically sourced from every user's ~/.bashrc
+# you can use to add extra features to their environment - here we use to add the hub-wide
+# python lib path to $PYTHONPATH and the bin directory to $PATH
+
+# this is needed to make things work. https://github.com/jupyter/notebook/issues/1318
+unset XDG_RUNTIME_DIR
+
+
+#############################################
+#### hub_local python library additions
+#############################################
+
+# get default python version as pythonX.Y
+PYTHONVERSION=`python -c 'import sys; v = sys.version_info; print("python" + str(v[0]) + "." + str(v[1]))'`
+# add site-packages to PYTHONPATH (for python on command-line)
+export PYTHONPATH=$ADMIN_HOME_DIR/python_libs/lib/$PYTHONVERSION/site-packages:$PYTHONPATH
+# to get jupyterlab notebooks to pick up the location, we can create a file in ~/.ipython/profile_default/startup; all .py files in here are run when notebooks start
+if [[ ! -f $HOME/.ipython/profile_default/startup/fixpath.py ]]; then
+  mkdir -p $HOME/.ipython/profile_default/startup
+  echo "import sys; sys.path.insert(0, \"$ADMIN_HOME_DIR/python_libs/lib/$PYTHONVERSION/site-packages\")" > $HOME/.ipython/profile_default/startup/001_fixpath.py
+fi
+# add python path to path
+export PATH=$ADMIN_HOME_DIR/python_libs/bin:$PATH
+
+
+#############################################
+#### hub_local bin $PATH addition
+#############################################
+export PATH=$ADMIN_HOME_DIR/bin:$PATH
+
+
+#############################################
+#### home .local/bin (for pip install --user installs)
+#############################################
+export PATH=$HOME/.local/bin:$PATH
+

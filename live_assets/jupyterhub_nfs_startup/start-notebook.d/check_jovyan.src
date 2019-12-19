@@ -1,0 +1,25 @@
+## setup permissions properly for 'classroom' access (admins read/write everywhere, users only in their home), and copy results to the /home mount
+## Do so *only* if they don't already exist in /home, so this happens only at first login (otherwise every login would result in cleaned out home dirs)
+
+# leave a debug jovyan around for kubernetes testing: kubectl exec -it pod/singleuser-pod bash has built-in hooks that look for /home/jovyan and fail if it's not there
+# TODO: in the future we could allow a jovyan login (with password set during spinup) for a dummy student account - instructors like dummy student accounts to test things with
+if [[ ! -d /home/jovyan ]]; then
+  # these permissions and ownership set things up nicely for class usage - instructors mostly all powerful (file permission-wise), students normally-powerful
+  chown 1000:$ADMIN_GROUPNAME /tmp/jovyan
+  chmod -R 770 /tmp/jovyan                        # make sure we have group read on everything, some aren't in the .npm cache dir
+  # re-own inner contents
+  chown -R 1000:100 /tmp/jovyan/.??*                        # chown dotfiles, TODO: this simple cmd won't work with .a or other single-letter dotfiles (not a problem in current docker image, but just to be safe)
+  chown -R 1000:100 /tmp/jovyan/*                           # chown others
+
+  cp -a /tmp/jovyan /home       # copy em over to the /home mount, -a for archive (like cp -r and preserve ownership and other metadata)
+fi
+
+# jovyan should never be an admin
+sed -r -i "/^jovyan$/d" $ADMIN_HOME_DIR/automanaged/etc_group_admins
+
+# put them in the users group no matter what
+grep -E "^jovyan\$" $ADMIN_HOME_DIR/automanaged/etc_group_users || echo jovyan >> $NB_USER $ADMIN_HOME_DIR/automanaged/etc_group_users
+
+# all done - remove /tmp staging  
+rm -rf /tmp/jovyan            # clean up /tmp staging
+

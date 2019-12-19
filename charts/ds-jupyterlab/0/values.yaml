@@ -2,16 +2,35 @@ jupyterhub:
   auth:
     type: dummy
     dummy:
-      password: dummy
+      password: 
   
   scheduling:
     userScheduler:
-      # TODO: userScheduler wants some cluster-wide priveledges to work, turning off for now
-      # this will likely result in less efficient resource utilization, cost undetermined
-      enabled: false 
+      enabled: true
+    userPods:
+      nodeAffinity:
+        matchNodePurpose: require
+    corePods:
+      nodeAffinity:
+        matchNodePurpose: require
+    userPlaceholder:
+      enabled: true
+      replicas: 5
+
+  cull:
+    enabled: true
+    timeout: 3600    # cull inactive servers after this long
+    every: 600       # how often to check 
+    maxAge: 0        # cull servers this old, even if active (0 disables)
+
   proxy:
     # TODO: don't hard code this; either generate psuedo-randomly, or ask user for salt and generate
     secretToken: "78767972dd3d0db5a98fb56554f4484daa57bc35bd73dc61aafebed8ac9fe3df"
+    service: 
+      type: ClusterIP
+    https:
+      enabled: true
+      type: offload
   singleuser:
     memory:
       limit: 1G
@@ -24,30 +43,38 @@ jupyterhub:
       tag: latest
       pullPolicy: Always
     defaultUrl: "/lab"
-    cmd: ["start-notebook.sh"]  # this should be the default anyway
-
+    cmd: ["start-singleuser.sh", "--allow-root"]  # don't think I need to add --allow-root... 
     storage:
       type: none
     extraEnv:
       NFS_HOME_SVC: ""
-      #CHOWN_HOME: "yes"
-      #CHOWN_HOME_OPTS: '-R'
     uid: 0
     fsGid: 0
 
 
   ingress:
     enabled: true
-    domain: dsosu.us
+    annotations:
+      nginx.org/websocket-services: "proxy-public"
+    hosts:
+    - eksdevd.dsosu.us 
+    tls:
+    - hosts:
+      - eksdevd.dsosu.us
 
   hub:
-    baseUrl: /
+    baseUrl: /ummm/
     
     image:
-      name: jupyterhub/k8s-hub
-      tag: '0.9-484ce8e'   # recent version for DummyAuth and and other features
+      name: oneilsh/ktesting-k8s-hub
+      tag: 'latest'   # installed nativeauthenticator: https://blog.jupyter.org/simpler-authentication-for-small-scale-jupyterhubs-with-nativeauthenticator-999534c77a09
 
     extraConfig:
+      # this doesn't work (proxy secret too) because the proxy is a separate container and doesn't know about
+      # config set in the hub's config; they both read it from the chart
+      #baseUrl: |
+      #  c.JupyterHub.base_url = "/hrm/"
+
       nfspriv: |
         from kubernetes import client
         def modify_pod_hook(spawner, pod):
@@ -61,22 +88,46 @@ jupyterhub:
         c.KubeSpawner.modify_pod_hook = modify_pod_hook
 
       authsetting: |
-        from jupyterhub.auth import DummyAuthenticator
-        from tornado import gen
+        import os
 
-        class DummyExtraAuthenticator(DummyAuthenticator):
-          @gen.coroutine
-          def pre_spawn_start(self, user, spawner):
-            # for use by scripts in start-notebook.d
-            # NB_USER is the username logged in with
-            # ADMIN_USER is "True" if they're an admin, "False" otherwise
-            spawner.environment['NB_USER'] = user.name
-            spawner.environment['ADMIN_USER'] = str(user.admin)
-            # below for debugging
-            #spawner.environment['NB_UID'] = "1000"
-            #spawner.environment['GRANT_SUDO'] = "yes"
+        auth_type = os.environ["AUTH_TYPE"]
         
-        c.JupyterHub.authenticator_class = DummyExtraAuthenticator
-        c.Authenticator.admin_users = {'oneils'}
+        if auth_type == "native":
+          from nativeauthenticator import NativeAuthenticator
+          from tornado import gen
+
+          class NativeExtraAuthenticator(NativeAuthenticator):
+            @gen.coroutine
+            def pre_spawn_start(self, user, spawner):
+              # for use by scripts in start-notebook.d
+              # NB_USER is the username logged in with
+              # ADMIN_USER is "True" if they're an admin, "False" otherwise
+              spawner.environment['NB_USER'] = user.name
+              spawner.environment['ADMIN_USER'] = str(user.admin)
+              # below for debugging
+              #spawner.environment['NB_UID'] = "1000"
+              #spawner.environment['GRANT_SUDO'] = "yes"
+       
+          ## read admin user list from provided values 
+          c.JupyterHub.authenticator_class = NativeExtraAuthenticator
+          # location in docker image
+          c.JupyterHub.template_paths = ["/home/jovyan/nativeauthenticator/nativeauthenticator/templates/"]       
+
+        else:
+          from jupyterhub.auth import DummyAuthenticator
+          from tornado import gen
+
+          class DummyExtraAuthenticator(DummyAuthenticator):
+            @gen.coroutine
+            def pre_spawn_start(self, user, spawner):
+              spawner.environment['NB_USER'] = user.name
+              spawner.environment['ADMIN_USER'] = str(user.admin)
+       
+          ## read admin user list from provided values 
+          c.JupyterHub.authenticator_class = DummyExtraAuthenticator
+
+        admin_users_comma_sep = os.environ["ADMIN_USERS"]  # grab admin usernames from environment variable set in questions.yaml
+        admin_users = set([entry.strip() for entry in admin_users_comma_sep.split(",")]) # split it into a set to use
+        c.Authenticator.admin_users = admin_users
         c.JupyterHub.admin_access = True
 

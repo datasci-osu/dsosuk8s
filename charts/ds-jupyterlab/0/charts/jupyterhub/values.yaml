@@ -48,7 +48,7 @@ hub:
   extraVolumeMounts: []
   image:
     name: jupyterhub/k8s-hub
-    tag: '0.9-484ce8e'
+    tag: '0.9.0-alpha.1.088.1350ad7'
     # pullSecrets:
     #   - secretName
   resources:
@@ -79,7 +79,15 @@ hub:
   shutdownOnLogout:
   templatePaths: []
   templateVars: {}
-
+  livenessProbe:
+    enabled: false
+    initialDelaySeconds: 30
+    periodSeconds: 10
+  readinessProbe:
+    enabled: true
+    initialDelaySeconds: 0
+    periodSeconds: 10
+  # existingSecret: existing-secret
 
 rbac:
   enabled: true
@@ -121,10 +129,19 @@ proxy:
       http:
       https:
     loadBalancerIP:
+    loadBalancerSourceRanges: []
   chp:
     image:
       name: jupyterhub/configurable-http-proxy
-      tag: 4.1.0
+      tag: 4.2.0
+    livenessProbe:
+      enabled: true
+      initialDelaySeconds: 30
+      periodSeconds: 10
+    readinessProbe:
+      enabled: true
+      initialDelaySeconds: 0
+      periodSeconds: 10
     resources:
       requests:
         cpu: 200m
@@ -203,7 +220,7 @@ singleuser:
   networkTools:
     image:
       name: jupyterhub/k8s-network-tools
-      tag: '0.9-b51ffeb'
+      tag: '0.9.0-alpha.1.000.f995427'
   cloudMetadata:
     enabled: false
     ip: 169.254.169.254
@@ -245,7 +262,7 @@ singleuser:
       storageAccessModes: [ReadWriteOnce]
   image:
     name: jupyterhub/k8s-singleuser-sample
-    tag: '0.9-b51ffeb'
+    tag: '0.9.0-alpha.1.022.59437a5'
     pullPolicy: IfNotPresent
     # pullSecrets:
     #   - secretName
@@ -286,7 +303,7 @@ scheduling:
     policy: {}
     image:
       name: gcr.io/google_containers/kube-scheduler-amd64
-      tag: v1.11.2
+      tag: v1.13.12
     nodeSelector: {}
     pdb:
       enabled: true
@@ -316,14 +333,14 @@ prePuller:
     enabled: true
     image:
       name: jupyterhub/k8s-image-awaiter
-      tag: '0.9-b51ffeb'
+      tag: '0.9.0-alpha.1.000.f995427'
   continuous:
     enabled: true
   extraImages: {}
   pause:
     image:
       name: gcr.io/google_containers/pause
-      tag: '3.0'
+      tag: '3.1'
 
 
 ingress:

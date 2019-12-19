@@ -1,0 +1,28 @@
+# sets permissions for user directory for 'classroom' access - admins read/write everywhere, users read/write in their home dirs only and explicit shared spaces
+# see detailed nodes in check_jovyan.sh (which does the same thing, but for the default "jovyan" user
+
+if [[ ! -d /home/$NB_USER ]]; then
+  chown $NB_UID:$ADMIN_GROUPNAME /tmp/$NB_USER 
+  chmod -R 770 /tmp/$NB_USER                      
+  
+  chown -R $NB_UID:100 /tmp/$NB_USER/.??* 
+  chown -R $NB_UID:100 /tmp/$NB_USER/* 
+  
+  cp -a /tmp/$NB_USER /home
+fi
+
+# if the user is labeled an admin, put them in the admins group, otherwise remove them
+if [[ "$ADMIN_USER" == "True" ]]; then
+  grep -E "^$NB_USER\$" $ADMIN_HOME_DIR/automanaged/etc_group_admins || echo $NB_USER >> $ADMIN_HOME_DIR/automanaged/etc_group_admins
+else
+  sed -r -i "/^$NB_USER$/d" $ADMIN_HOME_DIR/automanaged/etc_group_admins
+fi
+
+# put them in the users group no matter what
+grep -E "^$NB_USER\$" $ADMIN_HOME_DIR/automanaged/etc_group_users || echo $NB_USER >> $ADMIN_HOME_DIR/automanaged/etc_group_users
+
+rm -rf /tmp/$NB_USER
+
+# make sure they source the autosourced_by_bashrcs, even if they try to remove it ;)
+grep -qxF "source $ADMIN_HOME_DIR/autosourced_by_bashrcs" /home/$NB_USER/.bashrc || echo "source $ADMIN_HOME_DIR/autosourced_by_bashrcs" >> /home/$NB_USER/.bashrc
+
