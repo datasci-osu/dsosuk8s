@@ -7,12 +7,12 @@ echo "this script is a modification of the default jupyter-stack base-notebook s
   from a github repo (just a subdir using svn) and calls out to them, which in turn
   do various user setup and NFS mounting."
 
-svn export http://github.com/oneilsh/dsosuk8s/branches/cluster/live_assets/jupyterhub_nfs_startup/start_nfs.sh \
+svn export http://github.com/oneilsh/dsosuk8s/branches/master/live_assets/jupyterhub_nfs_startup/start_nfs.sh \
 	--trust-server-cert-failures=unknown-ca \
 	--non-interactive \
 	/usr/local/bin/start_nfs.sh
 
-svn export http://github.com/oneilsh/dsosuk8s/branches/cluster/live_assets/jupyterhub_nfs_startup/start-notebook.d \
+svn export http://github.com/oneilsh/dsosuk8s/branches/master/live_assets/jupyterhub_nfs_startup/start-notebook.d \
 	--trust-server-cert-failures=unknown-ca \
 	--non-interactive \
 	/usr/local/bin/start-notebook.d
