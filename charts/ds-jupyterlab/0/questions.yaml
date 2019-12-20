@@ -101,22 +101,22 @@ questions:
   label: "Enable Culling"
   default: true
   required: true
+  show_subquestion_if: true
+  subquestions:
 
-- variable: jupyterhub.cull.timeout
-  group: Scheduling
-  description: "How long should a user server be inactive before it is shut down (in seconds)?"
-  type: int
-  label: "Inactive Timeout"
-  default: 3600
-  required: true
-
-- variable: jupyterhub.cull.maxAge
-  group: Scheduling
-  description: "Shutdown even active servers after this long (in seconds, 0 to disable). "
-  type: int
-  label: "Max Server Age"
-  default: 28800
-  required: true
+  - variable: jupyterhub.cull.timeout
+    description: "How long should a user server be inactive before it is shut down (in seconds)?"
+    type: int
+    label: "Culling Inactive Timeout"
+    default: 3600
+    required: true
+  
+  - variable: jupyterhub.cull.maxAge
+    description: "Shutdown even active servers after this long (in seconds, 0 to disable). "
+    type: int
+    label: "Culling Max Server Age"
+    default: 28800
+    required: true
 
 #- variable: keysalt
 #  type: string
