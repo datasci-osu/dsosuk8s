@@ -32,13 +32,13 @@ jupyterhub:
       enabled: true
       type: offload
   singleuser:
-    # looks like these should be left empty for the c.Spawner limits below to be used
+    # looks like these should be set null to delete the key (including those defaulted in the jupyterhub chart) for the c.Spawner limits below to be used
     memory:
-      limit: 
-      guarantee: 
+      limit: null
+      guarantee: null
     cpu:
-      limit: 
-      guarantee: 
+      limit: null
+      guarantee: null
     image:
       name: oneilsh/ktesting-datascience-notebook
       tag: latest
