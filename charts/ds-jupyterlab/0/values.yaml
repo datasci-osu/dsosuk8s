@@ -33,11 +33,11 @@ jupyterhub:
       type: offload
   singleuser:
     memory:
-      limit: "1G"
-      guarantee: "0.5G"
+      limit: 
+      guarantee: 
     cpu:
-      limit: 1.2
-      guarantee: 0.1
+      limit: 
+      guarantee: 
     image:
       name: oneilsh/ktesting-datascience-notebook
       tag: latest
