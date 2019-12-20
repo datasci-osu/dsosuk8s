@@ -24,17 +24,17 @@ questions:
   description: "Usernames with administrator access, comma-separated. Admins can add more users in the UI."
   required: true
 
-- variable: jupyterhub.singleuser.cpu.guarantee
-  default: "0.25"
-  description: "CPU guarantee per student."
-  type: string
-  label: "CPU Guarantee"
-
-- variable: jupyterhub.singleuser.cpu.limit
-  default: "1.0"
-  description: "CPU limit per student."
-  type: string
-  label: "CPU Limit"
+  #- variable: jupyterhub.singleuser.cpu.guarantee
+  #  default: "0.25"
+  #  description: "CPU guarantee per student."
+  #  type: string
+  #  label: "CPU Guarantee"
+  #
+  #- variable: jupyterhub.singleuser.cpu.limit
+  #  default: "1.0"
+  #  description: "CPU limit per student."
+  #  type: string
+  #  label: "CPU Limit"
 
 - variable: jupyterhub.singleuser.memory.guarantee
   default: "0.5G"
