@@ -2,104 +2,119 @@ categories:
 - DataScience
 questions:
 - variable: jupyterhub.hub.extraEnv.AUTH_TYPE
+  group: General
   default: "native"
-  description: "JupyterHub authenticator to use."
-  label: "Authenticator: "
+  description: "JupyterHub authenticator to use - native allows request/approve workflow, dummy allows any user/password (for testing only!)."
+  label: "Authenticator"
   type: enum
   options:
   - "native"
   - "dummy"
 
 - variable: jupyterhub.singleuser.extraEnv.NFS_SVC_HOME
+  group: General
   default: ""
-  description: "Drive to use for home folders."
+  description: "Drive to use for home folders; use the name of the drive application within the same namespace."
   type: string
   label: "/home Drive"
   required: true
 
 - variable: jupyterhub.hub.extraEnv.ADMIN_USERS
+  group: General
   default: "oneils, smithj"
   type: string
   label: "Admins"
-  description: "Usernames with administrator access, comma-separated. Admins can add more users in the UI."
+  description: "Usernames with initial administrator access, comma-separated. Admins can add more users in the UI; if using native authenticator, they are auto-approved after signup."
   required: true
 
-- variable: jupyterhub.singleuser.cpu.guarantee
-  default: 0.25
-  description: "CPU guarantee per student."
+- variable: jupyterhub.hub.extraEnv.CPU_GUARANTEE
+  group: Resources
+  default: 0.1
+  description: "CPU guarantee per student (in cores)."
   type: float
   label: "CPU Guarantee"
 
-- variable: jupyterhub.singleuser.cpu.limit
+- variable: jupyterhub.hub.extraEnv.CPU_LIMIT
+  group: Resources
   default: 1.0
-  description: "CPU limit per student."
+  description: "CPU limit per student (in cores)."
   type: float
   label: "CPU Limit"
 
-- variable: jupyterhub.singleuser.memory.guarantee
-  default: "0.5G"
-  description: "Memory gaurantee per student."
-  type: string
+- variable: jupyterhub.hub.extraEnv.MEMORY_GUARANTEE
+  group: Resources
+  default: 0.5
+  description: "Memory gaurantee per student (in gigs)."
+  type: float
   label: "Memory Gaurantee"
 
-- variable: jupyterhub.singleuser.memory.limit
-  default: "1G"
-  description: "Memory limit, per student."
-  type: string
+- variable: jupyterhub.hub.extraEnv.MEMORY_LIMIT
+  group: Resources
+  default: 1.0
+  description: "Memory limit per student (in gigs)"
+  type: float
   label: "Memory Limit"
 
 - variable: jupyterhub.proxy.secretToken
+  group: Access
   description: "Required for security. Generate with `openssl rand -hex 32`."
   type: string
-  label: "Secret Token: "
+  label: "Secret Token"
   required: true
 
 - variable: jupyterhub.ingress.hosts[0]
-  description: "Hostname for hub (e.g. myhub.myorg.edu, or just myorg.edu)"
+  group: Access
+  description: "Hostname for hub (e.g. myhub.myorg.edu or just myorg.edu)"
   type: string
-  label: "Host: "
-  default: "eksdevd.dsosu.us"
+  label: "Host"
+  default: "cluster.datasci.oregonstate.edu"
   required: true
 
 - variable: jupyterhub.ingress.tls[0].hosts[0]
+  group: Access
   description: "TLS Hostname for hub (set as same as Host)"
   type: string
-  label: "TLS Host: "
-  default: "eksdevd.dsosu.us"
+  label: "TLS Host"
+  default: "cluster.datasci.oregonstate.edu"
   required: true
 
 - variable: jupyterhub.hub.baseUrl
+  group: Access
   description: "URL as base of hub. If not /, should start and end with /, e.g. /jupyterhub/"
   type: string
-  label: "URL: "
+  label: "URL"
   default: "/my-jupyterhub/"
   required: true
 
 - variable: jupyterhub.scheduling.userPlaceholder.replicas
+  group: Scheduling
   description: "Number of user placeholders to create - see https://zero-to-jupyterhub.readthedocs.io/en/latest/administrator/optimization.html."
   type: int
-  label: "Placeholders: "
+  label: "Placeholders"
   default: 5
   required: true
 
 - variable: jupyterhub.cull.enabled
+  group: Scheduling
   description: "Should inactive user servers be shut down? (Browser window open = activity; checked every 10 mins)"
   type: boolean
-  label: "Enable Culling: "
+  label: "Enable Culling"
   default: true
   required: true
 
 - variable: jupyterhub.cull.timeout
-  description: "How long should a user server be inactive before it is shut down (seconds)?"
+  group: Scheduling
+  description: "How long should a user server be inactive before it is shut down (in seconds)?"
   type: int
-  label: "Inactive Timeout: "
+  label: "Inactive Timeout"
   default: 3600
   required: true
 
 - variable: jupyterhub.cull.maxAge
-  description: "Shutdown even active servers after this long (seconds, 0 to disable). "
+  group: Scheduling
+  description: "Shutdown even active servers after this long (in seconds, 0 to disable). "
   type: int
-  label: "Max Server Age: "
+  label: "Max Server Age"
   default: 28800
   required: true
 
