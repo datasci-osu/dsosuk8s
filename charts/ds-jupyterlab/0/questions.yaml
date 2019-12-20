@@ -55,12 +55,6 @@ questions:
   type: float
   label: "Memory Limit"
 
-- variable: jupyterhub.proxy.secretToken
-  group: Access
-  description: "Required for security. Generate with `openssl rand -hex 32`."
-  type: string
-  label: "Secret Token"
-  required: true
 
 - variable: jupyterhub.ingress.hosts[0]
   group: Access
@@ -84,6 +78,13 @@ questions:
   type: string
   label: "URL"
   default: "/my-jupyterhub/"
+  required: true
+
+- variable: jupyterhub.proxy.secretToken
+  group: Access
+  description: "Required for security. Generate with `openssl rand -hex 32`."
+  type: string
+  label: "Secret Token"
   required: true
 
 - variable: jupyterhub.scheduling.userPlaceholder.replicas
