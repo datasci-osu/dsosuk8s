@@ -76,9 +76,9 @@ jupyterhub:
         import os
         # maybe the order of these matters? gaurantee first?
         if os.environ["MEMORY_GUARANTEE"]:
-          c.Spawner.mem_guarantee = int(float(os.environ["MEMORY_GUARANTEE"]) * 1000 * 1000 * 1000) # read as bytes
+          c.Spawner.mem_guarantee = str(os.environ["MEMORY_GUARANTEE"])) + "G"
         if os.environ["MEMORY_LIMIT"]:
-          c.Spawner.mem_limit = int(float(os.environ["MEMORY_LIMIT"]) * 1000 * 1000 * 1000) # read as bytes
+          c.Spawner.mem_limit = str(float(os.environ["MEMORY_LIMIT"])) + "G"
         if os.environ["CPU_GUARANTEE"]:
           c.Spawner.cpu_guarantee = float(os.environ["CPU_GUARANTEE"])
         if os.environ["CPU_LIMIT"]:
