@@ -70,11 +70,17 @@ jupyterhub:
       tag: 'latest'   # installed nativeauthenticator: https://blog.jupyter.org/simpler-authentication-for-small-scale-jupyterhubs-with-nativeauthenticator-999534c77a09
 
     extraConfig:
-      # this doesn't work (proxy secret too) because the proxy is a separate container and doesn't know about
-      # config set in the hub's config; they both read it from the chart
-      #baseUrl: |
-      #  c.JupyterHub.base_url = "/hrm/"
-
+      # we pass in mem and cpu requests via environment variables because the rancher UI won't pass them as floats :/  
+      resources: |
+        import os
+        if os.environ["MEMORY_LIMIT"]:
+          c.Spawner.mem_limit = int(float(os.environ["MEMORY_LIMIT"]) * 1000 * 1000 * 1000) # read as bytes
+        if os.environ["MEMORY_GUARANTEE"]:
+          c.Spawner.mem_guarantee = int(float(os.environ["MEMORY_GUARANTEE"]) * 1000 * 1000 * 1000) # read as bytes
+        if os.environ["CPU_LIMIT"]:
+          c.Spawner.cpu_limit = float(os.environ["CPU_LIMIT"])
+        if os.environ["CPU_GUARANTEE"]:
+          c.Spawner.cpu_guarantee = float(os.environ["CPU_GUARANTEE"])
       nfspriv: |
         from kubernetes import client
         def modify_pod_hook(spawner, pod):
