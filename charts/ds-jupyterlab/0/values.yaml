@@ -33,8 +33,8 @@ jupyterhub:
       type: offload
   singleuser:
     memory:
-      limit: 1G
-      guarantee: 0.5G
+      limit: "1G"
+      guarantee: "0.5G"
     cpu:
       limit: 1.0
       gaurantee: 0.25
