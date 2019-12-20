@@ -1,9 +1,8 @@
 # set user's UID to psuedorandom number in range 2000 -- 2^30 using some bash and modulus tricks
 
 # TODO: use a scheme that picks a random number not in use within $ADMIN_HOME_DIR/automanaged/etc_passwd_additions (below) to avoid UID collisions, incredibly rare though they may be
+# Since UID assignment is persisted in the mount, this should stay with the user even if they are removed+re-added within the hub.
 BIG=1073741824
 PSEUDO=$(md5sum <<< "$NB_USER")
 NB_UID=$(( (((0x${PSEUDO%% *} % $BIG) + $BIG) % $BIG) + 2000))
 
-#echo "Attempting adduser $NB_USER with UID $NB_UID"
-#adduser --shell /bin/bash --no-create-home --uid $NB_UID --gecos "" --group users --gid 100 $NB_UID

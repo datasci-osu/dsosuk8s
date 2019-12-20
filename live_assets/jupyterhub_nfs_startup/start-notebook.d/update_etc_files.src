@@ -2,16 +2,15 @@
 cat $ADMIN_HOME_DIR/automanaged/etc_passwd_additions >> /etc/passwd
 
 # group entries are persisted in $ADMIN_HOME_DIR/automanaged/{etc_group_admins,etc_group_users} as single-col lists
-# we need to first remove the entries from /etc/group
-sed -i -r '/^users:/d' /etc/group
+# we need to first remove the entries from /etc/group if they happen to be there already
+sed -i -r "/^$USER_GROUPNAME:/d" /etc/group
 sed -i -r "/^$ADMIN_GROUPNAME:/d" /etc/group
 
 # make sure they exist before we try to use them
 ls $ADMIN_HOME_DIR/automanaged/etc_group_users || touch $ADMIN_HOME_DIR/automanaged/etc_group_users
 ls $ADMIN_HOME_DIR/automanaged/etc_group_admins || touch $ADMIN_HOME_DIR/automanaged/etc_group_admins
 
-# users are group 100, admins are group 101 
 USERLIST=`cat $ADMIN_HOME_DIR/automanaged/etc_group_users | tr '\n' ',' | sed -r 's/(^,+)|(,+$)//g' | sed -r 's/,+/,/g'`
 ADMINLIST=`cat $ADMIN_HOME_DIR/automanaged/etc_group_admins | tr '\n' ',' | sed -r 's/(^,+)|(,+$)//g' | sed -r 's/,+/,/g'`
-echo "users:x:100:$USERLIST" >> /etc/group
-echo "$ADMIN_GROUPNAME:x:101:$ADMINLIST,$ADMIN_USERNAME" >> /etc/group
+echo "$USER_GROUPNAME:x:$USER_GID:$USERLIST" >> /etc/group
+echo "$ADMIN_GROUPNAME:x:$ADMIN_GID:$ADMINLIST,$ADMIN_USERNAME" >> /etc/group

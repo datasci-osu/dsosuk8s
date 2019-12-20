@@ -3,8 +3,13 @@
 
 export ADMIN_USERNAME=dsadmin
 export ADMIN_GROUPNAME=dsadmins
+export USER_GROUPNAME=dsusers
+export ADMIN_GID=101
+export USER_GID=102
+export ADMIN_UID=1001
 
-addgroup --gid 101 $ADMIN_GROUPNAME
-adduser --no-create-home --uid 1001 --gid 101 --disabled-password --disabled-login --gecos "" $ADMIN_USERNAME
+addgroup --gid $ADMIN_GID $ADMIN_GROUPNAME
+addgroup --gid $USER_GID $USER_GROUPNAME
+adduser --no-create-home --uid $ADMIN_UID --gid $ADMIN_GID --disabled-password --disabled-login --gecos "" $ADMIN_USERNAME
 adduser $ADMIN_USERNAME users
 

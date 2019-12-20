@@ -59,7 +59,7 @@ fi
 # or I'll just add a little random sleepytime :)
 if ! grep -E "^$NB_USER:" $ADMIN_HOME_DIR/automanaged/etc_passwd_additions; then
   sleep `awk 'BEGIN{print 5*rand()}'`   # sleep for a random amount between 1 and 5 seconds
-  echo "$NB_USER:x:$NB_UID:100:,,,:/home/$NB_USER:/bin/bash" >> $ADMIN_HOME_DIR/automanaged/etc_passwd_additions
+  echo "$NB_USER:x:$NB_UID:$USER_GROUPNAME:,,,:/home/$NB_USER:/bin/bash" >> $ADMIN_HOME_DIR/automanaged/etc_passwd_additions
 fi
 
 # set umask (defaulting to rw-rw---- for files and  rwxrwx--- for dirs, so that new files are by 

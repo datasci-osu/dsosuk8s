@@ -18,7 +18,6 @@ if [[ ! -z $NFS_SVC_HOME ]]; then
   source /usr/local/bin/start-notebook.d/set_uid.src
   source /usr/local/bin/start-notebook.d/check_admin_config.src
   source /usr/local/bin/start-notebook.d/check_nb_user.src
-  source /usr/local/bin/start-notebook.d/check_jovyan.src
   source /usr/local/bin/start-notebook.d/update_etc_files.src
 
   # go the new dir rather than leaving CWD to be the no-longer existing original

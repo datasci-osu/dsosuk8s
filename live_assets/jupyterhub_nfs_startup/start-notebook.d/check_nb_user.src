@@ -1,26 +1,33 @@
-# sets permissions for user directory for 'classroom' access - admins read/write everywhere, users read/write in their home dirs only and explicit shared spaces
-# see detailed nodes in check_jovyan.sh (which does the same thing, but for the default "jovyan" user
+## setup permissions properly for 'classroom' access (admins read/write everywhere, users only in their home), and copy results to the /home mount
+## Do so *only* if they don't already exist in /home, so this happens only at first login (otherwise every login would result in cleaned out home dirs)
 
 if [[ ! -d /home/$NB_USER ]]; then
+  # these permissions and ownership set things up nicely for class usage - instructors mostly all powerful (file permission-wise), students normally-powerful
   chown $NB_UID:$ADMIN_GROUPNAME /tmp/$NB_USER 
+  # make sure we have group read on everything, some aren't in the .npm cache dir in the inherited docker image
   chmod -R 770 /tmp/$NB_USER                      
   
-  chown -R $NB_UID:100 /tmp/$NB_USER/.??* 
-  chown -R $NB_UID:100 /tmp/$NB_USER/* 
+  # re-own inner contents
+  # chown dotfiles (note, this trick will fail on single-letter dotfiles e.g. '.a')
+  chown -R $NB_UID:$USER_GROUPNAME /tmp/$NB_USER/.??* 
+  # chown others
+  chown -R $NB_UID:$USER_GROUPNAME /tmp/$NB_USER/* 
   
+  # copy em over to the /home mount, -a for archive (like cp -r and preserve ownership and other metadata)
   cp -a /tmp/$NB_USER /home
 fi
 
-# if the user is labeled an admin, put them in the admins group, otherwise remove them
+# if the user is labeled an admin, ensure they are in the admins group, otherwise ensure they aren't
 if [[ "$ADMIN_USER" == "True" ]]; then
   grep -E "^$NB_USER\$" $ADMIN_HOME_DIR/automanaged/etc_group_admins || echo $NB_USER >> $ADMIN_HOME_DIR/automanaged/etc_group_admins
 else
   sed -r -i "/^$NB_USER$/d" $ADMIN_HOME_DIR/automanaged/etc_group_admins
 fi
 
-# put them in the users group no matter what
+# ensure they are in the users group no matter what
 grep -E "^$NB_USER\$" $ADMIN_HOME_DIR/automanaged/etc_group_users || echo $NB_USER >> $ADMIN_HOME_DIR/automanaged/etc_group_users
 
+# we're done with the staging in /tmp, remove it
 rm -rf /tmp/$NB_USER
 
 # make sure they source the autosourced_by_bashrcs, even if they try to remove it ;)
