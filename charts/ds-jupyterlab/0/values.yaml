@@ -64,7 +64,7 @@ jupyterhub:
       - eksdevd.dsosu.us
 
   hub:
-    baseUrl: /ummm/
+    baseUrl: /
     
     image:
       name: oneilsh/ktesting-k8s-hub

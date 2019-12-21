@@ -2,11 +2,6 @@ FROM jupyter/datascience-notebook:7a0c7325e470
 
 USER root
 
-# TODO: see if these are necessary
-#RUN pip install wheel
-#RUN pip install jupyterhub
-
-#RUN jupyter labextension install theme-dark-extension
 
 RUN jupyter labextension install jupyterlab-topbar-extension \
                              jupyterlab-system-monitor \
@@ -25,15 +20,6 @@ RUN apt-get update \
     subversion \
     vim \
  && apt-get clean && rm -rf /var/lib/apt/lists/*
-
-
-COPY start.sh /usr/local/bin/
-
-# the default image has /opt writable by the jovyan user, but anything installed there (e.g. w/ pip install)
-# will disappear once the container goes away, so let's just make it unwritable and avoid accidental installs there
-RUN chown -R root:root /opt
-#RUN mkdir -p /usr/local/bin/start-notebook.d
-#COPY ./start-notebook.d/. /usr/local/bin/start-notebook.d/
 
 ## Rstudio - based on https://github.com/jupyterhub/jupyter-server-proxy/blob/master/contrib/rstudio/Dockerfile
 
@@ -83,11 +69,13 @@ RUN conda install -c r r-stringi
 #RUN jupyter labextension install @jupyterlab/server-proxy
 
 # these are listed in the dockerfile example in https://github.com/jupyterhub/jupyter-server-proxy/blob/master/contrib/rstudio/Dockerfile,
-# but we'd need to tell the spawner to keep them in the spawned command; we could alternatively do it in the start_nfs.sh (set like PATH, PYTHONPATH, etc.)
-## The desktop package uses /usr/lib/rstudio/bin
+# we add them to the start_nfs.sh script in startup_scripts (set like PATH, PYTHONPATH, etc.)
 #ENV PATH="${PATH}:/usr/lib/rstudio-server/bin"
 #ENV LD_LIBRARY_PATH="/usr/lib/R/lib:/lib:/usr/lib/x86_64-linux-gnu:/usr/lib/jvm/java-7-openjdk-amd64/jre/lib/amd64/server:/opt/conda/lib/R/lib"
 
+COPY start.sh /usr/local/bin/
+COPY start_nfs.sh /usr/local/bin
+COPY start-notebook.d /usr/local/bin
 
 USER $NB_USER
 
