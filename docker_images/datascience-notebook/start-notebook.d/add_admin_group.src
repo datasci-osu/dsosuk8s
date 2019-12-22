@@ -10,6 +10,7 @@ export ADMIN_UID=1001
 
 addgroup --gid $ADMIN_GID $ADMIN_GROUPNAME
 addgroup --gid $USER_GID $USER_GROUPNAME
+#adduser --no-create-home --uid $USER_UID --gid $USER_GID --disabled-password --disabled-login --gecos "" $NB_USER
 adduser --no-create-home --uid $ADMIN_UID --gid $ADMIN_GID --disabled-password --disabled-login --gecos "" $ADMIN_USERNAME
 adduser $ADMIN_USERNAME users
 

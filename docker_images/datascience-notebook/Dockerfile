@@ -73,9 +73,8 @@ RUN conda install -c r r-stringi
 #ENV PATH="${PATH}:/usr/lib/rstudio-server/bin"
 #ENV LD_LIBRARY_PATH="/usr/lib/R/lib:/lib:/usr/lib/x86_64-linux-gnu:/usr/lib/jvm/java-7-openjdk-amd64/jre/lib/amd64/server:/opt/conda/lib/R/lib"
 
-COPY start.sh /usr/local/bin/
-COPY start_nfs.sh /usr/local/bin
-COPY start-notebook.d /usr/local/bin
+COPY start.sh /usr/local/bin/start.sh
+COPY start-notebook.d /usr/local/bin/start-notebook.d
 
 USER $NB_USER
 
