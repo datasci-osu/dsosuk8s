@@ -116,19 +116,25 @@ check_admin_config() {
   # if a class-specific /etc/passwd entry doesn't exist, add it
   # here's where entries for /etc/passwd will be appended; but we can't put them directly in /etc/passwd because changes there don't 
   # persist
-  # if lots of people log in for the first time simultaneously, will the NFS be able handle the simultaneous appends? if not some sort of central service to handle this could be setup...
-  # or I'll just add a little random sleepytime :)
   if ! grep -E "^$NB_USER:" $ADMIN_HOME_DIR/automanaged/etc_passwd_additions; then
+    # if lots of people log in for the first time simultaneously, will the NFS be able handle the simultaneous appends? if not some sort of central service to handle this could be setup...
+    # or I'll just add a little random sleepytime :)
     sleep `awk 'BEGIN{print 5*rand()}'`   # sleep for a random amount between 1 and 5 seconds
-    echo "$NB_USER:x:$NB_UID:$USER_GID:,,,:/home/$NB_USER:/bin/bash" >> $ADMIN_HOME_DIR/automanaged/etc_passwd_additions
+
+    ## if they are an admin, make that their primary group
+    if [[ "$ADMIN_USER" == "True" ]]; then
+      echo "$NB_USER:x:$NB_UID:$ADMIN_GID:,,,:/home/$NB_USER:/bin/bash" >> $ADMIN_HOME_DIR/automanaged/etc_passwd_additions
+    else
+      echo "$NB_USER:x:$NB_UID:$USER_GID:,,,:/home/$NB_USER:/bin/bash" >> $ADMIN_HOME_DIR/automanaged/etc_passwd_additions
+    fi
   fi
   
-  # set umask (defaulting to rw-rw---- for files and  rwxrwx--- for dirs, so that new files are by 
+  # set umask (defaulting to rw-rw-r-- for files and  rwxrwxr-x for dirs, so that new files are by 
   # default read/write by 
-  # NB_USER:users; thus the group and user are set appropriately, but they are writable by anyone
+  # NB_USER:(primary group); thus the group and user are set appropriately, but they are writable by anyone
   # in the users group - including admin users. Trick is, only the owner and anyone in $ADMIN_GROUPNAME
   # can access inside home dir itself, because that is owned by NB_USER:$ADMIN_GROUPNAME rwxrwx---)
-  echo "Defaults umask=007" >> /etc/sudoers
+  echo "Defaults umask=0002" >> /etc/sudoers
   # allow sudo to use this more permissive umasks than the default of union (for use by user jupyter process which is run with sudo -u $NB_USER)
   echo "Defaults umask_override" >> /etc/sudoers 
 }
