@@ -57,8 +57,8 @@ jupyterhub:
           name: start-configmap
     extraVolumeMounts:
       - name: start-volume
-        mountPath: /usr/local/bin/
-
+        mountPath: /usr/local/bin/start.sh
+        subPath: start.sh
 
   ingress:
     enabled: true
