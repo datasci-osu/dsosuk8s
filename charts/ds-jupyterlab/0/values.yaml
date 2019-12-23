@@ -48,6 +48,9 @@ jupyterhub:
     storage:
       type: none
       extraVolumes:
+        - name: various-volume
+          configMap:
+            name: various-configmap
         - name: start-volume
           configMap:
             name: start-configmap
@@ -55,6 +58,9 @@ jupyterhub:
         - name: start-volume
           mountPath: /usr/local/bin/start.sh
           subPath: start.sh
+        - name: various-volume
+          mountPath: /usr/local/bin/various
+
     extraEnv:
       NFS_HOME_SVC: ""
     uid: 0

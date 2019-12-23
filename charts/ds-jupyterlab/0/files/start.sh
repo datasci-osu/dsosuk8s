@@ -80,7 +80,7 @@ check_admin_config() {
   
   if [[ ! -d $ADMIN_HOME_DIR/bin ]] ; then
     mkdir -p $ADMIN_HOME_DIR/bin
-    cp hub_pip $ADMIN_HOME_DIR/bin/hub_pip
+    cp various/hubpip $ADMIN_HOME_DIR/bin/hubpip
     echo "This dir is automatically added to everyone's $PATH via the autosourced_by_bashrcs file" > $ADMIN_HOME_DIR/bin/readme.txt
     chown -R $ADMIN_USERNAME:$ADMIN_GROUPNAME $ADMIN_HOME_DIR/bin
     chmod -R 775 $ADMIN_HOME_DIR/bin
@@ -88,7 +88,7 @@ check_admin_config() {
   fi
   
   if [[ ! -f $ADMIN_HOME_DIR/autosourced_by_bashrcs ]] ; then
-    cp -r autosourced_by_bashrcs $ADMIN_HOME_DIR/autosourced_by_bashrcs
+    cp -r various/autosourced_by_bashrcs $ADMIN_HOME_DIR/autosourced_by_bashrcs
     chown $ADMIN_USERNAME:$ADMIN_GROUPNAME $ADMIN_HOME_DIR/autosourced_by_bashrcs
     chmod 664 $ADMIN_HOME_DIR/autosourced_by_bashrcs
   fi
