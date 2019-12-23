@@ -51,6 +51,13 @@ jupyterhub:
       NFS_HOME_SVC: ""
     uid: 0
     fsGid: 0
+    extraVolumes:
+      - name: start-volume
+        configMap:
+          name: start-configmap
+    extraVolumeMounts:
+      - name: start-volume
+        mountPath: /usr/local/bin/
 
 
   ingress:
