@@ -182,6 +182,7 @@ update_etc_files() {
 
 
 main() {
+  sleep infinity
   cd /tmp
 
   add_admin_group
@@ -208,9 +209,8 @@ main() {
   PATH="${PATH}:/usr/lib/rstudio-server/bin"
   LD_LIBRARY_PATH="/usr/lib/R/lib:/lib:/usr/lib/x86_64-linux-gnu:/usr/lib/jvm/java-7-openjdk-amd64/jre/lib/amd64/server:/opt/conda/lib/R/lib"
   
-  sleep infinity
-  #echo "Executing the command: ${cmd[@]}"
-  #exec sudo -E -H -u $NB_USER PATH=$PATH XDG_CACHE_HOME=/home/$NB_USER/.cache PYTHONPATH=${PYTHONPATH:-} LD_LIBRARY_PATH=${LD_LIBRARY_PATH:-} "${cmd[@]}"  
+  echo "Executing the command: ${cmd[@]}"
+  exec sudo -E -H -u $NB_USER PATH=$PATH XDG_CACHE_HOME=/home/$NB_USER/.cache PYTHONPATH=${PYTHONPATH:-} LD_LIBRARY_PATH=${LD_LIBRARY_PATH:-} "${cmd[@]}"  
 }
 
 main
