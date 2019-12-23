@@ -211,6 +211,12 @@ main_setup() {
 
 main_setup
 
+# Exec the specified command or fall back on bash
+if [ $# -eq 0 ]; then
+  cmd=( "bash" )
+else
+  cmd=( "$@" )
+fi
 
 echo "Executing the command:"
 echo exec sudo -E -H -u $NB_USER PATH=$PATH XDG_CACHE_HOME=/home/$NB_USER/.cache PYTHONPATH=${PYTHONPATH:-} LD_LIBRARY_PATH=${LD_LIBRARY_PATH:-} "${cmd[@]}"  
