@@ -39,7 +39,7 @@ export PATH=$HOME/.local/bin:$PATH
 #### create link to /home/hub_data
 #############################################
 if [ ! -e $HOME/hub_data ]; then
-  ln -s /home/hub_data $HOME/hub_data
+  ln -s /home/hub_data $HOME
 fi
 
 

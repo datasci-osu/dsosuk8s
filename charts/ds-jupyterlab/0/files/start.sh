@@ -90,12 +90,12 @@ check_admin_config() {
     chmod 664 $ADMIN_HOME_DIR/bin/readme.txt
   fi
 
-  if [[ ! -d $DATA_HOME_DIR/hub_data ]] ; then
-    mkdir -p $DATA_HOME_DIR/hub_data
-    echo "This is a good location to store datasets, it is by default only writable by admins." > $DATA_HOME_DIR/hub_data/readme.txt
-    chown -R $ADMIN_USERNAME:$ADMIN_GROUPNAME $DATA_HOME_DIR/hub_data
-    chmod -R 775 $DATA_HOME_DIR/hub_data
-    chmod 664 $DATA_HOME_DIR/hub_data/readme.txt
+  if [[ ! -d $DATA_HOME_DIR ]] ; then
+    mkdir -p $DATA_HOME_DIR
+    echo "This is a good location to store datasets, it is by default only writable by admins." > $DATA_HOME_DIR/readme.txt
+    chown -R $ADMIN_USERNAME:$ADMIN_GROUPNAME $DATA_HOME_DIR
+    chmod -R 775 $DATA_HOME_DIR
+    chmod 664 $DATA_HOME_DIR/readme.txt
   fi
   
   if [[ ! -f $ADMIN_HOME_DIR/autosourced_by_bashrcs ]] ; then
