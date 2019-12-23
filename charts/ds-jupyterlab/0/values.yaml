@@ -47,18 +47,18 @@ jupyterhub:
     cmd: ["start-singleuser.sh", "--allow-root"]  # don't think I need to add --allow-root... 
     storage:
       type: none
+      extraVolumes:
+        - name: start-volume
+          configMap:
+            name: start-configmap
+      extraVolumeMounts:
+        - name: start-volume
+          mountPath: /usr/local/bin/start.sh
+          subPath: start.sh
     extraEnv:
       NFS_HOME_SVC: ""
     uid: 0
     fsGid: 0
-    extraVolumes:
-      - name: start-volume
-        configMap:
-          name: start-configmap
-    extraVolumeMounts:
-      - name: start-volume
-        mountPath: /usr/local/bin/start.sh
-        subPath: start.sh
 
   ingress:
     enabled: true
