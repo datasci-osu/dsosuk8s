@@ -57,6 +57,9 @@ check_admin_config() {
   if [[ -z $ADMIN_HOME_DIR ]]; then
     export ADMIN_HOME_DIR=/home/hub_local
   fi
+  if [[ -z $DATA_HOME_DIR ]]; then
+    export DATA_HOME_DIR=/home/hub_data
+  fi
   
   
   # if the dir doesn't exist, create it, write permissions only for admins
@@ -87,12 +90,12 @@ check_admin_config() {
     chmod 664 $ADMIN_HOME_DIR/bin/readme.txt
   fi
 
-  if [[ ! -d $ADMIN_HOME_DIR/hub_data ]] ; then
-    mkdir -p $ADMIN_HOME_DIR/hub_data
-    echo "This is a good location to store datasets, it is by default only writable by admins." > $ADMIN_HOME_DIR/hub_data/readme.txt
-    chown -R $ADMIN_USERNAME:$ADMIN_GROUPNAME $ADMIN_HOME_DIR/hub_data
-    chmod -R 775 $ADMIN_HOME_DIR/hub_data
-    chmod 664 $ADMIN_HOME_DIR/hub_data/readme.txt
+  if [[ ! -d $DATA_HOME_DIR/hub_data ]] ; then
+    mkdir -p $DATA_HOME_DIR/hub_data
+    echo "This is a good location to store datasets, it is by default only writable by admins." > $DATA_HOME_DIR/hub_data/readme.txt
+    chown -R $ADMIN_USERNAME:$ADMIN_GROUPNAME $DATA_HOME_DIR/hub_data
+    chmod -R 775 $DATA_HOME_DIR/hub_data
+    chmod 664 $DATA_HOME_DIR/hub_data/readme.txt
   fi
   
   if [[ ! -f $ADMIN_HOME_DIR/autosourced_by_bashrcs ]] ; then
