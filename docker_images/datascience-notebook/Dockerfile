@@ -43,7 +43,9 @@ RUN apt-get clean && \
     rm -rf /var/lib/apt/lists/*
 
 
-RUN pip install git+https://github.com/jupyterhub/jupyter-rsession-proxy
+#RUN pip install git+https://github.com/jupyterhub/jupyter-rsession-proxy
+# use the pypi version to avoid a recent bug RE https://github.com/jupyterhub/jupyter-rsession-proxy/issues/71#issuecomment-523630103
+RUN pip install 'jupyter-rsession-proxy=1.0b6' --force-reinstall
 
 # because of some error RE https://github.com/jupyter/docker-stacks/issues/927 
 RUN conda install -c r r-stringi
