@@ -112,9 +112,9 @@ jupyterhub:
       authsetting: |
         import os
 
-        auth_type = os.environ["AUTH_TYPE"]
+        env_auth_type = os.environ["AUTH_TYPE"]
         
-        if auth_type == "native":
+        if env_auth_type == "native":
           from nativeauthenticator import NativeAuthenticator
           from tornado import gen
 

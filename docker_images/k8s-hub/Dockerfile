@@ -14,3 +14,5 @@ RUN git clone https://github.com/oneilsh/nativeauthenticator.git
 WORKDIR /home/jovyan/nativeauthenticator
 RUN pip3 install -e .
 
+WORKDIR /srv/jupyterhub
+
