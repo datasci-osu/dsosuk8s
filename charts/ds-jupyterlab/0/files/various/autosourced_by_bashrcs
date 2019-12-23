@@ -34,3 +34,12 @@ export PATH=$ADMIN_HOME_DIR/bin:$PATH
 #############################################
 export PATH=$HOME/.local/bin:$PATH
 
+
+#############################################
+#### create link to /home/hub_data
+#############################################
+if [ ! -e $HOME/hub_data ]; then
+  ln -s /home/hub_data hub_data
+fi
+
+
