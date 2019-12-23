@@ -78,7 +78,8 @@ jupyterhub:
 
   hub:
     baseUrl: /
-    
+    db:
+      upgrade: false 
     image:
       name: oneilsh/ktesting-k8s-hub
       tag: 'latest'   # installed nativeauthenticator: https://blog.jupyter.org/simpler-authentication-for-small-scale-jupyterhubs-with-nativeauthenticator-999534c77a09

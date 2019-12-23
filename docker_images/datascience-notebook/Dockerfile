@@ -5,7 +5,6 @@ USER root
 
 RUN jupyter labextension install jupyterlab-topbar-extension \
                              jupyterlab-system-monitor \
-                             jupyterlab-topbar-text \
                              jupyterlab-logout \
                              jupyterlab-theme-toggle
 
