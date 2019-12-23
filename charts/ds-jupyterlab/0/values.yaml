@@ -45,7 +45,7 @@ jupyterhub:
       pullPolicy: Always
     defaultUrl: "/lab"
     #cmd: ["start-singleuser.sh", "--allow-root"]  # don't think I need to add --allow-root... 
-    cmd: ["sleep", "6000"]
+    cmd: ["cat"]
     storage:
       type: none
       extraVolumes:
