@@ -182,7 +182,7 @@ update_etc_files() {
 
 
 main() {
-  #sleep infinity
+  sleep infinity
   cd /tmp
 
   add_admin_group
