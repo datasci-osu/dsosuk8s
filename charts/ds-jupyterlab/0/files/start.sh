@@ -181,8 +181,7 @@ update_etc_files() {
 }
 
 
-main() {
-  #sleep infinity
+main_setup() {
   cd /tmp
 
   add_admin_group
@@ -208,10 +207,11 @@ main() {
   # note that this is specific to the image RStudio install
   PATH="${PATH}:/usr/lib/rstudio-server/bin"
   LD_LIBRARY_PATH="/usr/lib/R/lib:/lib:/usr/lib/x86_64-linux-gnu:/usr/lib/jvm/java-7-openjdk-amd64/jre/lib/amd64/server:/opt/conda/lib/R/lib"
-  
-  echo "Executing the command:"
-  echo exec sudo -E -H -u $NB_USER PATH=$PATH XDG_CACHE_HOME=/home/$NB_USER/.cache PYTHONPATH=${PYTHONPATH:-} LD_LIBRARY_PATH=${LD_LIBRARY_PATH:-} "${cmd[@]}"  
-  exec sudo -E -H -u $NB_USER PATH=$PATH XDG_CACHE_HOME=/home/$NB_USER/.cache PYTHONPATH=${PYTHONPATH:-} LD_LIBRARY_PATH=${LD_LIBRARY_PATH:-} "${cmd[@]}"  
 }
 
-main
+main_setup
+
+
+echo "Executing the command:"
+echo exec sudo -E -H -u $NB_USER PATH=$PATH XDG_CACHE_HOME=/home/$NB_USER/.cache PYTHONPATH=${PYTHONPATH:-} LD_LIBRARY_PATH=${LD_LIBRARY_PATH:-} "${cmd[@]}"  
+exec sudo -E -H -u $NB_USER PATH=$PATH XDG_CACHE_HOME=/home/$NB_USER/.cache PYTHONPATH=${PYTHONPATH:-} LD_LIBRARY_PATH=${LD_LIBRARY_PATH:-} "${cmd[@]}"  
