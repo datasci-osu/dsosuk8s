@@ -145,7 +145,7 @@ check_admin_config() {
     mkdir -p $ADMIN_HOME_DIR/R_libs
     echo "This is the site-library for R packages, admins can install.packages() directly to here (which is the default), users cannot." > $ADMIN_HOME_DIR/R_libs/readme.txt
     echo "####################" > $ADMIN_HOME_DIR/autosourced_by_rprofiles
-    echo "## use the site lib first, then the user lib, then global lib (so instructors default installs go to site-lib and it is checked first)" >> $ADMIN_HOME_DIR/R_libs/autosourced_by_rprofiles
+    echo "## use the site lib first, then the user lib, then global lib (so instructors default installs go to site-lib and it is checked first)" >> $ADMIN_HOME_DIR/autosourced_by_rprofiles
     echo "####################" >> $ADMIN_HOME_DIR/autosourced_by_rprofiles
     echo ".libPaths(c(.libPaths()[1], \"$ADMIN_HOME_DIR/R_libs\", \"/opt/conda/lib/R/library\"))" >> $ADMIN_HOME_DIR/autosourced_by_rprofiles
     chown -R $ADMIN_USERNAME:$ADMIN_GROUPNAME $ADMIN_HOME_DIR/R_libs
