@@ -136,7 +136,27 @@ check_admin_config() {
   # can access inside home dir itself, because that is owned by NB_USER:$ADMIN_GROUPNAME rwxrwx---)
   echo "Defaults umask=0002" >> /etc/sudoers
   # allow sudo to use this more permissive umasks than the default of union (for use by user jupyter process which is run with sudo -u $NB_USER)
-  echo "Defaults umask_override" >> /etc/sudoers 
+  echo "Defaults umask_override" >> /etc/sudoers
+
+
+  # setup Rstudio Renviron to learn about the R site libraries 
+  # note that we have to build the autosourced_by_rprofiles here, because Rstudio doesn't get any of the fricken environment variables that jupyter does (and I decided long ago to make $ADMIN_HOME_DIR a var...)
+  if [[ ! -d $ADMIN_HOME_DIR/R_libs ]] ; then
+    mkdir -p $ADMIN_HOME_DIR/R_libs
+    echo "This is the site-library for R packages, admins can install.packages() directly to here (which is the default), users cannot." > $ADMIN_HOME_DIR/R_libs/readme.txt
+    echo "####################" > $ADMIN_HOME_DIR/R_libs/autosourced_by_rprofiles
+    echo "## use the site lib first, then the user lib, then global lib (so instructors default installs go to site-lib and it is checked first)" >> $ADMIN_HOME_DIR/R_libs/autosourced_by_rprofiles
+    echo "####################" >> $ADMIN_HOME_DIR/R_libs/autosourced_by_rprofiles
+    echo ".libPaths(c(.libPaths()[1], \"$ADMIN_HOME_DIR/R_libs\", \"/opt/conda/lib/R/library\")" >> $ADMIN_HOME_DIR/R_libs/autosourced_by_rprofiles
+    chown -R $ADMIN_USERNAME:$ADMIN_GROUPNAME $ADMIN_HOME_DIR/R_libs
+    chmod -R 775 $ADMIN_HOME_DIR/R_libs
+    chmod 664 $ADMIN_HOME_DIR/R_libs/readme.txt
+    chmod 664 $ADMIN_HOME_DIR/R_libs/autosourced_by_rprofiles
+
+    if [[ -e /opt/conda/lib/R/etc/Renviron ]]; then
+      grep "$ADMIN_HOME_DIR/R_libs" /opt/conda/lib/R/etc/Renviron || echo "R_LIBS_SITE=$ADMIN_HOME_DIR/R_libs" >> /opt/conda/lib/R/etc/Renviron
+    fi
+  fi
 }
 
 
@@ -175,6 +195,8 @@ check_nb_user() {
   
   # make sure they source the autosourced_by_bashrcs, even if they try to remove it ;)
   grep -qxF "source $ADMIN_HOME_DIR/autosourced_by_bashrcs" /home/$NB_USER/.bashrc || echo "source $ADMIN_HOME_DIR/autosourced_by_bashrcs" >> /home/$NB_USER/.bashrc
+  # make sure they source the autosourced_by_rprofiles, even if they try to remove it ;)
+  grep -qxF "source(\"$ADMIN_HOME_DIR/autosourced_by_rprofiles\")" /home/$NB_USER/.Rprofile || echo "source(\"$ADMIN_HOME_DIR/autosourced_by_rprofiles\")" >> /home/$NB_USER/.Rprofile
 }
 
 
