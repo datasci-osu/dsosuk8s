@@ -257,4 +257,4 @@ else
   cmd=( "$@" )
 fi
 
-exec sudo -E -H -u $NB_USER PATH=$PATH XDG_CACHE_HOME=/home/$NB_USER/.cache PYTHONPATH=${PYTHONPATH:-} LD_LIBRARY_PATH=${LD_LIBRARY_PATH:-} "source /home/$NB_USER/.bashrc; ${cmd[@]}"  
+exec sudo -i -E -H -u $NB_USER PATH=$PATH XDG_CACHE_HOME=/home/$NB_USER/.cache PYTHONPATH=${PYTHONPATH:-} LD_LIBRARY_PATH=${LD_LIBRARY_PATH:-} "${cmd[@]}"  
