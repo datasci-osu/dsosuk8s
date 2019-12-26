@@ -26,14 +26,19 @@ add_admin_group() {
 stage_home_copies() {
   # move things to /tmp to work on since we'll be NFS mounting over /home
   # make a copy of the jovyan home to $NB_USER HOME
-  mv /home/jovyan /tmp/jovyan                                    
+  echo "copying /home/jovyan to /tmp/jovyan"
+  mv /home/jovyan /tmp/jovyan               
+  echo "copying /tmp/jovyan to /tmp/$NB_USER"  
   cp -r /tmp/jovyan /tmp/$NB_USER                                # keep a token jovyan around for debugging/testing
+  echo "done copying home dirs..."
 }
 
 
 do_mount() {
   # mount the NFS, soft mount in case the server hiccups (to prevent user pods from going zombie), but 10 second timeout to prevent potential issues (based on recs for EFS, which I'd guess generalize? https://docs.aws.amazon.com/efs/latest/ug/mounting-fs-nfs-mount-settings.html)
+  echo "mounting $NFS_SVC_HOME"
   mount -o soft,timeo=100 $NFS_SVC_HOME:/ /home
+  echo "done mounting..."
 }
 
 
@@ -65,54 +70,61 @@ check_admin_config() {
   # if the dir doesn't exist, create it, write permissions only for admins
   if [[ ! -d $ADMIN_HOME_DIR ]] ; then
     mkdir -p $ADMIN_HOME_DIR
-    echo "This directory is used for hub-wide environment configuration, package and script installs, etc. It is read/writable by those in the admins group, but only readable by others." > $ADMIN_HOME_DIR/readme.txt
+    echo "This directory is used for hub-wide environment configuration, package and script installs, etc. It is read/writable by those in the admins group, but only readable by others." > $ADMIN_HOME_DIR/README.txt
     chown -R $ADMIN_USERNAME:$ADMIN_GROUPNAME $ADMIN_HOME_DIR
     chmod -R 775 $ADMIN_HOME_DIR
+    chmod 664 $ADMIN_HOME_DIR/README.txt
   fi
   
   # other dirs...
   if [[ ! -d $ADMIN_HOME_DIR/automanaged ]] ; then
     mkdir -p $ADMIN_HOME_DIR/automanaged
-    echo "This dir managed continuously by hub login processes, please don't edit." > $ADMIN_HOME_DIR/automanaged/readme.txt
+    echo "This dir managed continuously by hub login processes, please don't edit." > $ADMIN_HOME_DIR/automanaged/README.txt
     touch $ADMIN_HOME_DIR/automanaged/etc_group_admins
     touch $ADMIN_HOME_DIR/automanaged/etc_group_users
     chown -R $ADMIN_USERNAME:$ADMIN_GROUPNAME $ADMIN_HOME_DIR/automanaged
     chmod -R 775 $ADMIN_HOME_DIR/automanaged
-    chmod 664 $ADMIN_HOME_DIR/automanaged/readme.txt $ADMIN_HOME_DIR/automanaged/etc_group_users $ADMIN_HOME_DIR/automanaged/etc_group_admins
+    chmod 664 $ADMIN_HOME_DIR/automanaged/README.txt $ADMIN_HOME_DIR/automanaged/etc_group_users $ADMIN_HOME_DIR/automanaged/etc_group_admins
   fi
   
   if [[ ! -d $ADMIN_HOME_DIR/bin ]] ; then
     mkdir -p $ADMIN_HOME_DIR/bin
     cp -L /usr/local/bin/various/hubpip $ADMIN_HOME_DIR/bin/hubpip
-    echo "This dir is automatically added to everyone's $PATH via the autosourced_by_bashrcs file" > $ADMIN_HOME_DIR/bin/readme.txt
+    echo "This dir is automatically added to everyone's $PATH via the hubrc file" > $ADMIN_HOME_DIR/bin/README.txt
     chown -R $ADMIN_USERNAME:$ADMIN_GROUPNAME $ADMIN_HOME_DIR/bin
     chmod -R 775 $ADMIN_HOME_DIR/bin
-    chmod 664 $ADMIN_HOME_DIR/bin/readme.txt
+    chmod 664 $ADMIN_HOME_DIR/bin/README.txt
   fi
 
   if [[ ! -d $DATA_HOME_DIR ]] ; then
     mkdir -p $DATA_HOME_DIR
-    echo "This is a good location to store datasets, it is by default only writable by admins." > $DATA_HOME_DIR/readme.txt
+    echo "This is a good location to store datasets, it is by default only writable by admins." > $DATA_HOME_DIR/README.txt
     chown -R $ADMIN_USERNAME:$ADMIN_GROUPNAME $DATA_HOME_DIR
     chmod -R 775 $DATA_HOME_DIR
-    chmod 664 $DATA_HOME_DIR/readme.txt
+    chmod 664 $DATA_HOME_DIR/README.txt
   fi
   
-  if [[ ! -f $ADMIN_HOME_DIR/autosourced_by_bashrcs ]] ; then
-    cp -L /usr/local/bin/various/autosourced_by_bashrcs $ADMIN_HOME_DIR/autosourced_by_bashrcs
-    chown $ADMIN_USERNAME:$ADMIN_GROUPNAME $ADMIN_HOME_DIR/autosourced_by_bashrcs
-    chmod 664 $ADMIN_HOME_DIR/autosourced_by_bashrcs
+  if [[ ! -f $ADMIN_HOME_DIR/hubrc ]] ; then
+    cp -L /usr/local/bin/various/hubrc $ADMIN_HOME_DIR/hubrc
+    chown $ADMIN_USERNAME:$ADMIN_GROUPNAME $ADMIN_HOME_DIR/hubrc
+    chmod 664 $ADMIN_HOME_DIR/hubrc
   fi
   
   PYTHONVERSION=`python -c 'import sys; v = sys.version_info; print("python" + str(v[0]) + "." + str(v[1]))'`
   if [[ ! -d $ADMIN_HOME_DIR/python_libs/lib/$PYTHONVERSION/site-packages ]] ; then
     mkdir -p $ADMIN_HOME_DIR/python_libs/lib/$PYTHONVERSION/site-packages
-    echo "Hub-wide python packages can be installed here, but note that you must use $ADMIN_HOME_DIR/bin/hubpip to make the installations work properly." > $ADMIN_HOME_DIR/python_libs/readme.txt
+    echo "Hub-wide python packages can be installed here, but note that you must use $ADMIN_HOME_DIR/bin/hubpip to make the installations work properly." > $ADMIN_HOME_DIR/python_libs/README.txt
     chown -R $ADMIN_USERNAME:$ADMIN_GROUPNAME $ADMIN_HOME_DIR/python_libs
     chmod -R 775 $ADMIN_HOME_DIR/python_libs
-    chmod 664 $ADMIN_HOME_DIR/python_libs/readme.txt
+    chmod 664 $ADMIN_HOME_DIR/python_libs/README.txt
   fi
    
+  if [[ ! -f $ADMIN_HOME_DIR/autoexec_by_python_notebooks.py ]] ; then
+    cp -L /usr/local/bin/various/autoexec_by_python_notebooks.py $ADMIN_HOME_DIR/autoexec_by_python_notebooks.py
+    chown $ADMIN_USERNAME:$ADMIN_GROUPNAME $ADMIN_HOME_DIR/autoexec_by_python_notebooks.py
+    chmod 664 $ADMIN_HOME_DIR/autoexec_by_python_notebooks.py
+  fi
+
   # if a class-specific /etc/passwd entry doesn't exist, add it
   # here's where entries for /etc/passwd will be appended; but we can't put them directly in /etc/passwd because changes there don't 
   # persist
@@ -138,23 +150,27 @@ check_admin_config() {
   # allow sudo to use this more permissive umasks than the default of union (for use by user jupyter process which is run with sudo -u $NB_USER)
   echo "Defaults umask_override" >> /etc/sudoers
 
+  if [[ ! -f $ADMIN_HOME_DIR/autosourced_by_rprofiles.R ]] ; then
+    cp -L /usr/local/bin/various/autosourced_by_rprofiles.R $ADMIN_HOME_DIR/autosourced_by_rprofiles.R
+    chown $ADMIN_USERNAME:$ADMIN_GROUPNAME $ADMIN_HOME_DIR/autosourced_by_rprofiles.R
+    chmod 664 $ADMIN_HOME_DIR/autosourced_by_rprofiles.R
+  fi
 
   # setup Rstudio Renviron to learn about the R site libraries 
-  # note that we have to build the autosourced_by_rprofiles here, because Rstudio doesn't get any of the fricken environment variables that jupyter does (and I decided long ago to make $ADMIN_HOME_DIR a var...)
+  # note that we have to build the autosourced_by_rprofiles.R here, because Rstudio doesn't get any of the fricken environment variables that jupyter does (and I decided long ago to make $ADMIN_HOME_DIR a var...)
   if [[ ! -d $ADMIN_HOME_DIR/R_libs ]] ; then
     mkdir -p $ADMIN_HOME_DIR/R_libs
-    echo "This is the site-library for R packages, admins can install.packages() directly to here (which is the default), users cannot." > $ADMIN_HOME_DIR/R_libs/readme.txt
-    echo "####################" > $ADMIN_HOME_DIR/autosourced_by_rprofiles
-    echo "## use the site lib first, then the user lib, then global lib (so instructors default installs go to site-lib and it is checked first)" >> $ADMIN_HOME_DIR/autosourced_by_rprofiles
-    echo "####################" >> $ADMIN_HOME_DIR/autosourced_by_rprofiles
-    echo ".libPaths(c(.libPaths()[1], \"$ADMIN_HOME_DIR/R_libs\", \"/opt/conda/lib/R/library\"))" >> $ADMIN_HOME_DIR/autosourced_by_rprofiles
+    echo "This is the hub-library for R packages, admins can hub.install.packages() directly to here, users cannot, install.packages() works as normal and installs to each users' home directory." > $ADMIN_HOME_DIR/R_libs/README.txt
     chown -R $ADMIN_USERNAME:$ADMIN_GROUPNAME $ADMIN_HOME_DIR/R_libs
     chmod -R 775 $ADMIN_HOME_DIR/R_libs
-    chmod 664 $ADMIN_HOME_DIR/R_libs/readme.txt
-    chmod 664 $ADMIN_HOME_DIR/autosourced_by_rprofiles
+    chmod 664 $ADMIN_HOME_DIR/R_libs/README.txt
 
+    # the /etc/profile trick below seems to work, EXCEPT for some vars which RStudio won't read :(
+    # probably don't need the greps here
     if [[ -e /opt/conda/lib/R/etc/Renviron ]]; then
-      grep "$ADMIN_HOME_DIR/R_libs" /opt/conda/lib/R/etc/Renviron || echo "R_LIBS_SITE=$ADMIN_HOME_DIR/R_libs" >> /opt/conda/lib/R/etc/Renviron
+      grep "R_LIBS_SITE=$ADMIN_HOME_DIR/R_libs" /opt/conda/lib/R/etc/Renviron || echo "R_LIBS_SITE=$ADMIN_HOME_DIR/R_libs" >> /opt/conda/lib/R/etc/Renviron
+      grep "ADMIN_HOME_DIR=$ADMIN_HOME_DIR" /opt/conda/lib/R/etc/Renviron || echo "ADMIN_HOME_DIR=$ADMIN_HOME_DIR" >> /opt/conda/lib/R/etc/Renviron
+      grep "DATA_HOME_DIR=$DATA_HOME_DIR" /opt/conda/lib/R/etc/Renviron || echo "DATA_HOME_DIR=$DATA_HOME_DIR" >> /opt/conda/lib/R/etc/Renviron
     fi
   fi
 }
@@ -170,11 +186,23 @@ check_nb_user() {
     # make sure we have group read on everything, some aren't in the .npm cache dir in the inherited docker image
     chmod -R 770 /tmp/$NB_USER                      
     
+    # make a link to hub_data
+    ln -s $DATA_HOME_DIR /tmp/$NB_USER/$(basename $DATA_HOME_DIR)
+    # make sure they have a startup folder for pyhton notebooks
+    mkdir -p /tmp/$NB_USER/.ipython/profile_default/startup
+
     # re-own inner contents
     # chown dotfiles (note, this trick will fail on single-letter dotfiles e.g. '.a')
     chown -R $NB_UID:$USER_GROUPNAME /tmp/$NB_USER/.??* 
     # chown others
     chown -R $NB_UID:$USER_GROUPNAME /tmp/$NB_USER/* 
+  
+    # TODO: this was outside and referencing /home/$NB_USER, but I was occasionally getting errors e.g.  /home/juser/.ipython/profile_default/startup/001_autoexec.py: No such file or directory
+    # maybe an nfs thing? Anyway, putting it here means users can remove it and they won't come back, which might be undesirable
+    # make sure they source the autosourced_by_rprofiles, even if they try to remove it ;)
+    grep -qxF "source(\"$ADMIN_HOME_DIR/autosourced_by_rprofiles.R\")" /tmp/$NB_USER/.Rprofile || echo "source(\"$ADMIN_HOME_DIR/autosourced_by_rprofiles.R\")" >> /tmp/$NB_USER/.Rprofile
+    # make sure they exec the autoexec_by_python_notebooks, even if they try to remove it ;)
+    echo "exec(open(\"$ADMIN_HOME_DIR/autoexec_by_python_notebooks.py\").read())" > /tmp/$NB_USER/.ipython/profile_default/startup/001_autoexec.py 
     
     # copy em over to the /home mount, -a for archive (like cp -r and preserve ownership and other metadata)
     cp -a /tmp/$NB_USER /home
@@ -192,11 +220,6 @@ check_nb_user() {
   
   # we're done with the staging in /tmp, remove it
   rm -rf /tmp/$NB_USER
-  
-  # make sure they source the autosourced_by_bashrcs, even if they try to remove it ;)
-  grep -qxF "source $ADMIN_HOME_DIR/autosourced_by_bashrcs" /home/$NB_USER/.bashrc || echo "source $ADMIN_HOME_DIR/autosourced_by_bashrcs" >> /home/$NB_USER/.bashrc
-  # make sure they source the autosourced_by_rprofiles, even if they try to remove it ;)
-  grep -qxF "source(\"$ADMIN_HOME_DIR/autosourced_by_rprofiles\")" /home/$NB_USER/.Rprofile || echo "source(\"$ADMIN_HOME_DIR/autosourced_by_rprofiles\")" >> /home/$NB_USER/.Rprofile
 }
 
 
@@ -249,12 +272,23 @@ main_setup() {
 }
 
 main_setup
-
 # Exec the specified command or fall back on bash
 if [ $# -eq 0 ]; then
   cmd=( "bash" )
 else
-  cmd=( "$@" )
+  cmd=( "$*" )
 fi
 
-exec sudo -E -H -u $NB_USER PATH=$PATH XDG_CACHE_HOME=/home/$NB_USER/.cache PYTHONPATH=${PYTHONPATH:-} LD_LIBRARY_PATH=${LD_LIBRARY_PATH:-} "${cmd[@]}"  
+# rstudio doesn't get everything, except for what is defined in etc profile (and that doesn't include ADMIN_HOME_DIR unless we define it there)
+#echo "export DATA_HOME_DIR=$DATA_HOME_DIR" >> /etc/profile
+#echo "export ADMIN_HOME_DIR=$ADMIN_HOME_DIR" >> /etc/profile
+#echo "source $ADMIN_HOME_DIR/hubrc" >> /etc/profile
+#
+#echo "export DATA_HOME_DIR=$DATA_HOME_DIR" >> /etc/rstudio/rsession-profile
+#echo "export ADMIN_HOME_DIR=$ADMIN_HOME_DIR" >> /etc/rstudio/rsession-profile
+#echo "source $ADMIN_HOME_DIR/hubrc" >> /etc/rstudio/rsession-profile
+
+
+# using bash -c causes the stuff in /etc/profile to be picked up
+#exec sudo -E -H -u $NB_USER PATH=$PATH XDG_CACHE_HOME=/home/$NB_USER/.cache PYTHONPATH=${PYTHONPATH:-} LD_LIBRARY_PATH=${LD_LIBRARY_PATH:-} bash -c "$cmd"  
+exec sudo -E -H -u $NB_USER PATH=$PATH XDG_CACHE_HOME=/home/$NB_USER/.cache PYTHONPATH=${PYTHONPATH:-} LD_LIBRARY_PATH=${LD_LIBRARY_PATH:-} bash -c "source $ADMIN_HOME_DIR/hubrc && $cmd"  
