@@ -12,7 +12,7 @@ fi
 TARGETDIR=$1
 
 
-TAG=`find $TARGETDIR -type f -not -path "*/ops/*" -exec md5sum {} \; | sort -k 2 | md5sum | head -c 8`
+TAG=`find $TARGETDIR -type f -not -path "*/ops/*" -exec md5sum {} \; | grep -v -E '*.swp$' | sort -k 2 | md5sum | head -c 8`
 # if ops/lasttag.txt doesn't exist, or it's contents are different from TAG, we need to rebuild and push. Otherwise we don't
 
 IMAGENAME=`cat $TARGETDIR/image_name.txt`
