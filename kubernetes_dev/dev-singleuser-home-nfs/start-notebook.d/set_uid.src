@@ -1,7 +1,0 @@
-# set user's UID to psuedorandom number in range 2000 -- 2^30 using some bash and modulus tricks
-
-# TODO: use a scheme that picks a random number not in use within $ADMIN_HOME_DIR/automanaged/etc_passwd_additions (below) to avoid UID collisions, incredibly rare though they may be
-BIG=1073741824
-PSEUDO=$(md5sum <<< "$NB_USER")
-NB_UID=$(( (((0x${PSEUDO%% *} % $BIG) + $BIG) % $BIG) + 2000))
-

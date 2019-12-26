@@ -15,14 +15,18 @@ DIRNAME=`basename $DIRPATH`
 # build image, if triggered a build, also trigger a push
 # do both the base-notebook and the nfsserver since working on both
 # using paths relative to $SCRIPT_DIR rather than the pwd of the caller
-if $SCRIPT_DIR/../../scripts/docker_build.sh $SCRIPT_DIR/../../applications/base-notebook; then
-  $SCRIPT_DIR/../../scripts/docker_push.sh $SCRIPT_DIR/../../applications/base-notebook
+$SCRIPT_DIR/../../scripts/docker_build.sh $SCRIPT_DIR/../../docker_images/datascience-notebook
+RES=$?
+if [ $RES == 2 ]; then
+  $SCRIPT_DIR/../../scripts/docker_push.sh $SCRIPT_DIR/../../docker_images/datascience-notebook
 fi
 
 # same thing if the drive image changed, in which case we also need to redeploy the helm chart
 # (so delete it here)
-if $SCRIPT_DIR/../../scripts/docker_build.sh $SCRIPT_DIR/../../applications/nfsserver3; then
-  $SCRIPT_DIR/../../scripts/docker_push.sh $SCRIPT_DIR/../../applications/nfsserver3
+$SCRIPT_DIR/../../scripts/docker_build.sh $SCRIPT_DIR/../../docker_images/nfsserver3
+RES=$?
+if [ $RES == 2 ]; then
+  $SCRIPT_DIR/../../scripts/docker_push.sh $SCRIPT_DIR/../../docker_images/nfsserver3
   helm delete --purge nfsdrive-$DIRNAME
 fi
 
@@ -30,10 +34,10 @@ fi
 # create a namespace if needed to work in, based on the folder name this test is in; 
 # create a yaml def and send it to kubectl apply so
 # no warning is created if it already exists
-kubectl create namespace $DIRNAME --dry-run -o yaml | kubectl apply -f -
+kubectl create namespace $DIRNAME --dry-run -o yaml | kubectl apply -f - --wait
 
 # set the context in case it's different, seems like helm install --namespace wn't 
-kubectl config set-context --current --namespace $DIRNAME
+kubectl config set-context --current --namespace $DIRNAME 
 
 # if a drive is not running, start one (but don't wait on helm upgrade to do nothing, too slow,
 # instead just check to see if one is already running)
@@ -47,12 +51,16 @@ if ! kubectl get pods -n $DIRNAME | grep -E ".nfsdrive-$DIRNAME.*Running.*"; the
 	--wait
 fi
 
+## clear out the drive contents - start fresh each time
+DRIVEPOD=$(kubectl get pod -l app=nfs-nfsdrive-$DIRNAME-pod -o jsonpath="{.items[0].metadata.name}")
+kubectl exec -it $DRIVEPOD -- /bin/bash -c 'rm -rf /nfsshare/*'
+kubectl exec -it $DRIVEPOD -- /bin/bash -c 'ls -lah /nfsshare'
 
 # update configmap based on testing start.sh and mount_home_nfs.sh
 # the pod definition mounts the configmaps to the right location in the filesystem - this way 
 # we don't have to rebuild/repush/repull the image every time
-kubectl create configmap --dry-run start --from-file=./start.sh --output yaml | kubectl apply -n $DIRNAME -f - 
-kubectl create configmap --dry-run start-notebook-d --from-file=./start-notebook.d --output yaml | kubectl apply -n $DIRNAME -f -
+kubectl create configmap --dry-run start-cm --from-file=./start.sh --output yaml | kubectl apply -n $DIRNAME -f - --wait 
+kubectl create configmap --dry-run various-cm --from-file=./various --output yaml | kubectl apply -n $DIRNAME -f - --wait
 
 # delete and recreate pod to get the new configmaps 
 # (it may be enough to just apply, but in case something changed in the singleuser_pod.yaml

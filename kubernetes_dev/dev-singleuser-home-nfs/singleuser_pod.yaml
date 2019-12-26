@@ -8,25 +8,27 @@ spec:
   volumes:
    - name: start-vol
      configMap:
-       name: start
-   - name: start-notebook-d-vol
+       name: start-cm
+   - name: various-vol
      configMap:
-       name: start-notebook-d
+       name: various-cm
   containers:
   - name: jh-container
-    image: oneilsh/ktesting-base-notebook:latest
+    image: oneilsh/ktesting-datascience-notebook:latest
     imagePullPolicy: Always
     volumeMounts:
-    - mountPath: /usr/local/bin/start-notebook.d/
-      name: start-notebook-d-vol
+    - mountPath: /usr/local/bin/various/
+      name: various-vol
     - mountPath: /usr/local/bin/start.sh
       subPath: start.sh
       name: start-vol
     env:
-      - name: NFS_SVC
+      - name: NFS_SVC_HOME
         value: "nfsdrive"
       - name: NB_USER
         value: juser
+      - name: ADMIN_USER
+        value: "True"
     securityContext:
       runAsUser: 0
       capabilities:
