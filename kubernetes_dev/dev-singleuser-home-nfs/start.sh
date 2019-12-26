@@ -26,14 +26,19 @@ add_admin_group() {
 stage_home_copies() {
   # move things to /tmp to work on since we'll be NFS mounting over /home
   # make a copy of the jovyan home to $NB_USER HOME
-  mv /home/jovyan /tmp/jovyan                                    
+  echo "copying /home/jovyan to /tmp/jovyan"
+  mv /home/jovyan /tmp/jovyan               
+  echo "copying /tmp/jovyan to /tmp/$NB_USER"  
   cp -r /tmp/jovyan /tmp/$NB_USER                                # keep a token jovyan around for debugging/testing
+  echo "done copying home dirs..."
 }
 
 
 do_mount() {
   # mount the NFS, soft mount in case the server hiccups (to prevent user pods from going zombie), but 10 second timeout to prevent potential issues (based on recs for EFS, which I'd guess generalize? https://docs.aws.amazon.com/efs/latest/ug/mounting-fs-nfs-mount-settings.html)
+  echo "mounting $NFS_SVC_HOME"
   mount -o soft,timeo=100 $NFS_SVC_HOME:/ /home
+  echo "done mounting..."
 }
 
 
@@ -283,7 +288,6 @@ fi
 #echo "export ADMIN_HOME_DIR=$ADMIN_HOME_DIR" >> /etc/rstudio/rsession-profile
 #echo "source $ADMIN_HOME_DIR/hubrc" >> /etc/rstudio/rsession-profile
 
-jupyter labextension install @jupyterlab/server-proxy
 
 # using bash -c causes the stuff in /etc/profile to be picked up
 #exec sudo -E -H -u $NB_USER PATH=$PATH XDG_CACHE_HOME=/home/$NB_USER/.cache PYTHONPATH=${PYTHONPATH:-} LD_LIBRARY_PATH=${LD_LIBRARY_PATH:-} bash -c "$cmd"  
