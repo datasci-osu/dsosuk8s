@@ -17,4 +17,9 @@ questions:
     type: string
     label: "Max upload size: "
     required: true 
-
+  - variable: master-host
+    default: "dev1.datasci.oregonstate.edu"
+    description: "The master hostname the loadbalancer will respond to - this allows multiple ingress resources to use the same master hostname but different paths."
+    type: string
+    label: "Master hostname: "
+    required: true
