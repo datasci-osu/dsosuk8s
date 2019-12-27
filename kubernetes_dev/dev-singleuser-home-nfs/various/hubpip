@@ -2,11 +2,11 @@
 
 if [[ "$#" == "0" ]] || [[ "$1" == "-h" ]]; then
   echo "Usage: hubpip install package1 package2 ..."
-  echo "This just calls \`pip install --prefix=$ADMIN_HOME_DIR/python_lib package1 package2 ...\` in case you need to do anything fancy."
+  echo "This just calls \`pip install --prefix=$ADMIN_HOME_DIR/python_libs package1 package2 ...\` in case you need to do anything fancy."
   exit 1
 fi
 
-echo -e "\e[32mhubpip: Running \`pip $1 --prefix=$ADMIN_HOME_DIR/python_lib ${@:2}\` ...\e[0m"
+echo -e "\e[32mhubpip: Running \`pip $1 --prefix=$ADMIN_HOME_DIR/python_libs ${@:2}\` ...\e[0m"
 pip $1 --prefix=$ADMIN_HOME_DIR/python_libs ${@:2}
 
 echo -e "\e[32mhubpip: Fixing permissions ...\e[0m"
