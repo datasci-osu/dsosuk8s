@@ -1,3 +1,0 @@
-# Source: templates/pod.yaml
-datastorage: datastoragename
-targetdir: /mnt/nfsshare

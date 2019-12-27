@@ -1,7 +1,0 @@
-questions:
-  - variable: nginx-ingress.controller.service.annotations.service\.beta\.kubernetes\.io\/aws-load-balancer-ssl-cert
-    default: "arn:aws:acm:XX-XXXX-X:XXXXXXXXX:certificate/XXXXXXXX-XXXX-XXXX-XXXX-XXXXXXXXXX"
-    description: "ARN of certificate setup in AWS ACM. Note that this may create a *new* ELB in AWS; if the cert exists already it should attach it automatically. "
-    type: string
-    label: "Cert ARN: "
-    required: true

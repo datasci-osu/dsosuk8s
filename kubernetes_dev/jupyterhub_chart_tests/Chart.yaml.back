@@ -1,5 +1,0 @@
-apiVersion: v1
-appVersion: "1.0"
-description: DS@OSU Customized JupyterHub
-name: jupyterhub-dsosu-datascience-basic
-version: 0.1.1

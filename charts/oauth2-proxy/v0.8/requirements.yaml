@@ -1,3 +1,0 @@
-dependencies:
-  - name: oauth2-proxy
-    repository: file://charts

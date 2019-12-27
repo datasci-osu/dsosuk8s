@@ -1,6 +1,0 @@
-name: efs-provisioner
-version: 0.8
-appVersion: 0.1.2
-description: Racher chart for efs-provisioner, https://github.com/kubernetes-incubator/external-storage/tree/master/aws/efs
-icon: file://../icon.png
-engine: gotpl
