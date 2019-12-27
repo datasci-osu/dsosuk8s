@@ -1,6 +1,0 @@
-name: eksctl-autoscaler
-version: 0.8
-appVersion: 1.12.3
-description: Autoscaler for eksctl-based clusters, based on https://github.com/kubernetes/autoscaler/tree/master/cluster-autoscaler/cloudprovider/aws, specifically auto-discovery but using kubernetes.io/cluster/eksdevd tag instead of adding a special tag as indicated by the docs.
-icon: file://../icon.png
-engine: gotpl

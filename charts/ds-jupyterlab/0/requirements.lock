@@ -1,9 +1,0 @@
-dependencies:
-- name: jupyterhub
-  repository: https://jupyterhub.github.io/helm-chart
-  version: 0.9-13f3807
-- name: nfs-server-provisioner
-  repository: https://kubernetes-charts.storage.googleapis.com
-  version: 0.3.0
-digest: sha256:19a7a6e246f9cd9ffa58beb21b3e6ca537d0b69ea9ad2ebc7449c4e5042b089e
-generated: "2019-09-18T16:27:13.494452-07:00"

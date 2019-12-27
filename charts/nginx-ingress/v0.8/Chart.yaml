@@ -1,6 +1,0 @@
-name: nginx-ingress
-version: 0.8
-appVersion: 0.26.1
-description: Nginx ingress controller built on https://github.com/nginxinc/kubernetes-ingress/tree/master/deployments/helm-chart.
-icon: file://../icon.png
-engine: gotpl
