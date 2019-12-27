@@ -1,4 +1,4 @@
-master-host: ""
+masterHost: ""
 nginx-ingress:
   controller:
     wildcardTLS:

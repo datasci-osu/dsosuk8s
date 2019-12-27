@@ -8,6 +8,6 @@ metadata:
 spec:
   tls:
   - hosts:
-    - {{ .Values.master-host }}
+    - {{ .Values.masterHost }}
   rules:
-  - host: {{ .Values.master-host }}
+  - host: {{ .Values.masterHost }}
