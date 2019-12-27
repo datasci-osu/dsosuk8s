@@ -9,7 +9,10 @@ volume type, due to this issue: https://github.com/kubernetes/kubernetes/issues/
 
 *Warning*: In it's current configuration, "deleting" a drive application will *not* also remove the associated PVC and PV,
 for safety. That needs to be done separately. In the Rancher UI, in the project where the volume was created, navigate to Resources ->
-Workloads, and select the Volumes tab. They can be deleted from there. (They will be stuck in "Removing" state until the app itself is 
-deleted; if any other applications (like jupyter users) are accessing the drive, then the behavior is unknown yet.)
+Workloads, and select the Volumes tab. They can be deleted from there. They will be stuck in "Removing" state until the app itself is 
+deleted; if any other applications (like jupyter users) are accessing the drive, then the volume will go into a failed state, and need to be
+deleted by hand, detached in the AWS console, and finally deleted in the AWS console.
+
+So be sure nothing is accessing it before deleting it!
 
  
