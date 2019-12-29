@@ -1,0 +1,9 @@
+apiVersion: policy/v1beta1
+kind: PodDisruptionBudget
+metadata:
+  name: {{ .Release.name }}-pdb
+spec:
+  maxUnavailable: 0
+  selector:
+    matchLabels:
+      app: nfs-{{ .Release.Name }}-pod
