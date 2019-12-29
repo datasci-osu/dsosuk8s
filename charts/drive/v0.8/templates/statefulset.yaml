@@ -17,6 +17,13 @@ spec:
         volatile: "false"   # require non-volatile nodes (won't be autoscaled out frequently, as this will disrupt service to this drive)
       containers:
       - name: nfs
+        resources: 
+          requests:
+            cpu: 0.1
+            memory: "128M"
+          limits:
+            cpu: 0.5
+            memory: "2G"
         image: oneilsh/ktesting-nfsserver3:latest
         imagePullPolicy: Always # specifying :latest should do this as well, but i'm feeling paranoid
         securityContext:
