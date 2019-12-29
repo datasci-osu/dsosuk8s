@@ -10,6 +10,11 @@ jupyterhub:
     userPods:
       nodeAffinity:
         matchNodePurpose: require
+    podPriority:
+      enabled: true
+      globalDefault: false
+      defaultPriority: 0
+      userPlaceholderPriority: -10
     corePods:
       nodeAffinity:
         matchNodePurpose: require
