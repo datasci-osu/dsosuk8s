@@ -27,32 +27,36 @@ questions:
   description: "Usernames with initial administrator access, comma-separated. Admins can add more users in the UI; if using native authenticator, they are auto-approved after signup."
   required: true
 
-- variable: jupyterhub.hub.extraEnv.CPU_GUARANTEE
+#- variable: jupyterhub.hub.extraEnv.CPU_GUARANTEE
+- variable: jupyterhub.singleuser.cpu.guarantee
   group: Resources
-  default: 0.1
+  default: "0.1"
   description: "CPU guarantee per student (in cores)."
-  type: float
+  type: string
   label: "CPU Guarantee"
 
-- variable: jupyterhub.hub.extraEnv.CPU_LIMIT
+#- variable: jupyterhub.hub.extraEnv.CPU_LIMIT
+- variable: jupyterhub.singleuser.cpu.limit
   group: Resources
-  default: 1.0
+  default: "1.0"
   description: "CPU limit per student (in cores)."
-  type: float
+  type: string
   label: "CPU Limit"
 
-- variable: jupyterhub.hub.extraEnv.MEMORY_GUARANTEE
+#- variable: jupyterhub.hub.extraEnv.MEMORY_GUARANTEE
+- variable: jupyterhub.singleuser.memory.guarantee
   group: Resources
-  default: 0.5
+  default: "0.5"
   description: "Memory gaurantee per student (in gigs)."
-  type: float
+  type: string
   label: "Memory Gaurantee"
 
-- variable: jupyterhub.hub.extraEnv.MEMORY_LIMIT
+#- variable: jupyterhub.hub.extraEnv.MEMORY_LIMIT
+- variable: jupyterhub.singleuser.memory.limit
   group: Resources
-  default: 1.0
+  default: "1.0"
   description: "Memory limit per student (in gigs)"
-  type: float
+  type: string
   label: "Memory Limit"
 
 

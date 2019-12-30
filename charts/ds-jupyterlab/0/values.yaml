@@ -93,17 +93,17 @@ jupyterhub:
 
     extraConfig:
       # we pass in mem and cpu requests via environment variables because the rancher UI won't pass them as floats :/  
-      resources: |
-        import os
-        # maybe the order of these matters? gaurantee first?
-        if os.environ["MEMORY_GUARANTEE"]:
-          c.Spawner.mem_guarantee = str(os.environ["MEMORY_GUARANTEE"]) + "G"
-        if os.environ["MEMORY_LIMIT"]:
-          c.Spawner.mem_limit = str(os.environ["MEMORY_LIMIT"]) + "G"
-        if os.environ["CPU_GUARANTEE"]:
-          c.Spawner.cpu_guarantee = float(os.environ["CPU_GUARANTEE"])
-        if os.environ["CPU_LIMIT"]:
-          c.Spawner.cpu_limit = float(os.environ["CPU_LIMIT"])
+      #resources: |
+      #  import os
+      #  # maybe the order of these matters? gaurantee first?
+      #  if os.environ["MEMORY_GUARANTEE"]:
+      #    c.Spawner.mem_guarantee = str(os.environ["MEMORY_GUARANTEE"]) + "G"
+      #  if os.environ["MEMORY_LIMIT"]:
+      #    c.Spawner.mem_limit = str(os.environ["MEMORY_LIMIT"]) + "G"
+      #  if os.environ["CPU_GUARANTEE"]:
+      #    c.Spawner.cpu_guarantee = float(os.environ["CPU_GUARANTEE"])
+      #  if os.environ["CPU_LIMIT"]:
+      #    c.Spawner.cpu_limit = float(os.environ["CPU_LIMIT"])
       nfspriv: |
         from kubernetes import client
         def modify_pod_hook(spawner, pod):
