@@ -63,7 +63,7 @@ check_admin_config() {
     export ADMIN_HOME_DIR=/home/hub_local
   fi
   if [[ -z $DATA_HOME_DIR ]]; then
-    export DATA_HOME_DIR=/home/hub_share_data
+    export DATA_HOME_DIR=/home/hub_data_share
   fi
   
   
