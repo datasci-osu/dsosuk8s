@@ -30,17 +30,17 @@ questions:
 #- variable: jupyterhub.hub.extraEnv.CPU_GUARANTEE
 - variable: jupyterhub.singleuser.cpu.guarantee
   group: Resources
-  default: "0.1"
+  default: 0.1
   description: "CPU guarantee per student (in cores)."
-  type: string
+  type: float
   label: "CPU Guarantee"
 
 #- variable: jupyterhub.hub.extraEnv.CPU_LIMIT
 - variable: jupyterhub.singleuser.cpu.limit
   group: Resources
-  default: "1.0"
+  default: 1.0
   description: "CPU limit per student (in cores)."
-  type: string
+  type: float
   label: "CPU Limit"
 
 #- variable: jupyterhub.hub.extraEnv.MEMORY_GUARANTEE
