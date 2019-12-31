@@ -63,7 +63,7 @@ check_admin_config() {
     export ADMIN_HOME_DIR=/home/hub_local
   fi
   if [[ -z $DATA_HOME_DIR ]]; then
-    export DATA_HOME_DIR=/home/hub_data
+    export DATA_HOME_DIR=/home/hub_share_data
   fi
   
   
@@ -186,7 +186,7 @@ check_nb_user() {
     # make sure we have group read on everything, some aren't in the .npm cache dir in the inherited docker image
     chmod -R 770 /tmp/$NB_USER                      
     
-    # make a link to hub_data
+    # make a link to $DATA_HOME_DIR
     ln -s $DATA_HOME_DIR /tmp/$NB_USER/$(basename $DATA_HOME_DIR)
     # make sure they have a startup folder for pyhton notebooks
     mkdir -p /tmp/$NB_USER/.ipython/profile_default/startup
