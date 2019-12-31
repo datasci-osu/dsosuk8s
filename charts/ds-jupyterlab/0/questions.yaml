@@ -46,16 +46,16 @@ questions:
 #- variable: jupyterhub.hub.extraEnv.MEMORY_GUARANTEE
 - variable: jupyterhub.singleuser.memory.guarantee
   group: Resources
-  default: "0.5"
-  description: "Memory gaurantee per student (in gigs)."
+  default: "0.5G"
+  description: "Memory gaurantee per student."
   type: string
   label: "Memory Gaurantee"
 
 #- variable: jupyterhub.hub.extraEnv.MEMORY_LIMIT
 - variable: jupyterhub.singleuser.memory.limit
   group: Resources
-  default: "1.0"
-  description: "Memory limit per student (in gigs)"
+  default: "1.0G"
+  description: "Memory limit per student."
   type: string
   label: "Memory Limit"
 
@@ -65,7 +65,7 @@ questions:
   description: "Hostname for hub (e.g. myhub.myorg.edu or just myorg.edu)"
   type: string
   label: "Host"
-  default: "cluster.datasci.oregonstate.edu"
+  default: "dev.datasci.oregonstate.edu"
   required: true
 
 - variable: jupyterhub.ingress.tls[0].hosts[0]
@@ -73,7 +73,7 @@ questions:
   description: "TLS Hostname for hub (set as same as Host)"
   type: string
   label: "TLS Host"
-  default: "cluster.datasci.oregonstate.edu"
+  default: "dev.datasci.oregonstate.edu"
   required: true
 
 - variable: jupyterhub.hub.baseUrl
