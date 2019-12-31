@@ -240,7 +240,7 @@ component: {{ include "jupyterhub.componentLabel" . }}
 {{- if $r -}}
 requests:
   {{- if $r1 }}
-  cpu: {{ .Values.singleuser.cpu.guarantee | float64 }}
+  cpu: {{ .Values.singleuser.cpu.guarantee | int }}
   {{- end }}
   {{- if $r2 }}
   memory: {{ .Values.singleuser.memory.guarantee }}
@@ -255,7 +255,7 @@ requests:
 {{- if $l }}
 limits:
   {{- if $l1 }}
-  cpu: {{ .Values.singleuser.cpu.limit | float64 }}
+  cpu: {{ .Values.singleuser.cpu.limit | int }}
   {{- end }}
   {{- if $l2 }}
   memory: {{ .Values.singleuser.memory.limit }}
