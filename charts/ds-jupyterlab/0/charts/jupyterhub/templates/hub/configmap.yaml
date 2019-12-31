@@ -30,7 +30,7 @@ data:
   {{- $_ := set $values.singleuser.cpu "limit" (.Values.singleuser.cpu.limit | float64 ) }}
 {{- end }}
 {{- if .Values.singleuser.cpu.guarantee }}
-  {{- $_ := set $values.singleuser "guarantee" (.Values.singleuser.cpu.guarantee | float64 ) }}
+  {{- $_ := set $values.singleuser.cpu "guarantee" (.Values.singleuser.cpu.guarantee | float64 ) }}
 {{- end }}
 {{- $_ := set $values.singleuser "imagePullSecret" (omit .Values.singleuser.imagePullSecret "password") }}
 {{- /* preserve behavior of deprecated hub.extraConfigMap */ -}}
