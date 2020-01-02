@@ -124,6 +124,31 @@ changes their status.
 
 <img src="images/authorize_user_tab.png" width="80%" align="center"/>
 
+Once authorized they will be able to login; by default newly authorized users are not Admins (though that can be changed). 
+
+### Managing Users (Removing and Changing Admin Status)
+
+The "Admin" tab of the control panel shows a list of users that *have previously logged in*, whether they are authorized or not. 
+This means that users that are authorized but have not logged in yet will not be shown here, and users that have been de-authorized may 
+still show in this list (but they won't be able to login again until re-authorized). If you need to see entries for not-yet-logged-in
+users, you can add their usernames manually with the **Add Users** button. 
+
+<img src="images/admin_tab.png" width="80%" align="center"/>
+
+Users can be removed with the **Delete User** button. *This does not delete their data in their `/home/username` directory.* It merely removes
+their password and authorization status. To regain access, they can go through the signup and authorization process again. 
+
+To change a users' Admin status, click **Edit User**--a checkbox will be available in the popup to make them Admin. 
+
+The "server" buttons will be covered below in section [User Server Management](#user-server-management). 
+
+### Password changes and Resets
+
+Any user can change their own password by opening their hub control panel and selecting the "Change Password" tab. 
+
+An Admin can reset a users' password, but the process is simply to 1) delete the user from the "Admin" tab, 2) request that they visit
+the Signup page again (where they can choose the same username and a new password), and then 3) re-authorize the login. 
+
 
 
 ## User Server Management 
