@@ -88,7 +88,7 @@ as Admin users.
 
 When accessing the Hub URL (e.g. `https://beta.datasci.oregonstate.edu/nmc-245`) for the first time, you'll see the login page:
 
-<center><img src="images/login_box.png" width="40%" /></center>
+<img src="images/login_box.png" width="40%" align="center"/>
 
 
 
