@@ -92,20 +92,37 @@ When accessing the Hub URL (e.g. `https://beta.datasci.oregonstate.edu/nmc-245`)
 
 <img src="images/login_box.png" width="40%" align="center"/>
 
-... but, you won't be able to login (even as an Admin) unless you set a password. To do so, click the "signup" link to get to the signup page:
+... but, you won't be able to login (even as an Admin) unless you set a password. To do so, click the **Signup!** link to get to the signup page:
 
 <img src="images/signup_box.png" width="40%" align="center"/>
  
-Here, enter your username (e.g. `smithj`) and your chosen password, then click "Create User". The box will clear and let you know your information
+Here, enter your username (e.g. `smithj`) and your chosen password, then click **Create User**. The box will clear and let you know your information
 has been submitted. 
 
 <img src="images/signup_box_submitted.png" width="40%" align="center"/>
 
-Now, click the "login" link to return to the login page, and login with your username and chosen password. Admins are pre-authorized to login, so
+Now, click the **Login!** link to return to the login page, and login with your username and chosen password. Admins are pre-authorized to login, so
 you'll be logged into the JupyterLab interface.
 
+### Authorizing Others
 
+The process for other users (students and new TAs or co-instructors) wishing to access the hub is similar - they will visit the Signup page
+and choose a username and password. However, they won't be able to login until their access is authorized by an Admin. 
 
+In the JupyterLab interface, every user has access to their "Hub Control Panel" from the File menu.
+
+<img src="images/file_hub_control_panel.png" width="80%" align="center"/>
+
+When the control panel opens, the page will look like so:
+
+<img src="images/control_panel_tabs.png" width="80%" align="center"/>
+
+Non-admin users will only see tabs for "Home", "Token" and "Change Password", *not* "Admin" or "Authorize Users".
+
+Visiting the "Authorize Users" tab shows a list of usernames and their authorized status; clicking "Authorize" or "Unauthorize"
+changes their status. 
+
+<img src="images/authorize_users_tab.png" width="80%" align="center"/>
 
 
 
