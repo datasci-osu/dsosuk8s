@@ -16,4 +16,9 @@ Welcome to the DataScience@OregonState instructional platform. This is still a w
 Some screenshots:
 
 <a href="https://raw.githubusercontent.com/oneilsh/dsosuk8s/userdocs/user_docs/images/launcher.png"><img src="images/launcher.png" width="30%"/></a>
+<a href="https://raw.githubusercontent.com/oneilsh/dsosuk8s/userdocs/user_docs/images/python_notebook_autocomplete.png"><img src="images/python_notebook_autocomplete.png" width="30%"/></a>
+<a href="https://raw.githubusercontent.com/oneilsh/dsosuk8s/userdocs/user_docs/images/rstudio.png"><img src="images/rstudio.png" width="30%"/></a>
+
+## Quickstart
+
 
