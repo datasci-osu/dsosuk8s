@@ -142,7 +142,7 @@ To change a users' Admin status, click **Edit User**--a checkbox will be availab
 
 The "server" buttons will be covered below in section [User Server Management](#user-server-management). 
 
-### Password changes and Resets
+### Password Changes and Resets
 
 Any user can change their own password by opening their hub control panel and selecting the "Change Password" tab. 
 
