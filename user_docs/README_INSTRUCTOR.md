@@ -1,5 +1,9 @@
 # DataScience@OregonState - Instructor Readme
 
+Contents:
+
+* [Features](#features)
+
 ## Features
 
 Welcome to the DataScience@OregonState instructional platform. This is still a work in progress, but we're excited to offer:
