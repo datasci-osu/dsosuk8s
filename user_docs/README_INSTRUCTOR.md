@@ -147,8 +147,9 @@ The "server" buttons will be covered below in section [User Server Management](#
 Any user can change their own password by opening their hub control panel and selecting the "Change Password" tab. 
 
 An Admin can reset a users' password, but the process is simply to 1) delete the user from the "Admin" tab, 2) request that they visit
-the Signup page again (where they can choose the same username and a new password), and then 3) re-authorize the login. 
-
+the Signup page again (where they can choose the same username and a new password), and then 3) re-authorize the login. Because
+deleting a user does not remove data in their `/home/username` directory, this is effectively a password reset (provided they choose
+the same username to re-signup with). 
 
 
 ## User Server Management 
