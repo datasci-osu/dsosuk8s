@@ -13,7 +13,7 @@ Welcome to the DataScience@OregonState instructional platform. This is still a w
   * Students can read/write in their own home directories, and have read-only access to a designated `hub_data_share` folder
   * Instructors (or others with designated Admin access) have read+write to student directories and other locations
 
-Some screenshots:
+Some screenshots (Initial JupyterLab Interface, a Python Notebook, and RStudio):
 
 <a href="https://raw.githubusercontent.com/oneilsh/dsosuk8s/userdocs/user_docs/images/launcher.png"><img src="images/launcher.png" width="30%"/></a>&nbsp;
 <a href="https://raw.githubusercontent.com/oneilsh/dsosuk8s/userdocs/user_docs/images/python_notebook_autocomplete.png"><img src="images/python_notebook_autocomplete.png" width="30%"/></a>&nbsp;
@@ -21,4 +21,51 @@ Some screenshots:
 
 ## Quickstart
 
+We've designed DS@OSU to balance user-friendliness with flexibility and power. Understanding the sections below 
+will help you get the most from the platform. Nevertheless, here are some important notes to you playing quickly:
 
+1. A single "Hub" provides access to a shared environment for members of a class (instructors, TAs, students) at a specific URL, for 
+   example `http://beta.datasci.oregonstate.edu/nmc-245/`, and different classes access different Hubs/URLs. Within a Hub, some users
+   (instructors & TAs) have "Admin"-level access with special permissions.
+
+2. Eacher user's "interface" (shown in the screenshots above) is running as an individual server (Docker container, actually) in 
+   the cloud. This has some implications for Admins--for example, user servers may be shut down after a period of inactivity (e.g. 1. hour), or after
+   a maximum amount of active time (e.g. 8 hours) to save on resources and costs. 
+
+   Fortunately, user servers start up quickly on login (in a few seconds), *unless* a new cloud-based machine must be created behind-the-scenes to support
+   that server. When this happens a delay of up to 10 minutes can occur on login. This is most likely to happen when a large number of students
+   attempt to login simultaneously after a period of inactivity, such as at the start of a morning lab class. See sections "User Management"
+   and "User Server Management" below for details on how avoid this and other implications of running in an auto-scaling cloud.
+
+   *Activity*, by the way, means a browser tab open and the user logged in, *even if the user is not doing anything.* You can thus
+   help us control costs by instructing your students to logout or close their browser tabs when they won't be using the system for an hour or more.
+
+3. Python Users: Each user can install python3 packages for their own use with `pip install --user packagename`. Admins can install packages "hub-wide"
+   (for import by all users) with `hubpip install packagename`. Installed packages are available for import in Jupyter notebooks an on the
+   command-line. 
+
+4. R Users: Each user can install R packages for their own use with the standard `install.packages("packagename")` function or RStudio packages interface. 
+   Github packages can be be installed for individual use with the usual `devtools::install_github("username/packagename")`, and the same
+   for BioConductor packages. 
+
+   Admins can install R packages hub-wide to the site-library with the helper functions `hub.install.packages("packagename")`, 
+   `hub.install_github("username/packagename")`, and `hub.install_bioconductor("packagename")`. 
+
+5. File Permissions and Scripts: User home directories are located at `/home/username`; 
+   files created in user home directories are by default read+write for their owner and Admins, with no access for non-Admin users. Files
+   added to `/home/hub_data_share` are by default read+write for Admins and read-only for others. 
+
+   Admins have read+write access to `/home/hub_local`, others have read-only access. Hub-wide Python and R packages are installed to subdirectories 
+   here, and the file `/home/hub_local/hubrc` is used to configure the environment for every user on login (akin to lines added to all users' `.bashrc` 
+   files). Executable scripts and programs may be placed in `/home/hub_local/bin` (which is added to every users' `$PATH` via the `hubrc` file--if
+   compiling software, use `--prefix=/home/hub_local`). Some environment variables reference these locations--`env` shows a list these and others.
+
+6. Data Storage: The `/home` directory and all its contents listed above exist on a single shared network drive. Currently there are no per-user
+   limits within this space, so theoretically any user can fill the entire space accidentally. (Implementing per-user quotas is [on the todo list](https://github.com/oneilsh/dsosuk8s/issues/28)).
+   If the drive fills up, it will interfere with first-time logins and prevent new file creation, but won't result in data loss. You can
+   check space used and available by running `df -h /home` in a terminal. Creating a dashboard for space usage is also on the [todo list](https://github.com/oneilsh/dsosuk8s/issues/29).
+
+
+
+
+ 
