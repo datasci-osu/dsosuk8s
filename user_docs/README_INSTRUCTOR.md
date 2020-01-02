@@ -3,6 +3,10 @@
 Contents:
 
 * [Features](#features)
+* [QuickStart](#quickstart)
+* [User Management](#user-management)
+* [User Server Management](#user-server-management)
+
 
 ## Features
 
@@ -23,14 +27,18 @@ Some screenshots (Initial JupyterLab Interface, a Python Notebook, and RStudio):
 <a href="https://raw.githubusercontent.com/oneilsh/dsosuk8s/userdocs/user_docs/images/python_notebook_autocomplete.png"><img src="images/python_notebook_autocomplete.png" width="30%"/></a>&nbsp;
 <a href="https://raw.githubusercontent.com/oneilsh/dsosuk8s/userdocs/user_docs/images/rstudio.png"><img src="images/rstudio.png" width="30%"/></a>
 
-## Quickstart
+## QuickStart
 
 We've designed DS@OSU to balance user-friendliness with flexibility and power. Understanding the sections below 
-will help you get the most from the platform. Nevertheless, here are some important notes to you playing quickly:
+will help you get the most from the platform. Nevertheless, here are some important notes to help you start playing quickly:
 
 1. **Hubs:** A single "Hub" provides access to a shared environment for members of a class (instructors, TAs, students) at a specific URL, for 
    example `http://beta.datasci.oregonstate.edu/nmc-245/`, and different classes access different Hubs/URLs. Within a Hub, some users
    (instructors & TAs) have "Admin"-level access with special permissions.
+
+2. **Login and User Management:** We don't yet have ONID or single-sign-on integration. In the meantime, the workflow is for students to request
+   access by signing up to a Hub with their preferred username and password, after which an Admin user can authorize them to login. For details on this
+   process, be sure to see section [user-management](#user-management) below. 
 
 2. **Cloud-Based Servers:** Eacher user's "interface" (shown in the screenshots above) is running as an individual server (Docker container, actually) in 
    the cloud. This has some implications for Admins--for example, user servers may be shut down after a period of inactivity (e.g. 1. hour), or after
@@ -38,8 +46,8 @@ will help you get the most from the platform. Nevertheless, here are some import
 
    Fortunately, user servers start up quickly on login (in a few seconds), *unless* a new cloud-based machine must be created behind-the-scenes to support
    that server. When this happens a delay of up to 10 minutes can occur on login. This is most likely to happen when a large number of students
-   attempt to login simultaneously after a period of inactivity, such as at the start of a morning lab class. See sections "User Management"
-   and "User Server Management" below for details on how avoid this and other implications of running in an auto-scaling cloud.
+   attempt to login simultaneously after a period of inactivity, such as at the start of a morning lab class. See section  [User Server Management](#user-server-managment)
+   below for details on how avoid this and other implications of running in an auto-scaling cloud.
 
    *Activity*, by the way, means a browser tab open and the user logged in, *even if the user is not doing anything.* You can thus
    help us control costs by instructing your students to logout or close their browser tabs when they won't be using the system for an hour or more.
@@ -70,6 +78,13 @@ will help you get the most from the platform. Nevertheless, here are some import
    check space used and available by running `df -h /home` in a terminal. Creating a dashboard for space usage is also on the [todo list](https://github.com/oneilsh/dsosuk8s/issues/29).
 
 
+## User Management
+
+User management and access are in development--we don't yet have ONID or single-sign-on integration, 
+and the login system we do have is a little clunky. 
 
 
- 
+
+
+
+## User Server Management 
