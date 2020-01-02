@@ -122,7 +122,7 @@ Non-admin users will only see tabs for "Home", "Token" and "Change Password", *n
 Visiting the "Authorize Users" tab shows a list of usernames and their authorized status; clicking "Authorize" or "Unauthorize"
 changes their status. 
 
-<img src="images/authorize_users_tab.png" width="80%" align="center"/>
+<img src="images/authorize_user_tab.png" width="80%" align="center"/>
 
 
 
