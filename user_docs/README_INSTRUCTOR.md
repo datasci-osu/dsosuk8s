@@ -78,9 +78,9 @@ will help you get the most from the platform. Nevertheless, here are some import
    check space used and available by running `df -h /home` in a terminal. Creating a dashboard for space usage is also on the [todo list](https://github.com/oneilsh/dsosuk8s/issues/29).
 
 
-## Access and User Management
+## Access and User Management (Non-SSO)
 
-User management and access are in development--we don't yet have ONID or single-sign-on integration, 
+User management and access are in development--we don't yet have ONID or single-sign-on (SSO) integration, 
 and the login system we do have is a little clunky. Please bear with us while we work on integrating DS@OSU with other campus services.
 
 ### Initial Instructor (Admin) Access
