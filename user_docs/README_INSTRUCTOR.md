@@ -24,11 +24,11 @@ Some screenshots (Initial JupyterLab Interface, a Python Notebook, and RStudio):
 We've designed DS@OSU to balance user-friendliness with flexibility and power. Understanding the sections below 
 will help you get the most from the platform. Nevertheless, here are some important notes to you playing quickly:
 
-1. A single "Hub" provides access to a shared environment for members of a class (instructors, TAs, students) at a specific URL, for 
+1. **Hubs:** A single "Hub" provides access to a shared environment for members of a class (instructors, TAs, students) at a specific URL, for 
    example `http://beta.datasci.oregonstate.edu/nmc-245/`, and different classes access different Hubs/URLs. Within a Hub, some users
    (instructors & TAs) have "Admin"-level access with special permissions.
 
-2. Eacher user's "interface" (shown in the screenshots above) is running as an individual server (Docker container, actually) in 
+2. **Cloud-Based Servers:** Eacher user's "interface" (shown in the screenshots above) is running as an individual server (Docker container, actually) in 
    the cloud. This has some implications for Admins--for example, user servers may be shut down after a period of inactivity (e.g. 1. hour), or after
    a maximum amount of active time (e.g. 8 hours) to save on resources and costs. 
 
@@ -40,27 +40,27 @@ will help you get the most from the platform. Nevertheless, here are some import
    *Activity*, by the way, means a browser tab open and the user logged in, *even if the user is not doing anything.* You can thus
    help us control costs by instructing your students to logout or close their browser tabs when they won't be using the system for an hour or more.
 
-3. Python Users: Each user can install python3 packages for their own use with `pip install --user packagename`. Admins can install packages "hub-wide"
+3. **For Python Users**: Each user can install python3 packages for their own use with `pip install --user packagename`. Admins can install packages "hub-wide"
    (for import by all users) with `hubpip install packagename`. Installed packages are available for import in Jupyter notebooks an on the
-   command-line. 
+   command-line.
 
-4. R Users: Each user can install R packages for their own use with the standard `install.packages("packagename")` function or RStudio packages interface. 
+4. **For R Users**: Each user can install R packages for their own use with the standard `install.packages("packagename")` function or RStudio packages interface. 
    Github packages can be be installed for individual use with the usual `devtools::install_github("username/packagename")`, and the same
    for BioConductor packages. 
 
    Admins can install R packages hub-wide to the site-library with the helper functions `hub.install.packages("packagename")`, 
    `hub.install_github("username/packagename")`, and `hub.install_bioconductor("packagename")`. 
 
-5. File Permissions and Scripts: User home directories are located at `/home/username`; 
+5. **File Permissions:** User home directories are located at `/home/username`; 
    files created in user home directories are by default read+write for their owner and Admins, with no access for non-Admin users. Files
    added to `/home/hub_data_share` are by default read+write for Admins and read-only for others. 
 
-   Admins have read+write access to `/home/hub_local`, others have read-only access. Hub-wide Python and R packages are installed to subdirectories 
+6. **For Command-Line Users:** Admins have read+write access to `/home/hub_local`, others have read-only access. Hub-wide Python and R packages are installed to subdirectories 
    here, and the file `/home/hub_local/hubrc` is used to configure the environment for every user on login (akin to lines added to all users' `.bashrc` 
    files). Executable scripts and programs may be placed in `/home/hub_local/bin` (which is added to every users' `$PATH` via the `hubrc` file--if
-   compiling software, use `--prefix=/home/hub_local`). Some environment variables reference these locations--`env` shows a list these and others.
+   compiling software, use `--prefix=/home/hub_local`). Some environment variables reference these locations; `env` shows a list these and others.
 
-6. Data Storage: The `/home` directory and all its contents listed above exist on a single shared network drive. Currently there are no per-user
+6. **Data Storage:** The `/home` directory and all its contents listed above exist on a single shared network drive. Currently there are no per-user
    limits within this space, so theoretically any user can fill the entire space accidentally. (Implementing per-user quotas is [on the todo list](https://github.com/oneilsh/dsosuk8s/issues/28)).
    If the drive fills up, it will interfere with first-time logins and prevent new file creation, but won't result in data loss. You can
    check space used and available by running `df -h /home` in a terminal. Creating a dashboard for space usage is also on the [todo list](https://github.com/oneilsh/dsosuk8s/issues/29).
