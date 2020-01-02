@@ -83,12 +83,29 @@ will help you get the most from the platform. Nevertheless, here are some import
 User management and access are in development--we don't yet have ONID or single-sign-on integration, 
 and the login system we do have is a little clunky. Please bear with us while we work on integrating DS@OSU with other campus services.
 
+### Initial Instructor (Admin) Access
+
 In it's current form, when a Hub is created for a class, specific usernames (e.g. the instructor `smithj` and TA `oneils`) are designated 
 as Admin users. 
 
-When accessing the Hub URL (e.g. `https://beta.datasci.oregonstate.edu/nmc-245`) for the first time, you'll see the login page:
+When accessing the Hub URL (e.g. `https://beta.datasci.oregonstate.edu/nmc-245`) for the first time, you'll see the login page...
 
 <img src="images/login_box.png" width="40%" align="center"/>
+
+... but, you won't be able to login (even as an Admin) unless you set a password. To do so, click the "signup" link to get to the signup page:
+
+<img src="images/signup_box.png" width="40%" align="center"/>
+ 
+Here, enter your username (e.g. `smithj`) and your chosen password, then click "Create User". The box will clear and let you know your information
+has been submitted. 
+
+<img src="images/signup_box_submitted.png" width="40%" align="center"/>
+
+Now, click the "login" link to return to the login page, and login with your username and chosen password. Admins are pre-authorized to login, so
+you'll be logged into the JupyterLab interface.
+
+
+
 
 
 
