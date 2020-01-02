@@ -13,5 +13,7 @@ Welcome to the DataScience@OregonState instructional platform. This is still a w
   * Students can read/write in their own home directories, and have read-only access to a designated `hub_data_share` folder
   * Instructors (or others with designated Admin access) have read+write to student directories and other locations
 
+Some screenshots:
 
+<img src="images/launcher.png" width="30%"/>
 
