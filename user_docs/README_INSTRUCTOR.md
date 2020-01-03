@@ -122,18 +122,18 @@ and choose a username and password. However, they won't be able to login until t
 
 In the JupyterLab interface, every user has access to their "Hub Control Panel" from the File menu.
 
-<img src="images/file_hub_control_panel.png" width="80%" align="center"/>
+<img src="images/file_hub_control_panel.png" width="100%" align="center"/>
 
 When the control panel opens, the page will look like so:
 
-<img src="images/control_panel_tabs.png" width="80%" align="center"/>
+<img src="images/control_panel_tabs.png" width="100%" align="center"/>
 
 Non-admin users will only see tabs for "Home", "Token" and "Change Password", *not* "Admin" or "Authorize Users".
 
 Visiting the "Authorize Users" tab shows a list of usernames and their authorized status; clicking "Authorize" or "Unauthorize"
 changes their status. 
 
-<img src="images/authorize_user_tab.png" width="80%" align="center"/>
+<img src="images/authorize_user_tab.png" width="100%" align="center"/>
 
 Once authorized they will be able to login; by default newly authorized users are not Admins (though that can be changed). 
 
@@ -144,7 +144,7 @@ This means that users that are authorized but have not logged in yet will not be
 still show in this list (but they won't be able to login again until re-authorized). If you need to see entries for not-yet-logged-in
 users, you can add their usernames manually with the **Add Users** button. 
 
-<img src="images/admin_tab.png" width="80%" align="center"/>
+<img src="images/admin_tab.png" width="100%" align="center"/>
 
 Users can be removed with the **Delete User** button. *This does not delete their data in their `/home/username` directory.* It merely removes
 their password and authorization status. To regain access, they can go through the signup and authorization process again. 
@@ -191,4 +191,22 @@ The new placeholder can't actually run until Cloud Machine 4 has fully booted, a
 however, there's room for 6 more users to login with minimal wait:
 
 <img src="images/placeholders4.png" width="100%" align="center"/>
+
+Now suppose, however, that 13 new users attempt to login simultaneously (and again, their servers are not already running as they haven't logged
+in recently). There is room for 11 of them on running cloud machines (bumping all of the placeholders), but 2 will have to also wait along
+with the placeholders for new Cloud Machines to boot up before they can start working.
+
+<img src="images/placeholders5.png" width="100%" align="center"/>
+
+The placeholder servers are a nice solution when users login over time, but when many users log in simultaneously after a period of inactivity, 
+such as at the start of a morning lab class, there may be delays. 
+
+As an Admin, you can avoid this by pre-starting the servers for users of your hub ~20 minutes before the start of a class where this may be
+an issue, using the **Start All** button in the hub control panel Admin tab:
+
+<img src="images/admin_tab.png" width="100%" align="center"/>
+
+This may trigger the creation of a number of cloud machines to hold these user servers, but if done in advance of class students won't have
+to wait while these are created.
+
 
