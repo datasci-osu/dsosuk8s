@@ -82,8 +82,11 @@ will help you get the most from the platform. Nevertheless, here are some import
    limits within this space, so theoretically any user can fill the entire space accidentally. (Implementing per-user quotas is [on the todo list](https://github.com/oneilsh/dsosuk8s/issues/28)).
    If the drive fills up, it will interfere with first-time logins and prevent new file creation, but won't result in data loss. You can
    check space used and available by running `df -h /home` in a terminal. Creating a dashboard for space usage is also on the [todo list](https://github.com/oneilsh/dsosuk8s/issues/29).
-
-   *Hub storage is not permanent - we will require all data to be removed by 2 weeks after the class end date.* We are working on longer-term and reusable storage options.
+   
+   ```diff
+   - Hub storage is not permanent - we will require all data to be removed by 2 weeks after the class end date. 
+   ```
+   We are working on longer-term and reusable storage options.
 
 7. **Questions or Issues:** If you notice any technical issues or have feature requests, please feel free to log them as GitHub Issues [here](https://github.com/oneilsh/dsosuk8s/issues).
    General questions may be sent directly to `shawn.oneil@cgrb.oregonstate.edu` or `cj.keist@oregonstate.edu`. We'd love to hear from you!
