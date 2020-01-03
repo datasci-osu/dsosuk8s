@@ -165,4 +165,30 @@ the same username to re-signup with).
 <br />
 <br />
 
-## User Server Management 
+## User Server Management
+
+As mentioned in the the QuickStart, each user inteface runs on an individual "server" (this is the term JupyterHub uses-technically
+they are Docker containers) as part of an auto-scaling infrastructure. These servers live on cloud-based "machines" (virtual machines). 
+Each Hub is configured so that each user server is gauranteed some minimum amount of CPU cores and RAM and a maximum limit of 
+CPU cores and RAM it can use. This means only a certain number of user servers can fit on a cloud machine. 
+
+To provide space for new users to login quickly, a number of "placeholder" servers are also run:
+
+<img src="images/placeholders1.png" width="100%" align="center"/>
+
+Suppose that `userL` logs in, and their personal server isn't already running (it may be, if they were recently logged in); their
+personal server bumps a placeholder to another cloud machine (real user servers are not bumpable):
+
+<img src="images/placeholders2.png" width="100%" align="center"/>
+
+This process is fast, because starting a new user server on an existing cloud machine is fast. Suppose now that `userM` logs in:
+this bumps a placeholder from Cloud Machine 3, and `userM` logs in quickly as their user server starts on Machine 3. But now there's 
+no place for the bumped placeholder; this triggers the creation of a new Cloud Machine for the placeholder to start on. 
+
+<img src="images/placeholders3.png" width="100%" align="center"/>
+
+The new placeholder can't actually run until Cloud Machine 4 has fully booted, and this can take up to 10 minutes. Once it does,
+however, there's room for 6 more users to login with minimal wait:
+
+<img src="images/placeholders4.png" width="100%" align="center"/>
+
