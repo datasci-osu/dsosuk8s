@@ -83,6 +83,8 @@ will help you get the most from the platform. Nevertheless, here are some import
    If the drive fills up, it will interfere with first-time logins and prevent new file creation, but won't result in data loss. You can
    check space used and available by running `df -h /home` in a terminal. Creating a dashboard for space usage is also on the [todo list](https://github.com/oneilsh/dsosuk8s/issues/29).
 
+   *Hub storage is not permanent - we will require all data to be removed by 2 weeks after the class end date.* We are working on longer-term and reusable storage options.
+
 7. **Questions or Issues:** If you notice any technical issues or have feature requests, please feel free to log them as GitHub Issues [here](https://github.com/oneilsh/dsosuk8s/issues).
    General questions may be sent directly to `shawn.oneil@cgrb.oregonstate.edu` or `cj.keist@oregonstate.edu`. We'd love to hear from you!
 
@@ -93,6 +95,7 @@ will help you get the most from the platform. Nevertheless, here are some import
 
 User management and access are in development--we don't yet have ONID or single-sign-on (SSO) integration, 
 and the login system we do have is a little clunky. Please bear with us while we work on integrating DS@OSU with other campus services.
+The process described here should be considered temporary.
 
 #### Initial Instructor (Admin) Access
 
