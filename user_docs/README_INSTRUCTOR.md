@@ -209,4 +209,25 @@ an issue, using the **Start All** button in the hub control panel Admin tab:
 This may trigger the creation of a number of cloud machines to hold these user servers, but if done in advance of class students won't have
 to wait while these are created.
 
+### Server Termination and Scaling Down
+
+To save on resource usage and costs, the auto-scaling cluster is also configured to scale *down*--remove cloud machines when they aren't needed. 
+To avoid interrupting work, this only happens when a cloud machine is running no user servers. 
+
+To help clear out user servers that aren't actively being used, each Hub is configured to terminate a user server if it is inactive (meaning
+the interface is not logged into in a browser tab) after some amount of time (1 hour is the default). To facilitate this *we encourage
+instructors to encourage their students to logout (or at least close their browser tabs) when they won't be using the system for an hour or more.*
+
+Individual users can also terminate their user servers directly in the hub control panel "Home" tab. Admins can terminate servers of any user in
+the Admin tab. 
+
+In addition to the inactivity timeout, each Hub is also configured with a "max server age" parameter (default 8 hours). Any user server--including
+those open in browser tabs--will be terminated if it has been running this long. This can be adjusted if necessary, for example if you expect your
+students to run computational processes lasting longer than 8 hours. 
+
+
+
+
+
+
 
