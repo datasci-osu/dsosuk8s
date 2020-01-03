@@ -94,7 +94,7 @@ will help you get the most from the platform. Nevertheless, here are some import
 User management and access are in development--we don't yet have ONID or single-sign-on (SSO) integration, 
 and the login system we do have is a little clunky. Please bear with us while we work on integrating DS@OSU with other campus services.
 
-### Initial Instructor (Admin) Access
+#### Initial Instructor (Admin) Access
 
 In it's current form, when a Hub is created for a class, specific usernames (e.g. the instructor `smithj` and TA `oneils`) are designated 
 as Admin users. 
@@ -115,7 +115,7 @@ has been submitted.
 Now, click the **Login!** link to return to the login page, and login with your username and chosen password. Admins are pre-authorized to login, so
 you'll be logged into the JupyterLab interface.
 
-### Authorizing Others
+#### Authorizing Others
 
 The process for other users (students and new TAs or co-instructors) wishing to access the hub is similar - they will visit the Signup page
 and choose a username and password. However, they won't be able to login until their access is authorized by an Admin. 
@@ -137,7 +137,7 @@ changes their status.
 
 Once authorized they will be able to login; by default newly authorized users are not Admins (though that can be changed). 
 
-### Managing Users (Removing and Changing Admin Status)
+#### Managing Users (Removing and Changing Admin Status)
 
 The "Admin" tab of the control panel shows a list of users that *have previously logged in*, whether they are authorized or not. 
 This means that users that are authorized but have not logged in yet will not be shown here, and users that have been de-authorized may 
@@ -153,7 +153,7 @@ To change a users' Admin status, click **Edit User**--a checkbox will be availab
 
 The "server" buttons will be covered below in section [User Server Management](#user-server-management). 
 
-### Password Changes and Resets
+#### Password Changes and Resets
 
 Any user can change their own password by opening their hub control panel and selecting the "Change Password" tab. 
 
