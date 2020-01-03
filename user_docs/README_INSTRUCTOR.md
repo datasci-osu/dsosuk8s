@@ -29,6 +29,10 @@ Some screenshots (Initial JupyterLab Interface, a Python Notebook, and RStudio):
 <a href="https://raw.githubusercontent.com/oneilsh/dsosuk8s/userdocs/user_docs/images/python_notebook_autocomplete.png"><img src="images/python_notebook_autocomplete.png" width="30%"/></a>&nbsp;
 <a href="https://raw.githubusercontent.com/oneilsh/dsosuk8s/userdocs/user_docs/images/rstudio.png"><img src="images/rstudio.png" width="30%"/></a>
 
+<br />
+<br />
+
+
 ## QuickStart
 
 We've designed DS@OSU to balance user-friendliness with flexibility and power. Understanding the sections below 
@@ -82,6 +86,8 @@ will help you get the most from the platform. Nevertheless, here are some import
 7. **Questions or Issues:** If you notice any technical issues or have feature requests, please feel free to log them as GitHub Issues [here](https://github.com/oneilsh/dsosuk8s/issues).
    General questions may be sent directly to `shawn.oneil@cgrb.oregonstate.edu` or `cj.keist@oregonstate.edu`. We'd love to hear from you!
 
+<br />
+<br />
 
 ## Access and User Management (Non-SSO)
 
@@ -156,5 +162,7 @@ the Signup page again (where they can choose the same username and a new passwor
 deleting a user does not remove data in their `/home/username` directory, this is effectively a password reset (provided they choose
 the same username to re-signup with). 
 
+<br />
+<br />
 
 ## User Server Management 
