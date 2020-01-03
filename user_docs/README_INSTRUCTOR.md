@@ -125,7 +125,7 @@ and choose a username and password. However, they won't be able to login until t
 
 In the JupyterLab interface, every user has access to their "Hub Control Panel" from the File menu.
 
-<img src="images/file_hub_control_panel.png" width="100%" align="center"/>
+<img src="images/file_hub_control_panel.png" width="70%" align="center"/>
 
 When the control panel opens, the page will look like so:
 
