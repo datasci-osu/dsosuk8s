@@ -16,7 +16,7 @@
   "gnetId": null,
   "graphTooltip": 0,
   "id": 24,
-  "iteration": 1578125810945,
+  "iteration": 1578126707606,
   "links": [],
   "panels": [
     {
@@ -33,7 +33,10 @@
       "type": "row"
     },
     {
-      "aliasColors": {},
+      "aliasColors": {
+        "t3a.large/user": "semi-dark-red",
+        "t3a.medium/core": "semi-dark-blue"
+      },
       "bars": false,
       "cacheTimeout": null,
       "dashLength": 10,
@@ -138,7 +141,9 @@
       }
     },
     {
-      "aliasColors": {},
+      "aliasColors": {
+        "192.168.37.141": "light-green"
+      },
       "bars": false,
       "cacheTimeout": null,
       "dashLength": 10,
@@ -237,7 +242,9 @@
       }
     },
     {
-      "aliasColors": {},
+      "aliasColors": {
+        "ip-192-168-62-66.us-west-2.compute.internal": "light-green"
+      },
       "bars": false,
       "dashLength": 10,
       "dashes": false,
@@ -289,7 +296,7 @@
           "expr": "# I don't know why \"${nodetype:csv}\" works but \"${nodetype:regex}\" doesn't...\n(sum(kube_pod_container_resource_requests_cpu_cores) by (node)) \n / (sum(kube_node_status_allocatable_cpu_cores) by (node)) \n * on(node) group_right() kube_node_labels{label_beta_kubernetes_io_instance_type=~\"${nodetype:csv}\"}",
           "hide": false,
           "intervalFactor": 1,
-          "legendFormat": "{{host_ip}}",
+          "legendFormat": "{{node}}",
           "refId": "A"
         }
       ],
@@ -372,7 +379,7 @@
       "renderer": "flot",
       "repeat": null,
       "repeatDirection": "h",
-      "repeatIteration": 1578125810945,
+      "repeatIteration": 1578126707606,
       "repeatPanelId": 11,
       "scopedVars": {
         "nodetype": {
@@ -390,7 +397,7 @@
           "expr": "# I don't know why \"${nodetype:csv}\" works but \"${nodetype:regex}\" doesn't...\n(sum(kube_pod_container_resource_requests_cpu_cores) by (node)) \n / (sum(kube_node_status_allocatable_cpu_cores) by (node)) \n * on(node) group_right() kube_node_labels{label_beta_kubernetes_io_instance_type=~\"${nodetype:csv}\"}",
           "hide": false,
           "intervalFactor": 1,
-          "legendFormat": "{{host_ip}}",
+          "legendFormat": "{{node}}",
           "refId": "A"
         }
       ],
@@ -489,7 +496,7 @@
           "expr": "# I don't know why \"${nodetype:csv}\" works but \"${nodetype:regex}\" doesn't...\n(sum(kube_pod_container_resource_requests_memory_bytes) by (node)) \n / (sum(kube_node_status_allocatable_memory_bytes) by (node)) \n * on(node) group_right() kube_node_labels{label_beta_kubernetes_io_instance_type=~\"${nodetype:csv}\"}",
           "hide": false,
           "intervalFactor": 1,
-          "legendFormat": "{{host_ip}}",
+          "legendFormat": "{{node}}",
           "refId": "A"
         }
       ],
@@ -572,7 +579,7 @@
       "renderer": "flot",
       "repeat": null,
       "repeatDirection": "h",
-      "repeatIteration": 1578125810945,
+      "repeatIteration": 1578126707606,
       "repeatPanelId": 23,
       "scopedVars": {
         "nodetype": {
@@ -590,7 +597,7 @@
           "expr": "# I don't know why \"${nodetype:csv}\" works but \"${nodetype:regex}\" doesn't...\n(sum(kube_pod_container_resource_requests_memory_bytes) by (node)) \n / (sum(kube_node_status_allocatable_memory_bytes) by (node)) \n * on(node) group_right() kube_node_labels{label_beta_kubernetes_io_instance_type=~\"${nodetype:csv}\"}",
           "hide": false,
           "intervalFactor": 1,
-          "legendFormat": "{{host_ip}}",
+          "legendFormat": "{{node}}",
           "refId": "A"
         }
       ],
@@ -690,7 +697,7 @@
           "expr": "# I don't know why \"${nodetype:csv}\" works but \"${nodetype:regex}\" doesn't...\n(sum(container_memory_rss) by (node)  / (sum(kube_node_status_allocatable_memory_bytes) by (node))) * on(node) group_right() kube_node_labels{label_beta_kubernetes_io_instance_type=~\"${nodetype:csv}\"}",
           "hide": false,
           "intervalFactor": 1,
-          "legendFormat": "{{host_ip}}",
+          "legendFormat": "{{node}}",
           "refId": "A"
         }
       ],
@@ -774,7 +781,7 @@
       "renderer": "flot",
       "repeat": null,
       "repeatDirection": "h",
-      "repeatIteration": 1578125810945,
+      "repeatIteration": 1578126707606,
       "repeatPanelId": 49,
       "scopedVars": {
         "nodetype": {
@@ -792,7 +799,7 @@
           "expr": "# I don't know why \"${nodetype:csv}\" works but \"${nodetype:regex}\" doesn't...\n(sum(container_memory_rss) by (node)  / (sum(kube_node_status_allocatable_memory_bytes) by (node))) * on(node) group_right() kube_node_labels{label_beta_kubernetes_io_instance_type=~\"${nodetype:csv}\"}",
           "hide": false,
           "intervalFactor": 1,
-          "legendFormat": "{{host_ip}}",
+          "legendFormat": "{{node}}",
           "refId": "A"
         }
       ],
@@ -969,7 +976,7 @@
       "fill": 1,
       "fillGradient": 0,
       "gridPos": {
-        "h": 5,
+        "h": 6,
         "w": 12,
         "x": 0,
         "y": 38
@@ -1082,7 +1089,7 @@
       "fill": 1,
       "fillGradient": 0,
       "gridPos": {
-        "h": 5,
+        "h": 6,
         "w": 12,
         "x": 12,
         "y": 38
@@ -1191,12 +1198,12 @@
         "h": 1,
         "w": 24,
         "x": 0,
-        "y": 43
+        "y": 44
       },
       "id": 53,
       "panels": [],
       "repeat": null,
-      "repeatIteration": 1578125810945,
+      "repeatIteration": 1578126707606,
       "repeatPanelId": 20,
       "scopedVars": {
         "namespace": {
@@ -1217,10 +1224,10 @@
       "fill": 1,
       "fillGradient": 0,
       "gridPos": {
-        "h": 5,
+        "h": 6,
         "w": 12,
         "x": 0,
-        "y": 44
+        "y": 45
       },
       "id": 54,
       "legend": {
@@ -1245,7 +1252,7 @@
       "renderer": "flot",
       "repeat": null,
       "repeatDirection": "h",
-      "repeatIteration": 1578125810945,
+      "repeatIteration": 1578126707606,
       "repeatPanelId": 28,
       "repeatedByRow": true,
       "scopedVars": {
@@ -1333,10 +1340,10 @@
       "fill": 1,
       "fillGradient": 0,
       "gridPos": {
-        "h": 5,
+        "h": 6,
         "w": 12,
         "x": 12,
-        "y": 44
+        "y": 45
       },
       "id": 55,
       "legend": {
@@ -1365,7 +1372,7 @@
       "renderer": "flot",
       "repeat": null,
       "repeatDirection": "h",
-      "repeatIteration": 1578125810945,
+      "repeatIteration": 1578126707606,
       "repeatPanelId": 8,
       "repeatedByRow": true,
       "scopedVars": {
@@ -1449,6 +1456,7 @@
       {
         "allValue": null,
         "current": {
+          "tags": [],
           "text": "csx46 + pyt-w20",
           "value": [
             "csx46",
@@ -1525,5 +1533,5 @@
   "timezone": "",
   "title": "JHub Cluster Metrics",
   "uid": "3FUD7YYZz",
-  "version": 30
+  "version": 37
 }
