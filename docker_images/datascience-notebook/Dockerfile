@@ -84,6 +84,8 @@ RUN rm -rf /home/jovyan/.cache/yarn
 
 RUN mkdir -p /usr/local/bin/various
 
+RUN pip install jupyterhub-samlauthenticator
+
 USER $NB_USER
 
 

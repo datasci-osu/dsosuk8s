@@ -141,7 +141,21 @@ jupyterhub:
           c.JupyterHub.authenticator_class = NativeExtraAuthenticator
           # location in docker image
           c.JupyterHub.template_paths = ["/home/jovyan/nativeauthenticator/nativeauthenticator/templates/"]       
+        
+        elif env_auth_type == "saml":
+          from samlauthenticator import SAMLAuthenticator
+          from tornado import gen
 
+          class SAMLExtraAuthentictor(SAMLAuthenticator):
+            @gen.coroutine
+            def pre_spawn_start(self, user, spawner):
+              spawner.environment['NB_USER'] = user.name
+              spawner.environment['ADMIN_USER'] = str(user.admin)
+
+            c.JupyterHub.authenticator_class = SAMLExtraAuthenticator
+            c.SAMLExtraAuthenticator.metadata_filepath = "/usr/local/bin/various/idp-metadata.xml"
+            c.SAMLExtraAuthenticator.xpath_username_location = '/samlp:Response/saml:Assertion/saml:AttributeStatement/saml:Attribute[@Name="urn:oid:0.9.2342.19200300.100.1.1"]/saml:AttributeValue/text()' 
+        
         else:
           from jupyterhub.auth import DummyAuthenticator
           from tornado import gen

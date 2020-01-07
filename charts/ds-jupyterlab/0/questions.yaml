@@ -9,6 +9,7 @@ questions:
   type: enum
   options:
   - "native"
+  - "saml"
   - "dummy"
 
 - variable: jupyterhub.singleuser.extraEnv.NFS_SVC_HOME
