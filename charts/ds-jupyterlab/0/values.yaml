@@ -146,7 +146,7 @@ jupyterhub:
           from samlauthenticator import SAMLAuthenticator
           from tornado import gen
 
-          class SAMLExtraAuthentictor(SAMLAuthenticator):
+          class SAMLExtraAuthenticator(SAMLAuthenticator):
             @gen.coroutine
             def pre_spawn_start(self, user, spawner):
               spawner.environment['NB_USER'] = user.name
