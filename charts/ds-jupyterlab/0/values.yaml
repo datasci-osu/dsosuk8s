@@ -90,6 +90,14 @@ jupyterhub:
     image:
       name: oneilsh/ktesting-k8s-hub
       tag: 'latest'   # installed nativeauthenticator: https://blog.jupyter.org/simpler-authentication-for-small-scale-jupyterhubs-with-nativeauthenticator-999534c77a09
+    extraVolumes:
+      - name: hubfiles-volume
+        configMap:
+          name: hubfiles-configmap
+    extraVolumeMounts:
+      - name: hubfiles-volume
+        mountPath: /etc/jupyter/hubfiles
+
 
     extraConfig:
       # we pass in mem and cpu requests via environment variables because the rancher UI won't pass them as floats :/  
@@ -152,7 +160,7 @@ jupyterhub:
               spawner.environment['NB_USER'] = user.name
               spawner.environment['ADMIN_USER'] = str(user.admin)
 
-          SAMLExtraAuthenticator.metadata_filepath = "/usr/local/bin/various/idp-metadata.xml"
+          SAMLExtraAuthenticator.metadata_filepath = "/etc/jupyter/hubfiles/idp-metadata.xml"
           SAMLExtraAuthenticator.xpath_username_location = '/samlp:Response/saml:Assertion/saml:AttributeStatement/saml:Attribute[@Name="urn:oid:0.9.2342.19200300.100.1.1"]/saml:AttributeValue/text()' 
           c.JupyterHub.authenticator_class = SAMLExtraAuthenticator
         
