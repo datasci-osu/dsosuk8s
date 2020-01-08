@@ -1,0 +1,6 @@
+echo "What AWS_PROFLE would you like to use? (entry from ~/.aws/credentials)"
+read AWS_PROFILE
+export AWS_PROFILE
+
+ADD_PATH=$(dirname $BASH_SOURCE)
+export PATH=$ADD_PATH:$PATH
