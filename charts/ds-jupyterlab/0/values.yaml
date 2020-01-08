@@ -162,6 +162,8 @@ jupyterhub:
 
           SAMLExtraAuthenticator.metadata_filepath = "/etc/jupyter/hubfiles/idp-metadata.xml"
           SAMLExtraAuthenticator.xpath_username_location = '/samlp:Response/saml:Assertion/saml:AttributeStatement/saml:Attribute[@Name="urn:oid:0.9.2342.19200300.100.1.1"]/saml:AttributeValue/text()' 
+          # this and entity_id will likely need to be set based on the ingress path, which will likely need to come in as an environment variable
+          #SAMLExtraAuthenticator.acs_endpoint_url = '' # protocol::/host/prefix/hub/local 
           c.JupyterHub.authenticator_class = SAMLExtraAuthenticator
         
         else:
