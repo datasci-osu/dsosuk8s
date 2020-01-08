@@ -24,8 +24,7 @@ spec:
           limits:
             cpu: 0.5
             memory: "2G"
-        image: oneilsh/ktesting-nfsserver3:latest
-        imagePullPolicy: Always # specifying :latest should do this as well, but i'm feeling paranoid
+        image: oneilsh/ktesting-nfsserver3:acb20051
         securityContext:
           capabilities:
             add: ["SYS_ADMIN", "SETPCAP"]
