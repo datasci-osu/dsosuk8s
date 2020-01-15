@@ -288,7 +288,8 @@ fi
 #echo "export ADMIN_HOME_DIR=$ADMIN_HOME_DIR" >> /etc/rstudio/rsession-profile
 #echo "source $ADMIN_HOME_DIR/hubrc" >> /etc/rstudio/rsession-profile
 
+ln -s $ADMIN_HOME_DIR/hubrc /etc/profile.d/hubrc.sh
 
 # using bash -c causes the stuff in /etc/profile to be picked up
 #exec sudo -E -H -u $NB_USER PATH=$PATH XDG_CACHE_HOME=/home/$NB_USER/.cache PYTHONPATH=${PYTHONPATH:-} LD_LIBRARY_PATH=${LD_LIBRARY_PATH:-} bash -c "$cmd"  
-exec sudo -E -H -u $NB_USER PATH=$PATH XDG_CACHE_HOME=/home/$NB_USER/.cache PYTHONPATH=${PYTHONPATH:-} LD_LIBRARY_PATH=${LD_LIBRARY_PATH:-} bash -c "source $ADMIN_HOME_DIR/hubrc && $cmd"  
+exec sudo -E -H -u $NB_USER PATH=$PATH XDG_CACHE_HOME=/home/$NB_USER/.cache PYTHONPATH=${PYTHONPATH:-} LD_LIBRARY_PATH=${LD_LIBRARY_PATH:-} bash -c "$cmd"  
