@@ -77,11 +77,27 @@ questions:
   default: "dev.datasci.oregonstate.edu"
   required: true
 
+- variable: jupyterhub.hub.extraEnv.JUPYTERHUB_HOST
+  group: Access
+  description: "JUPYTERHUB_HOST environment variable accessible to the hub (set as same as Host, needed for SAML auth)"
+  type: string
+  label: "JUPYTERHUB_HOST Variable"
+  default: "dev.datasci.oregonstate.edu"
+  required: true
+
 - variable: jupyterhub.hub.baseUrl
   group: Access
   description: "URL as base of hub. If not /, should start and end with /, e.g. /jupyterhub/"
   type: string
   label: "URL"
+  default: "/my-jupyterhub/"
+  required: true
+
+- variable: jupyterhub.hub.extraEnv.JUPYTERHUB_BASE_URL
+  group: Access
+  description: "JUPYTERHUB_BASE_URL environment variable accessible to the hub (set as same as URL, needed for SAML auth)"
+  type: string
+  label: "JUPYTERHUB_BASE_URL Variable"
   default: "/my-jupyterhub/"
   required: true
 

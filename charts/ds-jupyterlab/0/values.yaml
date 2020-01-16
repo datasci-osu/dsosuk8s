@@ -160,6 +160,13 @@ jupyterhub:
               spawner.environment['NB_USER'] = user.name
               spawner.environment['ADMIN_USER'] = str(user.admin)
 
+          print(os.environ)
+          jupyterhub_host = os.environ['JUPYTERHUB_HOST']
+          hub_prefix = os.environ['JUPYTERHUB_BASE_URL']
+          jupyterhub_url = "https://" + jupyterhub_host + hub_prefix # hub_prefix should begin and end in /
+          SAMLExtraAuthenticator.entity_id = jupyterhub_url
+          SAMLExtraAuthenticator.acs_endpoint_url = jupyterhub_url + "hub/login"
+
           SAMLExtraAuthenticator.metadata_filepath = "/etc/jupyter/hubfiles/idp-metadata.xml"
           SAMLExtraAuthenticator.xpath_username_location = '/samlp:Response/saml:Assertion/saml:AttributeStatement/saml:Attribute[@Name="urn:oid:0.9.2342.19200300.100.1.1"]/saml:AttributeValue/text()' 
           # this and entity_id will likely need to be set based on the ingress path, which will likely need to come in as an environment variable
