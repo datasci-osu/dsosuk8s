@@ -89,7 +89,7 @@ jupyterhub:
       upgrade: false 
     image:
       name: oneilsh/ktesting-k8s-hub
-      tag: "d746c46f"   # as of https://github.com/oneilsh/dsosuk8s/tree/caa236856df68732e62913bda5d0d05c0937b419
+      tag: "latest"   # as of https://github.com/oneilsh/dsosuk8s/tree/caa236856df68732e62913bda5d0d05c0937b419
 
     extraConfig:
       # we pass in mem and cpu requests via environment variables because the rancher UI won't pass them as floats :/  
@@ -137,10 +137,30 @@ jupyterhub:
               #spawner.environment['NB_UID'] = "1000"
               #spawner.environment['GRANT_SUDO'] = "yes"
        
-          ## read admin user list from provided values 
           c.JupyterHub.authenticator_class = NativeExtraAuthenticator
           # location in docker image
           c.JupyterHub.template_paths = ["/home/jovyan/nativeauthenticator/nativeauthenticator/templates/"]       
+
+        elif env_auth_type == "lti":
+          from ltiauthenticator import LTIAuthenticator
+          from tornado import gen
+
+          class LTIExtraAuthenticator(LTIAuthenticator):
+            @gen.coroutine
+            def pre_spawn_start(self, user, spawner):
+              # for use by scripts in start-notebook.d
+              # NB_USER is the username logged in with
+              # ADMIN_USER is "True" if they're an admin, "False" otherwise
+              spawner.environment['NB_USER'] = user.name
+              spawner.environment['ADMIN_USER'] = str(user.admin)
+              # below for debugging
+              #spawner.environment['NB_UID'] = "1000"
+              #spawner.environment['GRANT_SUDO'] = "yes"
+       
+          c.JupyterHub.authenticator_class = LTIExtraAuthenticator
+          c.LTIAuthenticator.consumers = {
+            os.environ['LTI_CLIENT_KEY']: os.environ['LTI_CLIENT_SECRET']
+          } 
 
         else:
           from jupyterhub.auth import DummyAuthenticator

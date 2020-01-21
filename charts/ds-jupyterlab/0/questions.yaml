@@ -9,7 +9,22 @@ questions:
   type: enum
   options:
   - "native"
+  - "lti"
   - "dummy"
+
+- variable: jupyterhub.hub.extraEnv.LTI_CLIENT_KEY
+  group: General
+  default: "biglongtoken"
+  description: "Client Key for LTIAuthentictor (see here: https://github.com/jupyterhub/ltiauthenticator)"
+  label: "LTI Client Key"
+  type: string
+
+- variable: jupyterhub.hub.extraEnv.LTI_CLIENT_SECRET
+  group: General
+  default: "biglongtoken"
+  description: "Client Secret Key for LTIAuthentictor"
+  label: "LTI Secret Key"
+  type: string
 
 - variable: jupyterhub.singleuser.extraEnv.NFS_SVC_HOME
   group: General
