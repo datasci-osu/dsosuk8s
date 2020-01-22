@@ -35,6 +35,18 @@ questions:
     label: "LTI Secret Key"
     type: string
   
+- variable: jupyterhub.singleuser.defaultUrl
+  group: General
+  default: "/lab"
+  type: enum
+  label: "Default Interface"
+  options:
+    - "/lab"
+    - "/tree"
+    - "/rstudio"
+  description: "Default to JupterLab, Jupyter Classic, or RStudio"
+  required: true
+
 - variable: jupyterhub.hub.extraEnv.ADMIN_USERS
   group: General
   default: "oneils, smithj"
