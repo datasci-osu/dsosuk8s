@@ -89,7 +89,7 @@ jupyterhub:
       upgrade: false 
     image:
       name: oneilsh/ktesting-k8s-hub
-      tag: "latest"   # as of https://github.com/oneilsh/dsosuk8s/tree/caa236856df68732e62913bda5d0d05c0937b419
+      tag: "d746c46f"   # as of https://github.com/oneilsh/dsosuk8s/tree/caa236856df68732e62913bda5d0d05c0937b419
 
     extraConfig:
       # we pass in mem and cpu requests via environment variables because the rancher UI won't pass them as floats :/  
