@@ -157,6 +157,8 @@ jupyterhub:
           class SAMLExtraAuthenticator(SAMLAuthenticator):
             @gen.coroutine
             def pre_spawn_start(self, user, spawner):
+              print("in pre_spawn_start...")
+              print(user)
               spawner.environment['NB_USER'] = user.name
               spawner.environment['ADMIN_USER'] = str(user.admin)
 
@@ -172,8 +174,9 @@ jupyterhub:
           
           # Don't use SAML Single Log Out
           # Yes, there is a typo in this variable name "forwad"
-          SAMLAuthenticator.slo_forwad_on_logout = False
+          SAMLExtraAuthenticator.slo_forwad_on_logout = False
 
+          SAMLExtraAuthenticator.create_system_users = False
           SAMLExtraAuthenticator.metadata_filepath = "/etc/jupyter/hubfiles/idp-dev-metadata.xml"
           SAMLExtraAuthenticator.xpath_username_location = '/samlp:Response/saml:Assertion/saml:AttributeStatement/saml:Attribute[@Name="urn:oid:0.9.2342.19200300.100.1.1"]/saml:AttributeValue/text()' 
           # this and entity_id will likely need to be set based on the ingress path, which will likely need to come in as an environment variable
