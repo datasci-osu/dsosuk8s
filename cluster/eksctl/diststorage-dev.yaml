@@ -4,7 +4,7 @@ apiVersion: eksctl.io/v1alpha5
 kind: ClusterConfig
 
 metadata:
-  name: diststorage-dev
+  name: diststorage-dev2
   region: us-west-2
 
 # default availabilityzones unless otherwise specified?
@@ -24,14 +24,14 @@ nodeGroups:
   # the other, workers, is for jh user pods
   # t3.large is EBS optimized - note that EACH NODE CAN SUPPORT A MAX OF 28 EBS ATTACHMENTS (actually 27; https://docs.aws.amazon.com/AWSEC2/latest/UserGuide/volume_limits.html)
   - name: jhcontrolplane
-    instanceType: t3a.medium
+    instanceType: t3a.xlarge
     availabilityZones: ["us-west-2b"]
     iam: 
       withAddonPolicies:
         autoScaler: true
     minSize: 1
     maxSize: 10
-    desiredCapacity: 1
+    desiredCapacity: 2
     volumeSize: 30
     # to allow ssh into the nodes
     #ssh:
@@ -64,13 +64,13 @@ nodeGroups:
        - "apt-get update && apt-get install open-iscsi -y"
 
   - name: workers
-    instanceType: t3a.large
+    instanceType: t3a.xlarge
     iam: 
       withAddonPolicies:
         autoScaler: true
     minSize: 1
     maxSize: 30
-    desiredCapacity: 1
+    desiredCapacity: 2
     volumeSize: 30
     ###availabilityZones: ["us-west-2a", "us-west-2b", "us-west-2c"]
     labels: 
