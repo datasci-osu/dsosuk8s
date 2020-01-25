@@ -111,6 +111,7 @@ spec:
 #   mgr:
   resources:
 # The requests and limits set here, allow the mgr pod to use half of one CPU core and 1 gigabyte of memory
+<<<<<<< HEAD
     mgr:
       limits:
         cpu: "500m"
@@ -150,6 +151,22 @@ spec:
 
 # The option to automatically remove OSDs that are out and are safe to destroy.
   removeOSDsIfOutAndSafeToRemove: true
+=======
+#    mgr:
+#      limits:
+#        cpu: "500m"
+#        memory: "1024Mi"
+#      requests:
+#        cpu: "500m"
+#        memory: "1024Mi"
+# The above example requests/limits can also be added to the mon and osd components
+#    mon:
+#    osd:
+#    prepareosd:
+#    crashcollector:
+  # The option to automatically remove OSDs that are out and are safe to destroy.
+  removeOSDsIfOutAndSafeToRemove: false
+>>>>>>> e377410de5dfc7619f264d9f3c3d14e7fb320c4f
 #  priorityClassNames:
 #    all: rook-ceph-default-priority-class
 #    mon: rook-ceph-mon-priority-class
