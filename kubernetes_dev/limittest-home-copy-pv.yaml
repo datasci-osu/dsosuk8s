@@ -1,0 +1,17 @@
+apiVersion: v1
+kind: PersistentVolume
+metadata: 
+  name: limittest-home-copy-pv
+  labels:
+    type: amazonEBS
+spec:
+  capacity: 
+    storage: 20Gi
+  accessModes:
+    - ReadWriteOnce
+  awsElasticBlockStore:
+    volumeID: vol-0a43ee99db70b3d67
+    fsType: ext4
+  claimRef: 
+    name: limittest-home-copy-pvc 
+    namespace: limittest

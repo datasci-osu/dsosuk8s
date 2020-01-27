@@ -1,0 +1,43 @@
+cluster_name: rancher-ha
+
+#ssh_agent_auth: true
+# rke up --config rancher-cluster.yaml
+## import and move resulting kube_config file to somewhere safe
+# kubectl -n cattle-system create secret tls tls-rancher-ingress --cert=/Users/soneil/Box/DataScience/SSL/dsosu-certonly.cer --key=/Users/soneil/Box/DataScience/SSL/star_datasci_oregonstate_edu.key 
+
+# helm install rancher rancher-stable/rancher --namespace cattle-system --set hostname=rancher2.datasci.oregonstate.edu --set ingress.tls.source=secret
+## check install: 
+# kubectl -n cattle-system rollout status deploy/rancher
+
+cloud_provider:
+  name: aws
+
+ssh_key_path: /Users/soneil/.ssh/aws-osu-dbarber.pem
+
+nodes:
+  - address: 34.222.96.136 
+    internal_address: 192.168.18.38
+    user: ec2-user
+    role: [controlplane, worker, etcd]
+  - address: 34.210.19.92
+    internal_address: 192.168.38.86
+    user: ec2-user
+    role: [controlplane, worker, etcd]
+  - address: 52.37.159.153
+    internal_address: 192.168.72.45
+    user: ec2-user
+    role: [controlplane, worker, etcd]
+
+services:
+  etcd:
+    snapshot: true
+    creation: 6h
+    retention: 24h
+
+# Required for external TLS termination with
+# ingress-nginx v0.22+
+ingress:
+  provider: nginx
+  options:
+    use-forwarded-headers: "true"
+

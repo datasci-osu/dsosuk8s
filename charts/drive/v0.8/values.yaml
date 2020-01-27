@@ -1,2 +1,3 @@
 # Source: templates/deploy.yaml
 size: 4Gi
+existingVolumeName: ""
