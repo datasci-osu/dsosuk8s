@@ -8,4 +8,4 @@ questions:
 - variable: existingVolumeName
   description: "Bind to an existing volume by name (must be unbound); if empty will create dynamic PV."
   label: "Existing Volume Name: "
-
+  type: string

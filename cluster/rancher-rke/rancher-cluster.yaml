@@ -3,7 +3,8 @@ cluster_name: rancher-ha
 #ssh_agent_auth: true
 # rke up --config rancher-cluster.yaml
 ## import and move resulting kube_config file to somewhere safe
-# kubectl -n cattle-system create secret tls tls-rancher-ingress --cert=/Users/soneil/Box/DataScience/SSL/dsosu-certonly.cer --key=/Users/soneil/Box/DataScience/SSL/star_datasci_oregonstate_edu.key 
+## needed the cert to be the chain cert with the main entry on top
+# kubectl -n cattle-system create secret tls tls-rancher-ingress --cert=/Users/soneil/Box/DataScience/SSL/dsosu-cert-with-chain-maintop.cer --key=/Users/soneil/Box/DataScience/SSL/star_datasci_oregonstate_edu.key 
 
 # helm install rancher rancher-stable/rancher --namespace cattle-system --set hostname=rancher2.datasci.oregonstate.edu --set ingress.tls.source=secret
 ## check install: 
