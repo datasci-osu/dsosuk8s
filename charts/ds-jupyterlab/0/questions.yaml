@@ -34,7 +34,13 @@ questions:
     description: "Client Secret Key for LTIAuthentictor"
     label: "LTI Secret Key"
     type: string
-  
+
+- variable: jupyterhub.hub.db.pvc.selector
+  group: General
+  default: null
+  description: "Label selector for using an existing pv. Use e.g. '{\"matchLabels\": {\"volumeid\": \"someid\"}}' (no quotes), where volumeid is a label with value someid on the pv."
+  type: string
+
 - variable: jupyterhub.singleuser.defaultUrl
   group: General
   default: "/lab"
