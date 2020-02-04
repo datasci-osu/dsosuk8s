@@ -34,7 +34,7 @@ URL=$(git config --get remote.origin.url)
 rancher catalog add --branch $BRANCH catalog-$BRANCH $URL || echo "Catalog already exists"
 
 echo -e "\e[32mNoting chosen context in $SCRIPT_DIR/rancher_brancher_context.txt...\e[0m"
-echo $(rancher context current) > $SCRIPT_DIR/rancher_brancher_context.txt
+$(rancher context current) > $SCRIPT_DIR/rancher_brancher_context.txt
 
 echo -e "\e[32mRe-pushing...\e[0m"
 git push
