@@ -6,7 +6,7 @@ set -e
 SCRIPT_DIR=`dirname $0`
 
 if [ $# -ne 4 ]; then
-  echo "Usage: <aws_profile_name> <s3_bucket_name> <s3_region> <velero_secret_file>"
+  echo "Usage: <aws_profile_name> <s3_bucket_name_to_create> <s3_region> <velero_secret_file_to_create>"
   echo ""
   echo "This script installs the Velero kubernetes backup tool in the current kubernetes cluster, with storage backed by an AWS S3 bucket."
   echo ""
@@ -15,9 +15,9 @@ if [ $# -ne 4 ]; then
   echo "See https://github.com/vmware-tanzu/velero-plugin-for-aws#setup for details."
   echo ""
   echo "<aws_profile_name> is a valid AWS profile (usually in ~/.aws/credentials)"
-  echo "<s3_bucket_name> is the name of the s3 bucket to create for backup storage (alphanumeric with . and - allowed)"
+  echo "<s3_bucket_name_to_create> is the name of the s3 bucket to create for backup storage (alphanumeric with . and - allowed)"
   echo "<s3_region> is a valid region where the bucket should be stored (e.g. us-west-2)"
-  echo "<velero_secret_file> is the credentials file that the velero AWS"
+  echo "<velero_secret_file_to_create> is the credentials file that the velero AWS"
   exit 1
 fi
 
