@@ -4,12 +4,12 @@ jupyterhub:
     maxAge: 28800
     timeout: 3600
   hub:
-    baseUrl: /my-jupyterhub/
+    baseUrl: /example-namespace/
     extraEnv:
       ADMIN_USERS: oneils, smithj
       AUTH_TYPE: native
-      LTI_CLIENT_KEY: 948f723b194c2db689db68f34b98b9783869fd62ec342d3a079a87d0b93d5e6d
-      LTI_CLIENT_SECRET: 14e22c44cb1fdfad048bb662a711322844567d5ad7ee895f1be9696cc8ced4f4
+      LTI_CLIENT_KEY: fc40e67a99818f9d87e9887f3a7a59c5dcf3ca10b353bb42ed535f3222139ec8
+      LTI_CLIENT_SECRET: e9e3d223170f8f054a3f42c1db35014333971ca0c1153d2e12592363531f6e69
   ingress:
     hosts:
     - devb.datasci.oregonstate.edu
@@ -17,7 +17,7 @@ jupyterhub:
     - hosts:
       - devb.datasci.oregonstate.edu
   proxy:
-    secretToken: ac3da63080f6b487ffff0a15744a4b0f627e5bd0ee6527320ffcbdfc12d44bf4
+    secretToken: 5415149d8b5cc004f30add66cc82c3db4240c20a0d3f7351d4b714c602b6e297
   scheduling:
     userPlaceholder:
       enabled: true

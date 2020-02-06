@@ -1,0 +1,47 @@
+jupyterhub:
+  hub:
+    extraEnv:
+      AUTH_TYPE: native                               # native, lti, or dummy
+      LTI_CLIENT_KEY: 63a3cafe9287fc4922bd6df287050831c9c0865ab9395024a6e09d082b4c08d0         # used if using LTI auth
+      LTI_CLIENT_SECRET: 67d428ec80f70139d450da6d7ccbeca01c4e27dccaf3b79f3306071b25afcf25
+      ADMIN_USERS: "oneils, smithj"
+    baseUrl: "/ex2/"   # must start and end with a /
+
+  scheduling:
+    userPlaceholder:
+      enabled: true
+      replicas: 0
+
+  cull:
+    enabled: true
+    timeout: 3600        # cull inactive servers after this long
+    maxAge: 28800        # cull servers this old, even if active (0 disables)
+
+  proxy:
+    secretToken: 6cabfaa8b73e17d4bcf13953123db44dc3e73c22262abdc92293bbdb27130647
+
+  singleuser:
+    # looks like these should be set null to delete the key (including those defaulted in the jupyterhub chart) for the c.Spawner limits below to be used
+    memory:
+      limit: "1G"
+      guarantee: "0.5G"
+    cpu:
+      limit: 1
+      guarantee: 0.1
+    image:
+      name: oneilsh/ktesting-datascience-notebook
+      tag: "1d47a65a" 
+    defaultUrl: "/lab"
+
+    extraEnv:
+      NFS_SVC_HOME: homedrive-ex2   # same as above
+
+    uid: 0
+    fsGid: 0
+
+  ingress:
+    hosts:
+    - devb.datasci.oregonstate.edu
+    tls:
+    - hosts:
+      - devb.datasci.oregonstate.edu

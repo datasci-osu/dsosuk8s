@@ -1,14 +1,31 @@
-application:
+app:
   namespace: example-namespace
+  
+  actions: 
+  - type: commands
+    exec:
+      - echo we can reference values within the chart with \"plusVars\"
+      - echo namespace is ++app.namespace++
+      - echo this is a second command
 
-  charts:
-  - name: homedrive-$(basename $(pwd))
+  - type: setValues
+    set:
+      message: howdy
+      person: shawn
+
+  - type: commands
+    exec:
+      - echo ++message++ ++person++
+
+  - type: chart
+    name: homedrive-$(basename $(pwd))
     chartdir: ../../charts/drive/latest/
     valuesFile: drive.yaml
     values: 
       size: 4Gi
 
-  - name: lab-$(basename $(pwd))
+  - type: chart
+    name: lab-$(basename $(pwd))
     chartdir: ../../charts/ds-jupyterlab/latest
     valuesFile: ds-jupyterlab.yaml
     values:
@@ -20,7 +37,7 @@ application:
             LTI_CLIENT_KEY: $(openssl rand -hex 32)         # used if using LTI auth
             LTI_CLIENT_SECRET: $(openssl rand -hex 32)
             ADMIN_USERS: "oneils, smithj"
-          baseUrl: "/my-jupyterhub/"   # must start and end with a /
+          baseUrl: "/example-namespace/"   # must start and end with a /
       
         scheduling:
           userPlaceholder:
