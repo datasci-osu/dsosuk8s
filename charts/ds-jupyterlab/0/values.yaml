@@ -47,7 +47,6 @@ jupyterhub:
     image:
       name: oneilsh/ktesting-datascience-notebook
       tag: "1d47a65a" # as of https://github.com/oneilsh/dsosuk8s/tree/caa236856df68732e62913bda5d0d05c0937b419
-      pullPolicy: Always
     defaultUrl: "/lab"
     cmd: ["start-singleuser.sh", "--allow-root"]  # don't think I need to add --allow-root... 
     storage:
@@ -67,7 +66,7 @@ jupyterhub:
           mountPath: /usr/local/bin/various
 
     extraEnv:
-      NFS_HOME_SVC: ""
+      NFS_SVC_HOME: ""
     uid: 0
     fsGid: 0
 

@@ -1,0 +1,39 @@
+jupyterhub:
+  cull:
+    enabled: true
+    maxAge: 28800
+    timeout: 3600
+  hub:
+    baseUrl: /my-jupyterhub/
+    extraEnv:
+      ADMIN_USERS: oneils, smithj
+      AUTH_TYPE: native
+      LTI_CLIENT_KEY: 948f723b194c2db689db68f34b98b9783869fd62ec342d3a079a87d0b93d5e6d
+      LTI_CLIENT_SECRET: 14e22c44cb1fdfad048bb662a711322844567d5ad7ee895f1be9696cc8ced4f4
+  ingress:
+    hosts:
+    - devb.datasci.oregonstate.edu
+    tls:
+    - hosts:
+      - devb.datasci.oregonstate.edu
+  proxy:
+    secretToken: ac3da63080f6b487ffff0a15744a4b0f627e5bd0ee6527320ffcbdfc12d44bf4
+  scheduling:
+    userPlaceholder:
+      enabled: true
+      replicas: 5
+  singleuser:
+    cpu:
+      guarantee: 0.1
+      limit: 1.0
+    defaultUrl: /lab
+    extraEnv:
+      NFS_SVC_HOME: homedrive-example
+    fsGid: 0
+    image:
+      name: oneilsh/ktesting-datascience-notebook
+      tag: 1d47a65a
+    memory:
+      guarantee: 0.5G
+      limit: 1.0G
+    uid: 0
