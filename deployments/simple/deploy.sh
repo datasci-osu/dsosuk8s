@@ -32,11 +32,9 @@ HUB_CHART=$SCRIPT_DIR/../../charts/ds-jupyterlab/latest
 
 
 ##########################
-# work happens below
+# dirty work happens below
 ##########################
 
-# create namespace if it doesn't exist
-kubectl create namespace $NAMESPACE || true     # don't allow the set -e to take effect here
 
 cat <<EOF > 1-drive.yaml
 size: $HOMEDRIVE_SIZE
@@ -101,6 +99,33 @@ echo "#!/bin/bash" > 2-deploy-hub.sh
 echo "helm upgrade $HUB_APPNAME $HUB_CHART --namespace $NAMESPACE --atomic --cleanup-on-fail --install --values 2-hub.yaml" >> 2-deploy-hub.sh
 chmod u+x 2-deploy-hub.sh
 
+echo "#!/bin/bash" > status.sh
+echo "echo Helm chart list:" >> status.sh
+echo "helm list --namespace $NAMESPACE" >> status.sh
+echo "echo ''" >> status.sh
+echo "echo Kubernetes resources:" >> status.sh
+echo "kubectl get all --namespace $NAMESPACE" >> status.sh
+echo "echo ''" >> status.sh
+echo "echo Kubernetes PVCs:" >> status.sh
+echo "kubectl get pvc --namespace $NAMESPACE" >> status.sh
+echo "echo ''" >> status.sh
+echo "echo Kubernetes PVs:" >> status.sh
+echo "kubectl get pv | grep -E \"[[:blank::]$NAMESPACE\/\"" >> status.sh
+chmod u+x status.sh
 
+####
+# do iiiiit
+####
 
+# create namespace if it doesn't exist
+echo "Checking namespace: "
+kubectl create namespace $NAMESPACE || true     # don't allow the set -e to take effect here
+echo ""
 
+echo "Running 1-deploy-drive.sh..."
+./1-deploy-drive.sh
+echo ""
+
+echo "Running 2-deploy-hub.sh..."
+./2-deploy-hub.sh
+echo ""
