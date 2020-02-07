@@ -1,0 +1,82 @@
+app:
+  namespace: example-namespace
+  
+  actions: 
+  - type: commands
+    exec:
+      - echo we can reference values within the chart with \"plusVars\"
+      - echo namespace is ++app.namespace++
+      - echo this is a second command
+
+  - type: setValues
+    set:
+      message: howdy
+      person: shawn
+
+  - type: commands
+    exec:
+      - echo ++message++ ++person++
+
+  - type: chart
+    name: homedrive-$(basename $(pwd))
+    chartdir: ../../charts/drive/latest/
+    valuesFile: drive.yaml
+    values: 
+      size: 4Gi
+
+  - type: chart
+    name: lab-$(basename $(pwd))
+    chartdir: ../../charts/ds-jupyterlab/latest
+    valuesFile: ds-jupyterlab.yaml
+    values:
+
+      jupyterhub:
+        hub:
+          extraEnv:
+            AUTH_TYPE: native                               # native, lti, or dummy
+            LTI_CLIENT_KEY: $(openssl rand -hex 32)         # used if using LTI auth
+            LTI_CLIENT_SECRET: $(openssl rand -hex 32)
+            ADMIN_USERS: "oneils, smithj"
+          baseUrl: "/example-namespace/"   # must start and end with a /
+      
+        scheduling:
+          userPlaceholder:
+            enabled: true
+            replicas: 5
+      
+        cull:
+          enabled: true
+          timeout: 3600        # cull inactive servers after this long
+          maxAge: 28800        # cull servers this old, even if active (0 disables)
+      
+        proxy:
+          secretToken: $(openssl rand -hex 32) 
+      
+        singleuser:
+          # looks like these should be set null to delete the key (including those defaulted in the jupyterhub chart) for the c.Spawner limits below to be used
+          memory:
+            limit: "1.0G"
+            guarantee: "0.5G"
+          cpu:
+            limit: 1.0
+            guarantee: 0.1
+          image:
+            name: oneilsh/ktesting-datascience-notebook
+            tag: "1d47a65a" 
+          defaultUrl: "/lab"
+      
+          extraEnv:
+            NFS_SVC_HOME: homedrive-$(basename $(pwd))   # same as above
+      
+          uid: 0
+          fsGid: 0
+      
+        ingress:
+          hosts:
+          - devb.datasci.oregonstate.edu
+          tls:
+          - hosts:
+            - devb.datasci.oregonstate.edu
+  
+
+
