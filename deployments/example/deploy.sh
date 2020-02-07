@@ -35,6 +35,7 @@ HUB_CHART=$SCRIPT_DIR/../../charts/ds-jupyterlab/latest
 # dirty work happens below
 ##########################
 
+source ../colors.sh
 
 cat <<EOF > 1-drive.yaml
 size: $HOMEDRIVE_SIZE
@@ -91,41 +92,45 @@ jupyterhub:
 EOF
 
 
-echo "#!/bin/bash" > 1-deploy-drive.sh
-echo "helm upgrade $HOMEDRIVE_APPNAME $DRIVE_CHART --namespace $NAMESPACE --atomic --cleanup-on-fail --install --values 1-drive.yaml" >> 1-deploy-drive.sh
-chmod u+x 1-deploy-drive.sh
+echo "#!/bin/bash" > 1-create-drive.sh
+echo "helm upgrade $HOMEDRIVE_APPNAME $DRIVE_CHART --namespace $NAMESPACE --atomic --cleanup-on-fail --install --values 1-drive.yaml" >> 1-create-drive.sh
+chmod u+x 1-create-drive.sh
 
-echo "#!/bin/bash" > 2-deploy-hub.sh
-echo "helm upgrade $HUB_APPNAME $HUB_CHART --namespace $NAMESPACE --atomic --cleanup-on-fail --install --values 2-hub.yaml" >> 2-deploy-hub.sh
-chmod u+x 2-deploy-hub.sh
+echo "#!/bin/bash" > 2-create-hub.sh
+echo "helm upgrade $HUB_APPNAME $HUB_CHART --namespace $NAMESPACE --atomic --cleanup-on-fail --install --values 2-hub.yaml" >> 2-create-hub.sh
+chmod u+x 2-create-hub.sh
 
 echo "#!/bin/bash" > status.sh
-echo "echo Helm chart list:" >> status.sh
+echo "source ../colors.sh" >> status.sh
+echo 'echo $green Helm chart list:$white' >> status.sh
 echo "helm list --namespace $NAMESPACE" >> status.sh
 echo "echo ''" >> status.sh
-echo "echo Kubernetes resources:" >> status.sh
+echo 'echo $green Kubernetes resources:$white' >> status.sh
 echo "kubectl get all --namespace $NAMESPACE" >> status.sh
 echo "echo ''" >> status.sh
-echo "echo Kubernetes PVCs:" >> status.sh
+echo 'echo $green Kubernetes PVCs:$white' >> status.sh
 echo "kubectl get pvc --namespace $NAMESPACE" >> status.sh
 echo "echo ''" >> status.sh
-echo "echo Kubernetes PVs:" >> status.sh
-echo "kubectl get pv | grep -E \"[[:blank::]$NAMESPACE\/\"" >> status.sh
+echo 'echo $green Kubernetes PVs:$white' >> status.sh
+echo "kubectl get pv | grep -E \"[[:blank:]]$NAMESPACE\/\"" >> status.sh
 chmod u+x status.sh
 
 ####
 # do iiiiit
 ####
 
+
 # create namespace if it doesn't exist
-echo "Checking namespace: "
+echo "$yellow Checking namespace: $white"
 kubectl create namespace $NAMESPACE || true     # don't allow the set -e to take effect here
 echo ""
 
-echo "Running 1-deploy-drive.sh..."
-./1-deploy-drive.sh
+echo "$yellow Running 1-create-drive.sh...$white"
+./1-create-drive.sh
 echo ""
 
-echo "Running 2-deploy-hub.sh..."
-./2-deploy-hub.sh
+echo "$yellow Running 2-create-hub.sh...$white"
+./2-create-hub.sh
 echo ""
+
+echo "$green Finished! Your hub is at $blue https://$HOSTNAME$BASE_URL $white"
