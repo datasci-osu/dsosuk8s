@@ -20,7 +20,6 @@ NUM_PLACEHOLDERS=0
 #########################
 # these less so
 #########################
-HOSTNAME=devb.datasci.oregonstate.edu
 BASE_URL="/$APPNAME/"
 HOMEDRIVE_APPNAME="homedrive-$APPNAME"
 HUB_APPNAME="hub-$APPNAME"
@@ -35,11 +34,31 @@ HUB_CHART=$SCRIPT_DIR/../../charts/ds-jupyterlab/latest
 # dirty work happens below
 ##########################
 
-source ../colors.sh
+
+black="$(tput setaf 0)"
+red="$(tput setaf 1)"
+green="$(tput setaf 2)"
+yellow="$(tput setaf 3)"
+blue="$(tput setaf 4)"
+magenta="$(tput setaf 5)"
+cyan="$(tput setaf 6)"
+white="$(tput setaf 7)"
+
+
+
+HOSTNAME=$(cat ../cluster-ingress-hostname)
+KUBECONTEXT=$(cat ../kube-context)
+
+kubectl config use-context $KUBECONTEXT
+
+
 
 cat <<EOF > 1-drive.yaml
 size: $HOMEDRIVE_SIZE
 EOF
+
+
+
 
 cat <<EOF > 2-hub.yaml
 jupyterhub:
@@ -102,12 +121,16 @@ chmod u+x 1-create-drive.sh
 
 
 
+
 cat <<EOF > 2-create-hub.sh
 #!/bin/bash
 helm upgrade $HUB_APPNAME $HUB_CHART --namespace $NAMESPACE --atomic --cleanup-on-fail --install --values 2-hub.yaml
 EOF
 
 chmod u+x 2-create-hub.sh
+
+
+
 
 cat <<EOF > status.sh
 #!/bin/bash
@@ -139,6 +162,8 @@ echo ""
 EOF
 
 chmod u+x status.sh
+
+
 
 
 cat <<EOF > teardown.sh
@@ -212,8 +237,8 @@ echo ""
 
 EOF
  
-
 chmod u+x teardown.sh
+
 
 ####
 # do iiiiit
