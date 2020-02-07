@@ -92,28 +92,128 @@ jupyterhub:
 EOF
 
 
-echo "#!/bin/bash" > 1-create-drive.sh
-echo "helm upgrade $HOMEDRIVE_APPNAME $DRIVE_CHART --namespace $NAMESPACE --atomic --cleanup-on-fail --install --values 1-drive.yaml" >> 1-create-drive.sh
+
+cat <<EOF > 1-create-drive.sh
+#!/bin/bash
+helm upgrade $HOMEDRIVE_APPNAME $DRIVE_CHART --namespace $NAMESPACE --atomic --cleanup-on-fail --install --values 1-drive.yaml
+EOF
+
 chmod u+x 1-create-drive.sh
 
-echo "#!/bin/bash" > 2-create-hub.sh
-echo "helm upgrade $HUB_APPNAME $HUB_CHART --namespace $NAMESPACE --atomic --cleanup-on-fail --install --values 2-hub.yaml" >> 2-create-hub.sh
+
+
+cat <<EOF > 2-create-hub.sh
+#!/bin/bash
+helm upgrade $HUB_APPNAME $HUB_CHART --namespace $NAMESPACE --atomic --cleanup-on-fail --install --values 2-hub.yaml
+EOF
+
 chmod u+x 2-create-hub.sh
 
-echo "#!/bin/bash" > status.sh
-echo "source ../colors.sh" >> status.sh
-echo 'echo $green Helm chart list:$white' >> status.sh
-echo "helm list --namespace $NAMESPACE" >> status.sh
-echo "echo ''" >> status.sh
-echo 'echo $green Kubernetes resources:$white' >> status.sh
-echo "kubectl get all --namespace $NAMESPACE" >> status.sh
-echo "echo ''" >> status.sh
-echo 'echo $green Kubernetes PVCs:$white' >> status.sh
-echo "kubectl get pvc --namespace $NAMESPACE" >> status.sh
-echo "echo ''" >> status.sh
-echo 'echo $green Kubernetes PVs:$white' >> status.sh
-echo "kubectl get pv | grep -E \"[[:blank:]]$NAMESPACE\/\"" >> status.sh
+cat <<EOF > status.sh
+#!/bin/bash
+black="\$(tput setaf 0)"
+red="\$(tput setaf 1)"
+green="\$(tput setaf 2)"
+yellow="\$(tput setaf 3)"
+blue="\$(tput setaf 4)"
+magenta="\$(tput setaf 5)"
+cyan="\$(tput setaf 6)"
+white="\$(tput setaf 7)"
+
+echo "\$green Helm release list: \$white"
+helm list --namespace $NAMESPACE
+echo ""
+
+echo "\$green Kubernetes resources:\$white"
+kubectl get all --namespace $NAMESPACE
+echo ""
+
+echo "\$green Kubernetes PVCs:\$white"
+kubectl get pvc --namespace $NAMESPACE
+echo ""
+
+echo "\$green Kubernetes PVs:\$white"
+kubectl get pv | grep -E "[[:blank:]]$NAMESPACE\/"
+echo ""
+
+EOF
+
 chmod u+x status.sh
+
+
+cat <<EOF > teardown.sh
+#!/bin/bash
+
+black="\$(tput setaf 0)"
+red="\$(tput setaf 1)"
+green="\$(tput setaf 2)"
+yellow="\$(tput setaf 3)"
+blue="\$(tput setaf 4)"
+magenta="\$(tput setaf 5)"
+cyan="\$(tput setaf 6)"
+white="\$(tput setaf 7)"
+
+if kubectl get pods --selector=component=singleuser-server --namespace $NAMESPACE 2> /dev/null | grep -q jupyter; then
+  echo "\${red}Warning: This will kill the following user containers and delete all data for $APPNAME: \${white}"
+  kubectl get pods --selector=component=singleuser-server --namespace $NAMESPACE
+else 
+  echo "\${red}Warning: This will delete all data for $APPNAME. \${white}"
+fi
+
+echo -n "\${yellow}Type the APPNAME ($APPNAME) to continue: \${white}"
+read CHECKNAME
+if [ \${CHECKNAME} != $APPNAME ]; then
+  echo "No match, exiting."
+  exit 1
+fi
+
+echo -n "Ok, removing in ";
+for i in \$(seq 5 1); do
+  echo -n "\$i... "
+  sleep 1
+done
+echo ""
+echo ""
+
+if kubectl get pods --selector=component=singleuser-server --namespace $NAMESPACE 2> /dev/null | grep -q jupyter; then
+  echo "\${yellow}Deleting user containers... \$white"
+  echo "\${magenta}kubectl delete pods --selector=component=singleuser-server --namespace $NAMESPACE \${white}"
+  kubectl delete pods --selector=component=singleuser-server --namespace $NAMESPACE
+  echo ""
+fi
+
+echo "\${yellow}Deleting hub resources... \${white}"
+echo "\${magenta}helm delete $HUB_APPNAME --namespace $NAMESPACE \${white}"
+helm delete $HUB_APPNAME --namespace $NAMESPACE
+echo ""
+
+echo "\${yellow}Deleting drive containers... \${white}"
+echo "\${magenta}helm delete $HOMEDRIVE_APPNAME --namespace $NAMESPACE \${white}"
+helm delete $HOMEDRIVE_APPNAME --namespace $NAMESPACE
+echo ""
+
+PVCNAME=\$(kubectl get pvc --namespace $NAMESPACE | grep $HOMEDRIVE_APPNAME | awk '{print \$1}')
+PVNAME=\$(kubectl get pvc --namespace $NAMESPACE | grep $HOMEDRIVE_APPNAME | awk '{print \$3}')
+
+echo "\${yellow}Deleting drive PVC... \${white}"
+echo "\${magenta}kubectl delete pvc \$PVCNAME --namespace $NAMESPACE \${white}"
+kubectl delete pvc \$PVCNAME --namespace $NAMESPACE
+echo ""
+
+echo "\${yellow}Deleting drive PV... \${white}"
+echo "\${magenta}kubectl delete pv \$PVNAME \${white}"
+kubectl delete pv \$PVNAME
+echo ""
+
+echo "\${yellow}Deleting namespace... \${white}"
+echo "\${magenta}kubectl delete namespace $NAMESPACE \${white}"
+kubectl delete namespace $NAMESPACE
+echo ""
+
+EOF
+ 
+
+chmod u+x teardown.sh
 
 ####
 # do iiiiit
@@ -126,11 +226,11 @@ kubectl create namespace $NAMESPACE || true     # don't allow the set -e to take
 echo ""
 
 echo "$yellow Running 1-create-drive.sh...$white"
-./1-create-drive.sh
+#./1-create-drive.sh
 echo ""
 
 echo "$yellow Running 2-create-hub.sh...$white"
-./2-create-hub.sh
+#./2-create-hub.sh
 echo ""
 
 echo "$green Finished! Your hub is at $blue https://$HOSTNAME$BASE_URL $white"
