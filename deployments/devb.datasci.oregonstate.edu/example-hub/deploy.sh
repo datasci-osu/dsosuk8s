@@ -26,8 +26,8 @@ HUB_APPNAME="hub-$APPNAME"
 NAMESPACE=$APPNAME
 
 SCRIPT_DIR=$(dirname $0)
-DRIVE_CHART=$SCRIPT_DIR/../../charts/drive/latest
-HUB_CHART=$SCRIPT_DIR/../../charts/ds-jupyterlab/latest
+DRIVE_CHART=$SCRIPT_DIR/../../../charts/drive/latest
+HUB_CHART=$SCRIPT_DIR/../../../charts/ds-jupyterlab/latest
 
 
 ##########################
@@ -143,19 +143,19 @@ magenta="\$(tput setaf 5)"
 cyan="\$(tput setaf 6)"
 white="\$(tput setaf 7)"
 
-echo "\$green Helm release list: \$white"
+echo "\${yellow}Helm release list: \${white}"
 helm list --namespace $NAMESPACE
 echo ""
 
-echo "\$green Kubernetes resources:\$white"
+echo "\${yellow}Kubernetes resources:\${white}"
 kubectl get all --namespace $NAMESPACE
 echo ""
 
-echo "\$green Kubernetes PVCs:\$white"
+echo "\${yellow}Kubernetes PVCs:\${white}"
 kubectl get pvc --namespace $NAMESPACE
 echo ""
 
-echo "\$green Kubernetes PVs:\$white"
+echo "\${yellow}Kubernetes PVs:\${white}"
 kubectl get pv | grep -E "[[:blank:]]$NAMESPACE\/"
 echo ""
 
@@ -245,17 +245,23 @@ chmod u+x teardown.sh
 ####
 
 
+echo "${red}Warning: this can take a couple of minutes. "
+echo "Killing (with e.g. Ctrl-C) may leave things in an inconsistent state."
+echo "Only do so if needed and after several minutes' wait. ${white}"
+echo ""
+sleep 2
+
 # create namespace if it doesn't exist
-echo "$yellow Checking namespace: $white"
+echo "${yellow}Checking namespace: ${white}"
 kubectl create namespace $NAMESPACE || true     # don't allow the set -e to take effect here
 echo ""
 
-echo "$yellow Running 1-create-drive.sh...$white"
-#./1-create-drive.sh
+echo "${yellow}Running 1-create-drive.sh...${white}"
+./1-create-drive.sh
 echo ""
 
-echo "$yellow Running 2-create-hub.sh...$white"
-#./2-create-hub.sh
+echo "${yellow}Running 2-create-hub.sh...${white}"
+./2-create-hub.sh
 echo ""
 
-echo "$green Finished! Your hub is at $blue https://$HOSTNAME$BASE_URL $white"
+echo "${green}Finished! Your hub is at ${blue}https://$HOSTNAME$BASE_URL ${white}"
