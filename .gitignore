@@ -1,1 +1,5 @@
 *.swp
+deployments/*
+!deployments/devb.datasci.oregonstate.edu/cluster-ingress-hostname
+!deployments/devb.datasci.oregonstate.edu/kube-context
+!deployments/devb.datasci.oregonstate.edu/example-hub/deploy.sh
