@@ -36,8 +36,9 @@ white="$(tput setaf 7)"
 
 
 
-HOSTNAME=$(cat ../cluster-ingress-hostname)
-KUBECONTEXT=$(cat ../kube-context)
+SCRIPT_DIR=$(dirname $0)
+HOSTNAME=$(cat $SCRIPT_DIR/../cluster-ingress-hostname)
+KUBECONTEXT=$(cat $SCRIPT_DIR/../kube-context)
 
 kubectl config use-context $KUBECONTEXT
 
@@ -131,6 +132,11 @@ EOF
 
 cat <<EOF > 1-create-prometheus.sh
 #!/bin/bash
+SCRIPT_DIR=$(dirname $0)
+HOSTNAME=$(cat $SCRIPT_DIR/../cluster-ingress-hostname)
+KUBECONTEXT=$(cat $SCRIPT_DIR/../kube-context)
+
+kubectl config use-context $KUBECONTEXT
 helm upgrade $PROMETHEUS_APPNAME $PROMETHEUS_CHART --namespace $NAMESPACE --atomic --cleanup-on-fail --install --values 1-prometheus.yaml
 EOF
 
@@ -156,6 +162,12 @@ blue="\$(tput setaf 4)"
 magenta="\$(tput setaf 5)"
 cyan="\$(tput setaf 6)"
 white="\$(tput setaf 7)"
+
+SCRIPT_DIR=$(dirname $0)
+HOSTNAME=$(cat $SCRIPT_DIR/../cluster-ingress-hostname)
+KUBECONTEXT=$(cat $SCRIPT_DIR/../kube-context)
+
+kubectl config use-context $KUBECONTEXT
 
 echo "\${yellow}Helm release list: \${white}"
 helm list --namespace $NAMESPACE
@@ -191,6 +203,11 @@ magenta="\$(tput setaf 5)"
 cyan="\$(tput setaf 6)"
 white="\$(tput setaf 7)"
 
+SCRIPT_DIR=$(dirname $0)
+HOSTNAME=$(cat $SCRIPT_DIR/../cluster-ingress-hostname)
+KUBECONTEXT=$(cat $SCRIPT_DIR/../kube-context)
+
+kubectl config use-context $KUBECONTEXT
 
 echo "\${red}Warning: This will delete all data for $PROMETHEUS_APPNAME and $GRAFANA_APPNAME. \${white}"
 
