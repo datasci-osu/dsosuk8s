@@ -73,9 +73,9 @@ ingress:
   enabled: true
   annotations:
     kubernetes.io/ingress.class: nginx
-    nginx.org/mergable-ingress-type: "minion"
-    nginx.org/websocket-services: "proxy-public"
-    nginx.ingress.kubernetes.io/rewrite-target: /\$1
+    nginx.org/mergeable-ingress-type: "minion"
+    nginx.org/websocket-services: "grafana"
+    #nginx.ingress.kubernetes.io/rewrite-target: /\$1
   path: /$GRAFANA_PATH/
   hosts:
     - $HOSTNAME
