@@ -78,6 +78,9 @@ ingress:
   path: /$GRAFANA_PATH/
   hosts:
     - $HOSTNAME
+  tls:
+  - hosts:
+    - $HOSTNAME
 
 grafana.ini:
   server:
@@ -108,6 +111,19 @@ datasources:
       url: http://prometheus-server.$NAMESPACE.svc.cluster.local
       access: proxy
       isDefault: true  
+
+plugins:
+- digrich-bubblechart-panel
+- grafana-clock-panel
+- neocat-cal-heatmap-panel
+- petrslavotinek-carpetplot-panel
+- mtanda-histogram-panel
+- michaeldmoore-multistat-panel
+- natel-plotly-panel
+- mxswat-separator-panel
+- grafana-kubernetes-app
+- devopsprodigy-kubegraf-app
+
 EOF
 
 
