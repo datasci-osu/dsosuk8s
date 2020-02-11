@@ -165,13 +165,14 @@ check_admin_config() {
     chmod -R 775 $ADMIN_HOME_DIR/R_libs
     chmod 664 $ADMIN_HOME_DIR/R_libs/README.txt
 
-    # the /etc/profile trick below seems to work, EXCEPT for some vars which RStudio won't read :(
-    # probably don't need the greps here
-    if [[ -e /opt/conda/lib/R/etc/Renviron ]]; then
-      grep "R_LIBS_SITE=$ADMIN_HOME_DIR/R_libs" /opt/conda/lib/R/etc/Renviron || echo "R_LIBS_SITE=$ADMIN_HOME_DIR/R_libs" >> /opt/conda/lib/R/etc/Renviron
-      grep "ADMIN_HOME_DIR=$ADMIN_HOME_DIR" /opt/conda/lib/R/etc/Renviron || echo "ADMIN_HOME_DIR=$ADMIN_HOME_DIR" >> /opt/conda/lib/R/etc/Renviron
-      grep "DATA_HOME_DIR=$DATA_HOME_DIR" /opt/conda/lib/R/etc/Renviron || echo "DATA_HOME_DIR=$DATA_HOME_DIR" >> /opt/conda/lib/R/etc/Renviron
-    fi
+  fi
+
+  # the /etc/profile trick below seems to work, EXCEPT for some vars which RStudio won't read :(
+  # probably don't need the greps here
+  if [[ -e /opt/conda/lib/R/etc/Renviron ]]; then
+    grep "R_LIBS_SITE=$ADMIN_HOME_DIR/R_libs" /opt/conda/lib/R/etc/Renviron || echo "R_LIBS_SITE=$ADMIN_HOME_DIR/R_libs" >> /opt/conda/lib/R/etc/Renviron
+    grep "ADMIN_HOME_DIR=$ADMIN_HOME_DIR" /opt/conda/lib/R/etc/Renviron || echo "ADMIN_HOME_DIR=$ADMIN_HOME_DIR" >> /opt/conda/lib/R/etc/Renviron
+    grep "DATA_HOME_DIR=$DATA_HOME_DIR" /opt/conda/lib/R/etc/Renviron || echo "DATA_HOME_DIR=$DATA_HOME_DIR" >> /opt/conda/lib/R/etc/Renviron
   fi
 }
 
