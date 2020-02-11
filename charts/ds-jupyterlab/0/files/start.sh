@@ -204,7 +204,9 @@ check_nb_user() {
     grep -qxF "source(\"$ADMIN_HOME_DIR/autosourced_by_rprofiles.R\")" /tmp/$NB_USER/.Rprofile || echo "source(\"$ADMIN_HOME_DIR/autosourced_by_rprofiles.R\")" >> /tmp/$NB_USER/.Rprofile
     # make sure they exec the autoexec_by_python_notebooks, even if they try to remove it ;)
     echo "exec(open(\"$ADMIN_HOME_DIR/autoexec_by_python_notebooks.py\").read())" > /tmp/$NB_USER/.ipython/profile_default/startup/001_autoexec.py 
-    
+    chown $ADMIN_USERNAME:$ADMIN_GROUPNAME /tmp/$NB_USER/.ipython/profile_default/startup/001_autoexec.py
+    chmod 664 /tmp/$NB_USER/.ipython/profile_default/startup/001_autoexec.py
+
     # copy em over to the /home mount, -a for archive (like cp -r and preserve ownership and other metadata)
     cp -a /tmp/$NB_USER /home
   fi
