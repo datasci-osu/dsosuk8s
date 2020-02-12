@@ -12,8 +12,8 @@ add_admin_group() {
   export ADMIN_USERNAME=dsadmin
   export ADMIN_GROUPNAME=dsadmins
   export USER_GROUPNAME=dsusers
-  export ADMIN_GID=101
-  export USER_GID=102
+  export ADMIN_GID=102               # ssh group is 101 by default
+  export USER_GID=103
   export ADMIN_UID=1001
   
   addgroup --gid $ADMIN_GID $ADMIN_GROUPNAME

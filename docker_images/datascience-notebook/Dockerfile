@@ -84,6 +84,20 @@ RUN rm -rf /home/jovyan/.cache/yarn
 
 RUN mkdir -p /usr/local/bin/various
 
+# extra stuff
+RUN apt-get update \
+ && apt-get install -yq --no-install-recommends \
+    less \
+    openssh-client \
+ && apt-get clean && rm -rf /var/lib/apt/lists/*
+
+RUN pip install bash_kernel
+RUN python -m bash_kernel.install
+RUN pip install jupyter_contrib_nbextensions && jupyter contrib nbextension install 
+
+#TAG v1.1.4
+#TAG added-nbextensions
+
 USER $NB_USER
 
 
