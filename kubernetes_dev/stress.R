@@ -1,5 +1,5 @@
 #!/usr/bin/env Rscript
-  
+
 library(stringr)
 library(rstackdeque)
 library(pryr)
