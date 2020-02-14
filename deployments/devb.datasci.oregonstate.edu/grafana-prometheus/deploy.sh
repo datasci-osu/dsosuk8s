@@ -63,6 +63,17 @@ server:
     storageClass: $STORAGE_CLASS
   nodeSelector:
     hub.jupyter.org/node-purpose: core
+
+nodeExporter: 
+  tolerations:
+  - effect: NoSchedule
+    key: hub.jupyter.org/dedicated
+    operator: Equal
+    value: user
+  - effect: NoSchedule
+    key: hub.jupyter.org_dedicated
+    operator: Equal
+    value: user
 EOF
 
 
@@ -82,6 +93,9 @@ ingress:
   tls:
   - hosts:
     - $HOSTNAME
+
+persistence:
+  enabled: true
 
 grafana.ini:
   server:

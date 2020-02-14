@@ -265,13 +265,13 @@ alertmanager:
   ## alertmanager resource requests and limits
   ## Ref: http://kubernetes.io/docs/user-guide/compute-resources/
   ##
-  resources: {}
-    # limits:
-    #   cpu: 10m
-    #   memory: 32Mi
-    # requests:
-    #   cpu: 10m
-    #   memory: 32Mi
+  resources: 
+    limits:
+      cpu: 10m
+      memory: 32Mi
+    requests:
+      cpu: 10m
+      memory: 32Mi
 
   ## Security context to be added to alertmanager pods
   ##
@@ -338,7 +338,13 @@ configmapReload:
   ## configmap-reload resource requests and limits
   ## Ref: http://kubernetes.io/docs/user-guide/compute-resources/
   ##
-  resources: {}
+  resources: 
+    limits:
+      cpu: 50m
+      memory: 128Mi
+    requests:
+      cpu: 50m
+      memory: 64Mi
 
 kubeStateMetrics:
   ## If false, kube-state-metrics will not be installed
@@ -411,13 +417,13 @@ kubeStateMetrics:
   ## kube-state-metrics resource requests and limits
   ## Ref: http://kubernetes.io/docs/user-guide/compute-resources/
   ##
-  resources: {}
-    # limits:
-    #   cpu: 10m
-    #   memory: 16Mi
-    # requests:
-    #   cpu: 10m
-    #   memory: 16Mi
+  resources: 
+    limits:
+      cpu: 50m
+      memory: 32Mi
+    requests:
+      cpu: 10m
+      memory: 16Mi
 
   ## Security context to be added to kube-state-metrics pods
   ##
@@ -545,13 +551,13 @@ nodeExporter:
   ## node-exporter resource limits & requests
   ## Ref: https://kubernetes.io/docs/user-guide/compute-resources/
   ##
-  resources: {}
-    # limits:
-    #   cpu: 200m
-    #   memory: 50Mi
-    # requests:
-    #   cpu: 100m
-    #   memory: 30Mi
+  resources: 
+    limits:
+      cpu: 200m
+      memory: 50Mi
+    requests:
+      cpu: 100m
+      memory: 30Mi
 
   ## Security context to be added to node-exporter pods
   ##
@@ -800,7 +806,7 @@ server:
 
     ## Prometheus server data Persistent Volume size
     ##
-    size: 8Gi
+    size: 20Gi
 
     ## Prometheus server data Persistent Volume Storage Class
     ## If defined, storageClassName: <storageClass>
@@ -889,13 +895,13 @@ server:
   ## Prometheus server resource requests and limits
   ## Ref: http://kubernetes.io/docs/user-guide/compute-resources/
   ##
-  resources: {}
-    # limits:
-    #   cpu: 500m
-    #   memory: 512Mi
-    # requests:
-    #   cpu: 500m
-    #   memory: 512Mi
+  resources: 
+    limits:
+      cpu: 500m
+      memory: 512Mi
+    requests:
+      cpu: 200m
+      memory: 256Mi
 
   ## Vertical Pod Autoscaler config
   ## Ref: https://github.com/kubernetes/autoscaler/tree/master/vertical-pod-autoscaler
@@ -1052,13 +1058,13 @@ pushgateway:
   ## pushgateway resource requests and limits
   ## Ref: http://kubernetes.io/docs/user-guide/compute-resources/
   ##
-  resources: {}
-    # limits:
-    #   cpu: 10m
-    #   memory: 32Mi
-    # requests:
-    #   cpu: 10m
-    #   memory: 32Mi
+  resources: 
+    limits:
+      cpu: 50m
+      memory: 64Mi
+    requests:
+      cpu: 10m
+      memory: 32Mi
 
   ## Security context to be added to push-gateway pods
   ##
