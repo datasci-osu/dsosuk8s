@@ -1,0 +1,4 @@
+# node relabel:
+label_replace(kube_node_status_allocatable_memory_bytes, "mylabel", "$1", "kubernetes_node", "(.*)")
+
+

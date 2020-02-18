@@ -32,6 +32,9 @@ fi
 if ! grep -q "$TAG" <(docker image ls); then
   echo -e "\e[32mBuilding $IMAGENAME:$TAG.\e[0m"
   docker build -t $IMAGENAME:$TAG -f $TARGETDIR/Dockerfile $TARGETDIR
+  for CUSTOMTAG in $(grep '^#TAG' $TARGETDIR/Dockerfile | awk '{print $2}'); do
+    docker tag $IMAGENAME:$TAG $IMAGENAME:$CUSTOMTAG
+  done
   docker tag $IMAGENAME:$TAG $IMAGENAME:latest
   echo -e "\e[32mBuilt $IMAGENAME:$TAG.\e[0m"
   exit 2

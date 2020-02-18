@@ -46,8 +46,7 @@ jupyterhub:
       guarantee: null
     image:
       name: oneilsh/ktesting-datascience-notebook
-      tag: latest
-      pullPolicy: Always
+      tag: "v1.1.4" 
     defaultUrl: "/lab"
     cmd: ["start-singleuser.sh", "--allow-root"]  # don't think I need to add --allow-root... 
     storage:
@@ -67,7 +66,7 @@ jupyterhub:
           mountPath: /usr/local/bin/various
 
     extraEnv:
-      NFS_HOME_SVC: ""
+      NFS_SVC_HOME: ""
     uid: 0
     fsGid: 0
 
@@ -89,7 +88,7 @@ jupyterhub:
       upgrade: false 
     image:
       name: oneilsh/ktesting-k8s-hub
-      tag: 'latest'   # installed nativeauthenticator: https://blog.jupyter.org/simpler-authentication-for-small-scale-jupyterhubs-with-nativeauthenticator-999534c77a09
+      tag: 'v1.1.2'   # installed nativeauthenticator: https://blog.jupyter.org/simpler-authentication-for-small-scale-jupyterhubs-with-nativeauthenticator-999534c77a09
     extraVolumes:
       - name: hubfiles-volume
         configMap:
@@ -145,7 +144,6 @@ jupyterhub:
               #spawner.environment['NB_UID'] = "1000"
               #spawner.environment['GRANT_SUDO'] = "yes"
        
-          ## read admin user list from provided values 
           c.JupyterHub.authenticator_class = NativeExtraAuthenticator
           # location in docker image
           c.JupyterHub.template_paths = ["/home/jovyan/nativeauthenticator/nativeauthenticator/templates/"]       
@@ -183,6 +181,27 @@ jupyterhub:
           #SAMLExtraAuthenticator.acs_endpoint_url = '' # protocol::/host/prefix/hub/local 
           c.JupyterHub.authenticator_class = SAMLExtraAuthenticator
         
+        elif env_auth_type == "lti":
+          from ltiauthenticator import LTIAuthenticator
+          from tornado import gen
+
+          class LTIExtraAuthenticator(LTIAuthenticator):
+            @gen.coroutine
+            def pre_spawn_start(self, user, spawner):
+              # for use by scripts in start-notebook.d
+              # NB_USER is the username logged in with
+              # ADMIN_USER is "True" if they're an admin, "False" otherwise
+              spawner.environment['NB_USER'] = user.name
+              spawner.environment['ADMIN_USER'] = str(user.admin)
+              # below for debugging
+              #spawner.environment['NB_UID'] = "1000"
+              #spawner.environment['GRANT_SUDO'] = "yes"
+       
+          c.JupyterHub.authenticator_class = LTIExtraAuthenticator
+          c.LTIAuthenticator.consumers = {
+            os.environ['LTI_CLIENT_KEY']: os.environ['LTI_CLIENT_SECRET']
+          } 
+
         else:
           from jupyterhub.auth import DummyAuthenticator
           from tornado import gen

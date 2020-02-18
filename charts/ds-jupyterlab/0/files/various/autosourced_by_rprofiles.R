@@ -20,7 +20,7 @@ base$hub.install.packages <- function(...) {
 # for devtools::install_github
 base$hub.install_github <- function(...) {
   withr::with_libpaths(Sys.getenv("R_LIBS_SITE"), 
-                       devtools::install_github("oneilsh/tidytensor"))
+                       devtools::install_github(...))
 }
 
 # for bioconductor installs

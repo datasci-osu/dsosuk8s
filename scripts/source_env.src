@@ -1,0 +1,14 @@
+ADD_PATH=$(realpath $(dirname ${BASH_SOURCE:-$_}))
+
+echo "What AWS_PROFLE would you like to use?"
+echo " Options from ~/.aws/credentials:"
+cat ~/.aws/credentials | grep '\[' | tr -d '[]' | sed -r 's/^/   /g'
+
+echo ""
+echo -n "Enter profile name: "
+read AWS_PROFILE
+export AWS_PROFILE
+
+export PATH=$ADD_PATH:$PATH
+
+alias k=kubectl

@@ -1,6 +1,14 @@
 categories:
 - DataScience
 questions:
+- variable: jupyterhub.singleuser.extraEnv.NFS_SVC_HOME
+  group: General
+  default: ""
+  description: "Drive to use for home folders; use the name of the drive application within the same namespace."
+  type: string
+  label: "/home Drive"
+  required: true
+
 - variable: jupyterhub.hub.extraEnv.AUTH_TYPE
   group: General
   default: "native"
@@ -10,14 +18,34 @@ questions:
   options:
   - "native"
   - "saml"
+  - "lti"
   - "dummy"
-
-- variable: jupyterhub.singleuser.extraEnv.NFS_SVC_HOME
+  show_subquestion_if: lti
+  subquestions:
+  - variable: jupyterhub.hub.extraEnv.LTI_CLIENT_KEY
+    group: General
+    default: "biglongtoken"
+    description: "Client Key for LTIAuthentictor (see here: https://github.com/jupyterhub/ltiauthenticator)"
+    label: "LTI Client Key"
+    type: string
+  
+  - variable: jupyterhub.hub.extraEnv.LTI_CLIENT_SECRET
+    group: General
+    default: "biglongtoken"
+    description: "Client Secret Key for LTIAuthentictor"
+    label: "LTI Secret Key"
+    type: string
+  
+- variable: jupyterhub.singleuser.defaultUrl
   group: General
-  default: ""
-  description: "Drive to use for home folders; use the name of the drive application within the same namespace."
-  type: string
-  label: "/home Drive"
+  default: "/lab"
+  type: enum
+  label: "Default Interface"
+  options:
+    - "/lab"
+    - "/tree"
+    - "/rstudio"
+  description: "Default to JupterLab, Jupyter Classic, or RStudio"
   required: true
 
 - variable: jupyterhub.hub.extraEnv.ADMIN_USERS

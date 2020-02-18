@@ -75,7 +75,7 @@ will help you get the most from the platform. Nevertheless, here are some import
 
 6. **For Command-Line Users:** Admins have read+write access to `/home/hub_local`, others have read-only access. Hub-wide Python and R packages are installed to subdirectories 
    here, and the file `/home/hub_local/hubrc` is used to configure the environment for every user on login (akin to lines added to all users' `.bashrc` 
-   files). Executable scripts and programs may be placed in `/home/hub_local/bin` (which is added to every users' `$PATH` via the `hubrc` file--if
+   files; actually `/etc/profile.d/hubrc.sh` is linked to this file). Executable scripts and programs may be placed in `/home/hub_local/bin` (which is added to every users' `$PATH` via the `hubrc` file--if
    compiling software, use `--prefix=/home/hub_local`). Some environment variables reference these locations; `env` shows a list these and others.
 
 6. **Data Storage:** The `/home` directory and all its contents listed above exist on a single shared network drive. Currently there are no per-user

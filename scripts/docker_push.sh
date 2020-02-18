@@ -11,7 +11,7 @@ if [[ ( $# != 1 ) && ( $# != 2 ) ]]; then
   exit 1
 fi
 
-if ! grep -q '"experimental": "enabled"' ~/.docker/config.json; then
+if ! grep -q -E '"experimental"[[:blank:]]*:[[:blank:]]*"enabled"' ~/.docker/config.json; then
   echo 'Error: "experimental": "enabled" must be set in ~/.docker/config.json (to check for already existing images)'
   exit 1
 fi

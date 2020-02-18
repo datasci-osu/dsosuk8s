@@ -15,12 +15,13 @@
   "editable": true,
   "gnetId": null,
   "graphTooltip": 0,
-  "id": 24,
-  "iteration": 1578126707606,
+  "id": 1,
+  "iteration": 1581319643314,
   "links": [],
   "panels": [
     {
       "collapsed": false,
+      "datasource": null,
       "gridPos": {
         "h": 1,
         "w": 24,
@@ -41,7 +42,7 @@
       "cacheTimeout": null,
       "dashLength": 10,
       "dashes": false,
-      "datasource": "RANCHER_MONITORING",
+      "datasource": null,
       "decimals": 0,
       "description": "Number of nodes per nodepool, grouped by labels and instance types.",
       "fill": 1,
@@ -52,6 +53,7 @@
         "x": 0,
         "y": 1
       },
+      "hiddenSeries": false,
       "id": 6,
       "legend": {
         "alignAsTable": false,
@@ -148,7 +150,7 @@
       "cacheTimeout": null,
       "dashLength": 10,
       "dashes": false,
-      "datasource": "RANCHER_MONITORING",
+      "datasource": null,
       "decimals": 0,
       "description": "Number of singleuser servers running per node.",
       "fill": 1,
@@ -159,6 +161,7 @@
         "x": 0,
         "y": 7
       },
+      "hiddenSeries": false,
       "id": 34,
       "legend": {
         "alignAsTable": false,
@@ -248,7 +251,7 @@
       "bars": false,
       "dashLength": 10,
       "dashes": false,
-      "datasource": "RANCHER_MONITORING",
+      "datasource": null,
       "fill": 1,
       "fillGradient": 0,
       "gridPos": {
@@ -257,6 +260,7 @@
         "x": 0,
         "y": 12
       },
+      "hiddenSeries": false,
       "id": 11,
       "legend": {
         "avg": false,
@@ -343,11 +347,13 @@
       }
     },
     {
-      "aliasColors": {},
+      "aliasColors": {
+        "ip-192-168-62-66.us-west-2.compute.internal": "light-green"
+      },
       "bars": false,
       "dashLength": 10,
       "dashes": false,
-      "datasource": "RANCHER_MONITORING",
+      "datasource": null,
       "fill": 1,
       "fillGradient": 0,
       "gridPos": {
@@ -356,6 +362,7 @@
         "x": 12,
         "y": 12
       },
+      "hiddenSeries": false,
       "id": 50,
       "legend": {
         "avg": false,
@@ -379,7 +386,7 @@
       "renderer": "flot",
       "repeat": null,
       "repeatDirection": "h",
-      "repeatIteration": 1578126707606,
+      "repeatIteration": 1581319643314,
       "repeatPanelId": 11,
       "scopedVars": {
         "nodetype": {
@@ -448,7 +455,7 @@
       "bars": false,
       "dashLength": 10,
       "dashes": false,
-      "datasource": "RANCHER_MONITORING",
+      "datasource": null,
       "fill": 1,
       "fillGradient": 0,
       "gridPos": {
@@ -457,6 +464,7 @@
         "x": 0,
         "y": 18
       },
+      "hiddenSeries": false,
       "id": 23,
       "legend": {
         "avg": false,
@@ -547,7 +555,7 @@
       "bars": false,
       "dashLength": 10,
       "dashes": false,
-      "datasource": "RANCHER_MONITORING",
+      "datasource": null,
       "fill": 1,
       "fillGradient": 0,
       "gridPos": {
@@ -556,6 +564,7 @@
         "x": 12,
         "y": 18
       },
+      "hiddenSeries": false,
       "id": 51,
       "legend": {
         "avg": false,
@@ -579,7 +588,7 @@
       "renderer": "flot",
       "repeat": null,
       "repeatDirection": "h",
-      "repeatIteration": 1578126707606,
+      "repeatIteration": 1581319643314,
       "repeatPanelId": 23,
       "scopedVars": {
         "nodetype": {
@@ -648,7 +657,7 @@
       "bars": false,
       "dashLength": 10,
       "dashes": false,
-      "datasource": "RANCHER_MONITORING",
+      "datasource": null,
       "description": "Node memory utilization by resident set size.",
       "fill": 1,
       "fillGradient": 0,
@@ -658,6 +667,7 @@
         "x": 0,
         "y": 24
       },
+      "hiddenSeries": false,
       "id": 49,
       "legend": {
         "avg": false,
@@ -748,7 +758,7 @@
       "bars": false,
       "dashLength": 10,
       "dashes": false,
-      "datasource": "RANCHER_MONITORING",
+      "datasource": null,
       "description": "Node memory utilization by resident set size.",
       "fill": 1,
       "fillGradient": 0,
@@ -758,6 +768,7 @@
         "x": 12,
         "y": 24
       },
+      "hiddenSeries": false,
       "id": 52,
       "legend": {
         "avg": false,
@@ -781,7 +792,7 @@
       "renderer": "flot",
       "repeat": null,
       "repeatDirection": "h",
-      "repeatIteration": 1578126707606,
+      "repeatIteration": 1581319643314,
       "repeatPanelId": 49,
       "scopedVars": {
         "nodetype": {
@@ -847,6 +858,7 @@
     },
     {
       "collapsed": false,
+      "datasource": null,
       "gridPos": {
         "h": 1,
         "w": 24,
@@ -863,6 +875,7 @@
       "bars": false,
       "dashLength": 10,
       "dashes": false,
+      "datasource": null,
       "description": "Total data *used*, not allocated, per namespace.",
       "fill": 1,
       "fillGradient": 0,
@@ -872,6 +885,7 @@
         "x": 0,
         "y": 31
       },
+      "hiddenSeries": false,
       "id": 43,
       "legend": {
         "avg": false,
@@ -948,6 +962,7 @@
     },
     {
       "collapsed": false,
+      "datasource": null,
       "gridPos": {
         "h": 1,
         "w": 24,
@@ -960,8 +975,8 @@
       "scopedVars": {
         "namespace": {
           "selected": true,
-          "text": "csx46",
-          "value": "csx46"
+          "text": "ex2",
+          "value": "ex2"
         }
       },
       "title": "Pod Information - ${namespace}",
@@ -972,6 +987,7 @@
       "bars": false,
       "dashLength": 10,
       "dashes": false,
+      "datasource": null,
       "description": "For each singleuser pod, shows the RSS (resident set size) over the Request size (which may be greater than 1), and the RSS / Limit (which must be 0 to 1). To Make the plot clearer, RSS/Limit is shown flipped below the 0 axis. ",
       "fill": 1,
       "fillGradient": 0,
@@ -981,6 +997,7 @@
         "x": 0,
         "y": 38
       },
+      "hiddenSeries": false,
       "id": 28,
       "legend": {
         "avg": false,
@@ -1007,8 +1024,8 @@
       "scopedVars": {
         "namespace": {
           "selected": true,
-          "text": "csx46",
-          "value": "csx46"
+          "text": "ex2",
+          "value": "ex2"
         }
       },
       "seriesOverrides": [
@@ -1085,6 +1102,7 @@
       "cacheTimeout": null,
       "dashLength": 10,
       "dashes": false,
+      "datasource": null,
       "decimals": 0,
       "fill": 1,
       "fillGradient": 0,
@@ -1094,6 +1112,7 @@
         "x": 12,
         "y": 38
       },
+      "hiddenSeries": false,
       "id": 8,
       "legend": {
         "alignAsTable": false,
@@ -1124,262 +1143,8 @@
       "scopedVars": {
         "namespace": {
           "selected": true,
-          "text": "csx46",
-          "value": "csx46"
-        }
-      },
-      "seriesOverrides": [
-        {
-          "alias": "singleuser-server",
-          "linewidth": 3,
-          "zindex": 3
-        }
-      ],
-      "spaceLength": 10,
-      "stack": false,
-      "steppedLine": false,
-      "targets": [
-        {
-          "expr": "count (kube_pod_labels{label_app=\"jupyterhub\",namespace=~\"${namespace:regex}\"}) by (label_component) ",
-          "format": "time_series",
-          "hide": false,
-          "intervalFactor": 1,
-          "legendFormat": "{{label_component}}",
-          "refId": "B"
-        }
-      ],
-      "thresholds": [],
-      "timeFrom": null,
-      "timeRegions": [],
-      "timeShift": null,
-      "title": "Jupyterhub Pod Types -- ${namespace}",
-      "tooltip": {
-        "shared": true,
-        "sort": 0,
-        "value_type": "individual"
-      },
-      "transparent": true,
-      "type": "graph",
-      "xaxis": {
-        "buckets": null,
-        "mode": "time",
-        "name": null,
-        "show": true,
-        "values": []
-      },
-      "yaxes": [
-        {
-          "decimals": 0,
-          "format": "short",
-          "label": "Count",
-          "logBase": 1,
-          "max": null,
-          "min": "0",
-          "show": true
-        },
-        {
-          "decimals": null,
-          "format": "short",
-          "label": "",
-          "logBase": 1,
-          "max": null,
-          "min": null,
-          "show": false
-        }
-      ],
-      "yaxis": {
-        "align": false,
-        "alignLevel": null
-      }
-    },
-    {
-      "collapsed": false,
-      "gridPos": {
-        "h": 1,
-        "w": 24,
-        "x": 0,
-        "y": 44
-      },
-      "id": 53,
-      "panels": [],
-      "repeat": null,
-      "repeatIteration": 1578126707606,
-      "repeatPanelId": 20,
-      "scopedVars": {
-        "namespace": {
-          "selected": true,
-          "text": "pyt-w20",
-          "value": "pyt-w20"
-        }
-      },
-      "title": "Pod Information - ${namespace}",
-      "type": "row"
-    },
-    {
-      "aliasColors": {},
-      "bars": false,
-      "dashLength": 10,
-      "dashes": false,
-      "description": "For each singleuser pod, shows the RSS (resident set size) over the Request size (which may be greater than 1), and the RSS / Limit (which must be 0 to 1). To Make the plot clearer, RSS/Limit is shown flipped below the 0 axis. ",
-      "fill": 1,
-      "fillGradient": 0,
-      "gridPos": {
-        "h": 6,
-        "w": 12,
-        "x": 0,
-        "y": 45
-      },
-      "id": 54,
-      "legend": {
-        "avg": false,
-        "current": false,
-        "max": false,
-        "min": false,
-        "show": false,
-        "total": false,
-        "values": false
-      },
-      "lines": true,
-      "linewidth": 1,
-      "maxPerRow": 2,
-      "nullPointMode": "null",
-      "options": {
-        "dataLinks": []
-      },
-      "percentage": false,
-      "pointradius": 2,
-      "points": false,
-      "renderer": "flot",
-      "repeat": null,
-      "repeatDirection": "h",
-      "repeatIteration": 1578126707606,
-      "repeatPanelId": 28,
-      "repeatedByRow": true,
-      "scopedVars": {
-        "namespace": {
-          "selected": true,
-          "text": "pyt-w20",
-          "value": "pyt-w20"
-        }
-      },
-      "seriesOverrides": [
-        {
-          "alias": "/Limit/",
-          "transform": "negative-Y"
-        }
-      ],
-      "spaceLength": 10,
-      "stack": false,
-      "steppedLine": false,
-      "targets": [
-        {
-          "expr": "(sum(container_memory_rss) by(pod, namespace)) / on(pod, namespace) (sum(kube_pod_container_resource_requests_memory_bytes) by(pod, namespace)) * on(pod, namespace) kube_pod_labels{label_component=\"singleuser-server\", namespace=\"${namespace:regex}\"}",
-          "hide": false,
-          "intervalFactor": 1,
-          "legendFormat": "RSS/Request: {{namespace}}/{{pod}}",
-          "refId": "A"
-        },
-        {
-          "expr": "(sum(container_memory_rss) by(pod, namespace)) / on(pod, namespace) (sum(kube_pod_container_resource_limits_memory_bytes) by(pod, namespace)) * on(pod, namespace) kube_pod_labels{label_component=\"singleuser-server\", namespace=\"${namespace:regex}\"}",
-          "hide": false,
-          "intervalFactor": 1,
-          "legendFormat": "RSS/Limit: {{namespace}}/{{pod}}",
-          "refId": "B"
-        }
-      ],
-      "thresholds": [],
-      "timeFrom": null,
-      "timeRegions": [],
-      "timeShift": null,
-      "title": "Memory Use (singleuser servers) -- ${namespace}",
-      "tooltip": {
-        "shared": false,
-        "sort": 0,
-        "value_type": "individual"
-      },
-      "transparent": true,
-      "type": "graph",
-      "xaxis": {
-        "buckets": null,
-        "mode": "time",
-        "name": null,
-        "show": true,
-        "values": []
-      },
-      "yaxes": [
-        {
-          "decimals": null,
-          "format": "short",
-          "label": "RSS/Request, RSS/Limit (below 0)",
-          "logBase": 1,
-          "max": null,
-          "min": "-1",
-          "show": true
-        },
-        {
-          "format": "short",
-          "label": null,
-          "logBase": 1,
-          "max": null,
-          "min": null,
-          "show": false
-        }
-      ],
-      "yaxis": {
-        "align": false,
-        "alignLevel": null
-      }
-    },
-    {
-      "aliasColors": {},
-      "bars": false,
-      "cacheTimeout": null,
-      "dashLength": 10,
-      "dashes": false,
-      "decimals": 0,
-      "fill": 1,
-      "fillGradient": 0,
-      "gridPos": {
-        "h": 6,
-        "w": 12,
-        "x": 12,
-        "y": 45
-      },
-      "id": 55,
-      "legend": {
-        "alignAsTable": false,
-        "avg": false,
-        "current": true,
-        "max": false,
-        "min": false,
-        "rightSide": false,
-        "show": true,
-        "total": false,
-        "values": true
-      },
-      "lines": true,
-      "linewidth": 1,
-      "links": [],
-      "maxPerRow": 3,
-      "nullPointMode": "null as zero",
-      "options": {
-        "dataLinks": []
-      },
-      "percentage": false,
-      "pluginVersion": "6.3.6",
-      "pointradius": 2,
-      "points": false,
-      "renderer": "flot",
-      "repeat": null,
-      "repeatDirection": "h",
-      "repeatIteration": 1578126707606,
-      "repeatPanelId": 8,
-      "repeatedByRow": true,
-      "scopedVars": {
-        "namespace": {
-          "selected": true,
-          "text": "pyt-w20",
-          "value": "pyt-w20"
+          "text": "ex2",
+          "value": "ex2"
         }
       },
       "seriesOverrides": [
@@ -1448,7 +1213,7 @@
     }
   ],
   "refresh": false,
-  "schemaVersion": 19,
+  "schemaVersion": 22,
   "style": "dark",
   "tags": [],
   "templating": {
@@ -1456,14 +1221,12 @@
       {
         "allValue": null,
         "current": {
-          "tags": [],
-          "text": "csx46 + pyt-w20",
+          "text": "ex2",
           "value": [
-            "csx46",
-            "pyt-w20"
+            "ex2"
           ]
         },
-        "datasource": "RANCHER_MONITORING",
+        "datasource": "Prometheus",
         "definition": "label_values(kube_pod_labels, namespace)",
         "hide": 0,
         "includeAll": true,
@@ -1485,13 +1248,12 @@
       {
         "allValue": null,
         "current": {
-          "tags": [],
           "text": "All",
           "value": [
             "$__all"
           ]
         },
-        "datasource": "RANCHER_MONITORING",
+        "datasource": "Prometheus",
         "definition": "label_values(kube_node_labels, label_beta_kubernetes_io_instance_type)",
         "hide": 0,
         "includeAll": true,
@@ -1533,5 +1295,5 @@
   "timezone": "",
   "title": "JHub Cluster Metrics",
   "uid": "3FUD7YYZz",
-  "version": 37
+  "version": 5
 }

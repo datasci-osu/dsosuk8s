@@ -15,7 +15,9 @@ WORKDIR /home/jovyan/nativeauthenticator
 RUN pip3 install -e .
 
 RUN pip3 install jupyterhub-samlauthenticator
+RUN pip3 install jupyterhub-ltiauthenticator
 
+#TAG v1.1.2
 
 WORKDIR /srv/jupyterhub
 

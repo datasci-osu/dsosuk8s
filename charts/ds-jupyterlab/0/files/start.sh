@@ -12,8 +12,8 @@ add_admin_group() {
   export ADMIN_USERNAME=dsadmin
   export ADMIN_GROUPNAME=dsadmins
   export USER_GROUPNAME=dsusers
-  export ADMIN_GID=101
-  export USER_GID=102
+  export ADMIN_GID=102               # ssh group is 101 by default
+  export USER_GID=103
   export ADMIN_UID=1001
   
   addgroup --gid $ADMIN_GID $ADMIN_GROUPNAME
@@ -165,13 +165,14 @@ check_admin_config() {
     chmod -R 775 $ADMIN_HOME_DIR/R_libs
     chmod 664 $ADMIN_HOME_DIR/R_libs/README.txt
 
-    # the /etc/profile trick below seems to work, EXCEPT for some vars which RStudio won't read :(
-    # probably don't need the greps here
-    if [[ -e /opt/conda/lib/R/etc/Renviron ]]; then
-      grep "R_LIBS_SITE=$ADMIN_HOME_DIR/R_libs" /opt/conda/lib/R/etc/Renviron || echo "R_LIBS_SITE=$ADMIN_HOME_DIR/R_libs" >> /opt/conda/lib/R/etc/Renviron
-      grep "ADMIN_HOME_DIR=$ADMIN_HOME_DIR" /opt/conda/lib/R/etc/Renviron || echo "ADMIN_HOME_DIR=$ADMIN_HOME_DIR" >> /opt/conda/lib/R/etc/Renviron
-      grep "DATA_HOME_DIR=$DATA_HOME_DIR" /opt/conda/lib/R/etc/Renviron || echo "DATA_HOME_DIR=$DATA_HOME_DIR" >> /opt/conda/lib/R/etc/Renviron
-    fi
+  fi
+
+  # the /etc/profile trick below seems to work, EXCEPT for some vars which RStudio won't read :(
+  # probably don't need the greps here
+  if [[ -e /opt/conda/lib/R/etc/Renviron ]]; then
+    grep "R_LIBS_SITE=$ADMIN_HOME_DIR/R_libs" /opt/conda/lib/R/etc/Renviron || echo "R_LIBS_SITE=$ADMIN_HOME_DIR/R_libs" >> /opt/conda/lib/R/etc/Renviron
+    grep "ADMIN_HOME_DIR=$ADMIN_HOME_DIR" /opt/conda/lib/R/etc/Renviron || echo "ADMIN_HOME_DIR=$ADMIN_HOME_DIR" >> /opt/conda/lib/R/etc/Renviron
+    grep "DATA_HOME_DIR=$DATA_HOME_DIR" /opt/conda/lib/R/etc/Renviron || echo "DATA_HOME_DIR=$DATA_HOME_DIR" >> /opt/conda/lib/R/etc/Renviron
   fi
 }
 
@@ -203,7 +204,9 @@ check_nb_user() {
     grep -qxF "source(\"$ADMIN_HOME_DIR/autosourced_by_rprofiles.R\")" /tmp/$NB_USER/.Rprofile || echo "source(\"$ADMIN_HOME_DIR/autosourced_by_rprofiles.R\")" >> /tmp/$NB_USER/.Rprofile
     # make sure they exec the autoexec_by_python_notebooks, even if they try to remove it ;)
     echo "exec(open(\"$ADMIN_HOME_DIR/autoexec_by_python_notebooks.py\").read())" > /tmp/$NB_USER/.ipython/profile_default/startup/001_autoexec.py 
-    
+    chown $ADMIN_USERNAME:$ADMIN_GROUPNAME /tmp/$NB_USER/.ipython/profile_default/startup/001_autoexec.py
+    chmod 664 /tmp/$NB_USER/.ipython/profile_default/startup/001_autoexec.py
+
     # copy em over to the /home mount, -a for archive (like cp -r and preserve ownership and other metadata)
     cp -a /tmp/$NB_USER /home
   fi
@@ -288,7 +291,8 @@ fi
 #echo "export ADMIN_HOME_DIR=$ADMIN_HOME_DIR" >> /etc/rstudio/rsession-profile
 #echo "source $ADMIN_HOME_DIR/hubrc" >> /etc/rstudio/rsession-profile
 
+ln -s $ADMIN_HOME_DIR/hubrc /etc/profile.d/hubrc.sh
 
 # using bash -c causes the stuff in /etc/profile to be picked up
 #exec sudo -E -H -u $NB_USER PATH=$PATH XDG_CACHE_HOME=/home/$NB_USER/.cache PYTHONPATH=${PYTHONPATH:-} LD_LIBRARY_PATH=${LD_LIBRARY_PATH:-} bash -c "$cmd"  
-exec sudo -E -H -u $NB_USER PATH=$PATH XDG_CACHE_HOME=/home/$NB_USER/.cache PYTHONPATH=${PYTHONPATH:-} LD_LIBRARY_PATH=${LD_LIBRARY_PATH:-} bash -c "source $ADMIN_HOME_DIR/hubrc && $cmd"  
+exec sudo -E -H -u $NB_USER PATH=$PATH XDG_CACHE_HOME=/home/$NB_USER/.cache PYTHONPATH=${PYTHONPATH:-} LD_LIBRARY_PATH=${LD_LIBRARY_PATH:-} bash -c "$cmd"  
