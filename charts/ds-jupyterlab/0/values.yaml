@@ -157,9 +157,14 @@ jupyterhub:
               #spawner.environment['GRANT_SUDO'] = "yes"
        
           c.JupyterHub.authenticator_class = LTIExtraAuthenticator
-          c.LTIAuthenticator.consumers = {
+          c.LTIExtraAuthenticator.consumers = {
             os.environ['LTI_CLIENT_KEY']: os.environ['LTI_CLIENT_SECRET']
           } 
+
+          # todo: these should probably be grabbed from enviroment variables
+          c.LTIExtraAuthenticator.user_id_key = "custom_canvas_user_login_id"
+          c.LTIExtraAuthenticator.user_id_regex = "(^[^@]+).*"
+          c.LTIExtraAuthenticator.user_admin_roles = ["Instructor"]
 
         else:
           from jupyterhub.auth import DummyAuthenticator

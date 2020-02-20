@@ -4,7 +4,7 @@ set -e
 #############################
 # These you'll want to set
 #############################
-APPNAME=ex2
+APPNAME=example
 HOMEDRIVE_SIZE=4Gi
 ADMIN_USERS="oneils, smithj"
 
@@ -14,12 +14,15 @@ CPU_GUARANTEE=0.1
 CPU_LIMIT=1
 
 # can be native, lti, or dummy
-AUTH_TYPE=native
-NUM_PLACEHOLDERS=0
+AUTH_TYPE=dummy
+NUM_PLACEHOLDERS=1
 
 #########################
 # these less so
 #########################
+USER_IMAGE="v1.1.4"
+HUB_IMAGE="v1.2.1"
+
 BASE_URL="/$APPNAME/"
 HOMEDRIVE_APPNAME="homedrive-$APPNAME"
 HUB_APPNAME="hub-$APPNAME"
@@ -69,6 +72,9 @@ jupyterhub:
       LTI_CLIENT_SECRET: $(openssl rand -hex 32)
       ADMIN_USERS: "$ADMIN_USERS"
     baseUrl: "$BASE_URL"   # must start and end with a /
+    image:
+      name: oneilsh/ktesting-k8s-hub
+      tag: "$HUB_IMAGE"
 
   scheduling:
     userPlaceholder:
@@ -93,7 +99,7 @@ jupyterhub:
       guarantee: $CPU_GUARANTEE
     image:
       name: oneilsh/ktesting-datascience-notebook
-      tag: "1d47a65a" 
+      tag: "$USER_IMAGE" 
     defaultUrl: "/lab"
 
     extraEnv:
@@ -114,6 +120,10 @@ EOF
 
 cat <<EOF > 1-create-drive.sh
 #!/bin/bash
+HOSTNAME=$(cat ../cluster-ingress-hostname)
+KUBECONTEXT=$(cat ../kube-context)
+
+kubectl config use-context $KUBECONTEXT
 helm upgrade $HOMEDRIVE_APPNAME $DRIVE_CHART --namespace $NAMESPACE --atomic --cleanup-on-fail --install --values 1-drive.yaml
 EOF
 
@@ -124,6 +134,10 @@ chmod u+x 1-create-drive.sh
 
 cat <<EOF > 2-create-hub.sh
 #!/bin/bash
+HOSTNAME=$(cat ../cluster-ingress-hostname)
+KUBECONTEXT=$(cat ../kube-context)
+
+kubectl config use-context $KUBECONTEXT
 helm upgrade $HUB_APPNAME $HUB_CHART --namespace $NAMESPACE --atomic --cleanup-on-fail --install --values 2-hub.yaml
 EOF
 
@@ -142,6 +156,11 @@ blue="\$(tput setaf 4)"
 magenta="\$(tput setaf 5)"
 cyan="\$(tput setaf 6)"
 white="\$(tput setaf 7)"
+
+HOSTNAME=$(cat ../cluster-ingress-hostname)
+KUBECONTEXT=$(cat ../kube-context)
+
+kubectl config use-context $KUBECONTEXT
 
 echo "\${yellow}Helm release list: \${white}"
 helm list --namespace $NAMESPACE
