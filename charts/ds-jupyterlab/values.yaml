@@ -149,10 +149,12 @@ jupyterhub:
             os.environ['LTI_CLIENT_KEY']: os.environ['LTI_CLIENT_SECRET']
           } 
 
-          # todo: these should probably be grabbed from enviroment variables
-          c.LTIExtraAuthenticator.user_id_key = "custom_canvas_user_login_id"
-          c.LTIExtraAuthenticator.user_id_regex = "(^[^@]+).*"
-          c.LTIExtraAuthenticator.user_admin_roles = ["Instructor"]
+          user_admin_roles_comma_sep = os.environ["LTI_ADMIN_ROLES"]  # so we can pass in a var like "Instructor,TA"
+          user_admin_roles = [ entry.strip() for entry in user_admin_roles_comma_sep.split(",") ]  
+          
+          c.LTIExtraAuthenticator.user_id_key = os.environ["LTI_ID_KEY"] #"custom_canvas_user_login_id"
+          c.LTIExtraAuthenticator.user_id_regex = os.environ["LTI_ID_REGEX"] #"(^[^@]+).*"
+          c.LTIExtraAuthenticator.user_admin_roles = user_admin_roles #["Instructor"]
 
         else:
           from jupyterhub.auth import DummyAuthenticator
