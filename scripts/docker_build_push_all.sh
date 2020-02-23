@@ -1,9 +1,11 @@
 #!/usr/bin/env bash
 
-SCRIPT_DIR=`dirname $0`
+GIT_ROOT=$(git rev-parse --show-toplevel)
+source $GIT_ROOT/scripts/utils.src
+SCRIPT_DIR=$(realpath $(dirname ${BASH_SOURCE:-$_}))
 
 
-DIRLIST=$(find $SCRIPT_DIR/../docker_images/ -maxdepth 1 -mindepth 1 )
+DIRLIST=$(find $GIT_ROOT/docker_images/ -maxdepth 1 -mindepth 1 )
 
 for DIR in $DIRLIST; do
   # returns 2 for built, 1 for fail, 0 for build not needed

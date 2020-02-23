@@ -278,7 +278,7 @@ singleuser:
     guarantee:
   memory:
     limit:
-    guarantee: null
+    guarantee: 1G
   extraResource:
     limits: {}
     guarantees: {}
