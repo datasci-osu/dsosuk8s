@@ -1,3 +1,0 @@
-dependencies:
-  - name: jupyterhub
-    repository: file://charts

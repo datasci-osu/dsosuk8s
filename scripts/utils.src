@@ -1,0 +1,52 @@
+#!/bin/bash
+
+black="$(tput setaf 0)"
+red="$(tput setaf 1)"
+green="$(tput setaf 2)"
+yellow="$(tput setaf 3)"
+blue="$(tput setaf 4)"
+magenta="$(tput setaf 5)"
+cyan="$(tput setaf 6)"
+white="$(tput setaf 7)"
+
+
+validate_set () {
+  local paramname=$1
+  local paramvalue=$2
+  local regex=$3
+  local required=$4
+
+  if [ $# != 4 ] || ! $(echo $required | grep -Eq "required|notrequired"); then
+    echo "${red}Error, validate_set usage: validate_set <VARNAME> <value> <regex> <required|notrequired>" 1>&2
+    echo "<value> may be an empty string (if notrequired is set) but cannot be nothing:" 1>&2
+    echo "validate_set MYVAR \"\$1\" \".*\" notrequired  # works if \$1 is not set" 1>&2
+    echo "validate_set MYVAR \$1 \".*\" notrequired    # does not works if \$1 is not set." 1>&2
+    echo "got: '$@' ${white}"
+    exit 1
+  fi
+
+  if [ "${paramvalue}" != "" ]; then
+    if $(echo ${paramvalue} | grep -Eq "${regex}"); then
+      eval "${paramname}=${paramvalue}"
+    else
+      echo "${red}Error, '${paramname}' value '${paramvalue}' does not match regex \"${regex}\". Exiting.${white}" 1>&2
+      exit 1
+    fi
+  else
+    if [ "${required}" == "required" ]; then
+      echo "${red}Error, ${paramname} is required. Exiting.${white}" 1>&2
+      exit 1
+    fi
+  fi
+
+}
+
+# https://unix.stackexchange.com/questions/6463/find-searching-in-parent-directories-instead-of-subdirectories
+# usage location=$(find-up somefilename)
+find-up () {
+  curpath=$(pwd)
+  while [[ "$curpath" != "" && ! -e "$curpath/$1" ]]; do
+    curpath=${curpath%/*}
+  done
+  echo "$curpath"
+}

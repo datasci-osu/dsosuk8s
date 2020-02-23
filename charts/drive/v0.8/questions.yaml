@@ -1,6 +1,0 @@
-questions:
-- variable: size
-  default: "4Gi"
-  description: "Size of the storage drive."
-  type: string
-  label: "Size: "

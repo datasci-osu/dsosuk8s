@@ -91,18 +91,6 @@ jupyterhub:
       tag: "d746c46f"   # as of https://github.com/oneilsh/dsosuk8s/tree/caa236856df68732e62913bda5d0d05c0937b419
 
     extraConfig:
-      # we pass in mem and cpu requests via environment variables because the rancher UI won't pass them as floats :/  
-      #resources: |
-      #  import os
-      #  # maybe the order of these matters? gaurantee first?
-      #  if os.environ["MEMORY_GUARANTEE"]:
-      #    c.Spawner.mem_guarantee = str(os.environ["MEMORY_GUARANTEE"]) + "G"
-      #  if os.environ["MEMORY_LIMIT"]:
-      #    c.Spawner.mem_limit = str(os.environ["MEMORY_LIMIT"]) + "G"
-      #  if os.environ["CPU_GUARANTEE"]:
-      #    c.Spawner.cpu_guarantee = float(os.environ["CPU_GUARANTEE"])
-      #  if os.environ["CPU_LIMIT"]:
-      #    c.Spawner.cpu_limit = float(os.environ["CPU_LIMIT"])
       nfspriv: |
         from kubernetes import client
         def modify_pod_hook(spawner, pod):
@@ -119,7 +107,7 @@ jupyterhub:
         import os
 
         env_auth_type = os.environ["AUTH_TYPE"]
-        
+
         if env_auth_type == "native":
           from nativeauthenticator import NativeAuthenticator
           from tornado import gen
@@ -157,9 +145,16 @@ jupyterhub:
               #spawner.environment['GRANT_SUDO'] = "yes"
        
           c.JupyterHub.authenticator_class = LTIExtraAuthenticator
-          c.LTIAuthenticator.consumers = {
+          c.LTIExtraAuthenticator.consumers = {
             os.environ['LTI_CLIENT_KEY']: os.environ['LTI_CLIENT_SECRET']
           } 
+
+          user_admin_roles_comma_sep = os.environ["LTI_ADMIN_ROLES"]  # so we can pass in a var like "Instructor,TA"
+          user_admin_roles = [ entry.strip() for entry in user_admin_roles_comma_sep.split(",") ]  
+          
+          c.LTIExtraAuthenticator.user_id_key = os.environ["LTI_ID_KEY"] #"custom_canvas_user_login_id"
+          c.LTIExtraAuthenticator.user_id_regex = os.environ["LTI_ID_REGEX"] #"(^[^@]+).*"
+          c.LTIExtraAuthenticator.user_admin_roles = user_admin_roles #["Instructor"]
 
         else:
           from jupyterhub.auth import DummyAuthenticator
