@@ -5,16 +5,16 @@ source $GIT_ROOT/scripts/utils.src
 
 usage () {
   echo "Usage: $0  settings.vars" 1>&2
-  echo "Where settings.vars contains at least these vars (examples shown):"
-  echo "HUB_APPNAME=example-hub"
+  echo "Where settings.vars contains at least these vars (examples shown):" 1>&2
+  echo "HUB_APPNAME=example-hub" 1>&2
   echo "AUTH_TYPE=lti" 1>&2
   echo "ADMIN_USERS=oneils,smithj" 1>&2
   echo "BASE_URL=/example-hub/" 1>&2
   echo "HUB_IMAGE=v1.2.1"
   echo "USER_IMAGE=v1.1.4" 1>&2
   echo "NUM_PLACEHOLDERS=2" 1>&2
-  echo "MEM_GUARANTEE=0.5Gi" 1>&2
-  echo "MEM_LIMIT=1Gi" 1>&2
+  echo "MEM_GUARANTEE=0.5G" 1>&2
+  echo "MEM_LIMIT=1G" 1>&2
   echo "CPU_GUARANTEE=0.1" 1>&2
   echo "CPU_LIMIT=2" 1>&2
   echo "DRIVE_APPNAME=example-drive" 1>&2
@@ -145,7 +145,11 @@ helm upgrade $HUB_APPNAME $SCRIPT_DIR/.. --namespace $NAMESPACE --timeout 1m0s -
 rm $TEMPFILE
 
 
-echo "${green}Finished! Your hub is at ${blue}https://$CLUSTER_HOSTNAME$BASE_URL ${white}"
+if [ $AUTH_TYPE == "lti" ]; then
+  echo "${green}Finished! Your hub is at ${blue}https://${CLUSTER_HOSTNAME}${BASE_URL}hub/lti/launch ${white}"
+else
+  echo "${green}Finished! Your hub is at ${blue}https://$CLUSTER_HOSTNAME$BASE_URL ${white}"
+fi
 if [ $AUTH_TYPE == "lti" ]; then
   echo "${green}Your LTI_CLIENT_KEY is ${blue}$LTI_CLIENT_KEY ${white}"
   echo "${green}Your LTI_CLIENT_SECRET is ${blue}$LTI_CLIENT_SECRET ${white}"

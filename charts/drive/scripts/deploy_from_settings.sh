@@ -5,11 +5,11 @@ source $GIT_ROOT/scripts/utils.src
 
 usage () {
   echo "Usage: $0  settings.vars" 1>&2
-  echo "Where settings.vars contains at least these vars:"
+  echo "Where settings.vars contains at least these vars:" 1>&2
   echo "HOMEDRIVE_SIZE=4Gi" 1>&2
   echo "NAMESPACE=example-namespace" 1>&2
   echo "DRIVE_APPNAME=example-drive" 1>&2
-  echo "KUBE_CONTEXT=devContext"
+  echo "KUBE_CONTEXT=devContext" 1>&2
   echo "" 1>&2
   exit 1
 }
