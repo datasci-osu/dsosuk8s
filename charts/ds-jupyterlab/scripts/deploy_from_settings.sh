@@ -74,9 +74,9 @@ echo ""
 echo "${yellow}Installing $HUB_APPNAME ... ${white}"
 echo ""
 
-
-LTI_CLIENT_KEY=$(openssl rand -hex 32)
-LTI_CLIENT_SECRET=$(openssl rand -hex 32)
+# keys needed for canvas repeatable, hashed based on URL, kube context name, and admin users list
+LTI_CLIENT_KEY=$(echo ${CLUSTER_HOSTNAME}${BASE_URL}${KUBE_CONTEXT}${ADMIN_USERS} | sha256sum | awk '{print $1}')
+LTI_CLIENT_SECRET=$(echo ${ADMIN_USERS}${BASE_URL}${CLUSTER_HOSTNAME}${KUBE_CONTEXT} | sha256sum | awk '{print $1}')
 
 #cat <<EOF | helm template $SCRIPT_DIR/.. --values -
 # this bug: https://github.com/helm/helm/issues/7002
