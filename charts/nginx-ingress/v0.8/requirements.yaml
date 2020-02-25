@@ -1,3 +1,0 @@
-dependencies:
-  - name: nginx-ingress
-    repository: file://charts

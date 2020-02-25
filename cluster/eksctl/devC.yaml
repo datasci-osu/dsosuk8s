@@ -4,7 +4,7 @@ apiVersion: eksctl.io/v1alpha5
 kind: ClusterConfig
 
 metadata:
-  name: beta2
+  name: devC
   region: us-west-2
 
 # default availabilityzones unless otherwise specified?
