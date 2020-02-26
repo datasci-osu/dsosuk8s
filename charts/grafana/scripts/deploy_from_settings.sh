@@ -115,7 +115,7 @@ plugins:
 EOF
 
 
-helm upgrade $GRAFANA_APPNAME $SCRIPT_DIR/.. --namespace $NAMESPACE --timeout 1m0s --atomic --cleanup-on-fail --install --values $TEMPFILE
+helm upgrade $GRAFANA_APPNAME $SCRIPT_DIR/.. --namespace $NAMESPACE --timeout 5m0s --atomic --cleanup-on-fail --install --values $TEMPFILE
 
 rm $TEMPFILE
 

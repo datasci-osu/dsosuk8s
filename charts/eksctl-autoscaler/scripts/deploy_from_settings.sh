@@ -38,7 +38,7 @@ cat <<EOF > $TEMPFILE
 clusterName: ${EKS_CLUSTER_NAME}
 EOF
 
-helm upgrade $AUTOSCALER_APPNAME $SCRIPT_DIR/.. --namespace kube-system --timeout 2m0s --atomic --cleanup-on-fail --install --values $TEMPFILE
+helm upgrade $AUTOSCALER_APPNAME $SCRIPT_DIR/.. --namespace kube-system --timeout 5m0s --atomic --cleanup-on-fail --install --values $TEMPFILE
 
 rm $TEMPFILE
 

@@ -32,4 +32,5 @@ fi
 $GIT_ROOT/charts/nginx-ingress/scripts/deploy_from_settings.sh "$@"
 $GIT_ROOT/charts/prometheus/scripts/deploy_from_settings.sh "$@"
 $GIT_ROOT/charts/grafana/scripts/deploy_from_settings.sh "$@"
+$GIT_ROOT/charts/eksctl-autoscaler/scripts/deploy_from_settings.sh "$@"
 

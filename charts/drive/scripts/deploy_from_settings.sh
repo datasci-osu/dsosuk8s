@@ -44,7 +44,7 @@ cat <<EOF > $TEMPFILE
 size: ${HOMEDRIVE_SIZE}
 EOF
 
-helm upgrade $DRIVE_APPNAME $SCRIPT_DIR/.. --namespace $NAMESPACE --timeout 1m0s --atomic --cleanup-on-fail --install --values $TEMPFILE
+helm upgrade $DRIVE_APPNAME $SCRIPT_DIR/.. --namespace $NAMESPACE --timeout 5m0s --atomic --cleanup-on-fail --install --values $TEMPFILE
 
 rm $TEMPFILE
 

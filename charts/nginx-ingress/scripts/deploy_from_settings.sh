@@ -63,14 +63,14 @@ masterHost: $CLUSTER_HOSTNAME
 
 EOF
 
-helm upgrade $NGINX_APPNAME $SCRIPT_DIR/.. --namespace $NAMESPACE --timeout 1m0s --atomic --cleanup-on-fail --install --values $TEMPFILE
+helm upgrade $NGINX_APPNAME $SCRIPT_DIR/.. --namespace $NAMESPACE --timeout 5m0s --atomic --cleanup-on-fail --install --values $TEMPFILE
 
 rm $TEMPFILE
 
-ELB=$(kubectl get ingress -n $NAMESPACE | grep $HOSTNAME | awk '{print $3}')
+ELB=$(kubectl get ingress -n $NAMESPACE | grep $CLUSTER_HOSTNAME | awk '{print $3}')
 
 echo ""
-echo "${green}Success! Please add $HOSTNAME as a CNAME for $ELB in your DNS.${white}"
+echo "${green}Success! Please add $CLUSTER_HOSTNAME as a CNAME for $ELB in your DNS.${white}"
 echo ""
 
 
