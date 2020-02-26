@@ -4,7 +4,7 @@ apiVersion: eksctl.io/v1alpha5
 kind: ClusterConfig
 
 metadata:
-  name: dev1
+  name: devC
   region: us-west-2
 
 # default availabilityzones unless otherwise specified?
@@ -24,7 +24,7 @@ nodeGroups:
   # the other, workers, is for jh user pods
   # t3.large is EBS optimized - note that EACH NODE CAN SUPPORT A MAX OF 28 EBS ATTACHMENTS (actually 27; https://docs.aws.amazon.com/AWSEC2/latest/UserGuide/volume_limits.html)
   - name: jhcontrolplane
-    instanceType: t3a.medium
+    instanceType: t3a.large
     availabilityZones: ["us-west-2b"]
     iam: 
       withAddonPolicies:
@@ -46,20 +46,21 @@ nodeGroups:
       hub.jupyter.org/node-purpose: core
     tags:
       nodegroup-role: jhcontrolplane
+    # https://github.com/weaveworks/eksctl/issues/1460#issuecomment-576366059
+    kubeletExtraConfig:
+      readOnlyPort: 0
+      protectKernelDefaults: true  # (setting this required the preBootstrapCommands below)
+      eventRecordQPS: 0       
     preBootstrapCommands:
-        # enables docker bridge network so binderhub stuff works
-        # see https://gist.github.com/tobemedia/2144d74d232ccce8972613e8ae13b054
-        # and https://discourse.jupyter.org/t/binder-deployed-in-aws-eks-domain-name-resolution-errors/766
-        # Replicate what --enable-docker-bridge does in /etc/eks/bootstrap.sh
-        # Enabling the docker bridge network. We have to disable live-restore as it
-        # prevents docker from recreating the default bridge network on restart
-       - "cp /etc/docker/daemon.json /etc/docker/daemon_backup.json"
-       - "echo -e '.bridge=\"docker0\" | .\"live-restore\"=false' >  /etc/docker/jq_script"
-       - "jq -f /etc/docker/jq_script /etc/docker/daemon_backup.json | tee /etc/docker/daemon.json"
-       - "systemctl restart docker"
-        # modprope nfs and nfsd lets hosts (and containers) serve nfs
-       - "modprobe nfs"
-       - "modprobe nfsd"
+      - "#!/bin/bash -xe"
+      - "cat > /etc/sysctl.d/90-kubelet.conf << EOF \nvm.overcommit_memory=1 \nkernel.panic=10 \nkernel.panic_on_oops=1 \nEOF"
+      - "sysctl -p /etc/sysctl.d/90-kubelet.conf" 
+      # Not sure if these are loaded by default on Amazon Linux 2, but worth blacklisting anyway RE https://kubernetes.io/docs/tasks/administer-cluster/securing-a-cluster/#preventing-containers-from-loading-unwanted-kernel-modules
+      - "echo blacklist dccp >> /etc/modprobe.d/kubernetes-blacklist.conf"
+      - "echo blacklist sctp >> /etc/modprobe.d/kubernetes-blacklist.conf"
+      # modprope nfs and nfsd lets hosts (and containers) serve nfs
+      - "modprobe nfs"
+      - "modprobe nfsd"
 
   - name: workers
     instanceType: t3a.large
