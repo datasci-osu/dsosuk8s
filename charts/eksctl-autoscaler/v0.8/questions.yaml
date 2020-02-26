@@ -1,7 +1,0 @@
-questions:
-  - variable: clusterName
-    required: true
-    label: "Cluster Name: "
-    description: "We need to know the name of the cluster that this autoscaler will search for autoscaling groups in. It's probably the same one you're deploying it into..."
-    type: string
-
