@@ -123,7 +123,7 @@ rm $TEMPFILE
 echo ""
 echo "${green}Success! Your admin username is ${blue}admin ${white}"
 echo "${green}Your admin password is ${blue}${ADMIN_INIT_PASSWORD} ${white}"
-echo "${green}Don't lose you! You might want to go change it immediately at ${blue}https://$CLUSTER_HOSTNAME/$GRAFANA_PATH ${white}"
+echo "${green}Don't lose it! You might want to go change it immediately at ${blue}https://$CLUSTER_HOSTNAME/$GRAFANA_PATH ${white}"
 echo ""
 
 
