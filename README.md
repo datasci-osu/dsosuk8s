@@ -1,7 +1,5 @@
 # DataScience@OregonState Kubernetes 
 
-
-
 This repo is a work in progress, containing customized kubernetes-based jupyterhub deployments, targetting multitenancy [Rancher](https://rancher.com/) clusters. It
 is part of the DataScience@OregonState project, which aims to develop campus-scale infrastructure for teaching topics in data science. 
 
