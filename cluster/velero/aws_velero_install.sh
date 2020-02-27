@@ -1,7 +1,7 @@
 #!/bin/bash
 
 # exit if anything fails
-set -e
+# set -e
 
 SCRIPT_DIR=`dirname $0`
 

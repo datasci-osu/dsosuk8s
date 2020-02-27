@@ -31,10 +31,11 @@ spec:
               memory: 300Mi
           command:
             - ./cluster-autoscaler
-            - --v=4
-            - --stderrthreshold=info
+            - --v=3
+            - --stderrthreshold=warning
             - --cloud-provider=aws
-            - --skip-nodes-with-local-storage=false
+            - --skip-nodes-with-local-storage=0
+            - --skip-nodes-with-system-pods=0
             - --expander=least-waste
             - --node-group-auto-discovery=asg:tag=k8s.io/cluster-autoscaler/enabled,k8s.io/cluster-autoscaler/{{ .Values.clusterName }}
           volumeMounts:

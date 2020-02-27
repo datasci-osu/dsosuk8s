@@ -5,8 +5,8 @@ set -e
 
 SCRIPT_DIR=`dirname $0`
 
-if [ $# -ne 4 ]; then
-  echo "Usage: <s3_bucket_name> <s3_region> <velero_secret_file> <prefix>"
+if [ $# -ne 5 ]; then
+  echo "Usage: <s3_bucket_name> <s3_region> <velero_secret_file> <prefix> <namespace>"
   echo ""
   echo "This script installs the Velero kubernetes backup tool in the current kubernetes cluster, assuming AWS assets exist (created by aws_velero_install.sh), including the secret velero user credential file."
   echo ""
@@ -19,6 +19,7 @@ BUCKET=$1
 REGION=$2
 CREDENTIALS_FILE=$3
 PREFIX=$4
+NAMESPACE=$5
 
 if [ ! -f $CREDENTIALS_FILE ]; then
   echo "Error, cannot find credentials file $CREDENTIALS_FILE. Exiting."
@@ -47,5 +48,6 @@ velero install \
     --backup-location-config region=$REGION \
     --snapshot-location-config region=$REGION \
     --secret-file $CREDENTIALS_FILE \
-    --prefix $PREFIX
-
+    --prefix $PREFIX \
+    --namespace $NAMESPACE \
+    -- wait
