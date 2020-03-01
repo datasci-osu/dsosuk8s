@@ -36,6 +36,9 @@ echo "${yellow}Installing $AUTOSCALER_APPNAME ... ${white}"
 TEMPFILE=$(mktemp) 
 cat <<EOF > $TEMPFILE
 clusterName: ${EKS_CLUSTER_NAME}
+nodeSelector:
+  nodegroup-role: clustertools
+  #hub.jupyter.org/node-purpose: core
 EOF
 
 helm upgrade $AUTOSCALER_APPNAME $SCRIPT_DIR/.. --namespace kube-system --timeout 5m0s --atomic --cleanup-on-fail --install --values $TEMPFILE

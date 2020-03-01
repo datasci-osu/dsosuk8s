@@ -20,6 +20,11 @@ usage () {
   echo "CLUSTER_HOSTNAME=my.host.edu" 1>&2
   echo "GRAFANA_PATH=grafana       # will be located at my.host.edu/grafana" 1>&2
   echo "KUBE_CONTEXT=devContext" 1>&2
+  echo "EKS_CLUSTER_NAME=myCluster" 1>&2
+  echo "VELERO_APPNAME=velero" 1>&2
+  echo "VELERO_S3_BUCKET=my-s3bucket" 1>&2
+  echo "VELERO_BACKUP_REGION=us-west-2" 1>&2
+  echo "VELERO_CREDENTIALS_FILE=/path/to/my/creds.file" 1>&2
   echo "" 1>&2
   exit 1
 }
@@ -29,8 +34,9 @@ if [ "$#" -ne 1 ]; then
   exit 1
 fi
 
-$GIT_ROOT/charts/nginx-ingress/scripts/deploy_from_settings.sh "$@"
-$GIT_ROOT/charts/prometheus/scripts/deploy_from_settings.sh "$@"
-$GIT_ROOT/charts/grafana/scripts/deploy_from_settings.sh "$@"
 $GIT_ROOT/charts/eksctl-autoscaler/scripts/deploy_from_settings.sh "$@"
+$GIT_ROOT/charts/velero/scripts/deploy_from_settings.sh "$@"
+$GIT_ROOT/charts/prometheus/scripts/deploy_from_settings.sh "$@"
+$GIT_ROOT/charts/nginx-ingress/scripts/deploy_from_settings.sh "$@"
+$GIT_ROOT/charts/grafana/scripts/deploy_from_settings.sh "$@"
 

@@ -5,7 +5,7 @@ nginx-ingress:
       cert: ""
       key: ""
     nodeSelector: 
-      volatile: "false"
+      nodegroup-role: clustertools
     config:
       entries:
         client-max-body-size: "1000m"

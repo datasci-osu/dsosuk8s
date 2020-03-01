@@ -30,8 +30,6 @@ SETTINGS_DIR=$(realpath $(dirname $1))
 
 validate_set GRAFANA_PATH "$GRAFANA_PATH" "^[[:alnum:]-]+$" required
 validate_set CLUSTER_HOSTNAME "$CLUSTER_HOSTNAME" "^([[:alnum:]_-]+\.)*([[:alnum:]_-]+)$" required
-validate_set STORAGE_CLASS "$STORAGE_CLASS" "^[[:alnum:]-]+$" required
-validate_set STORAGE_CLASS "$STORAGE_CLASS" "^[[:alnum:]-]+$" required
 validate_set NAMESPACE "$NAMESPACE" "^[[:alnum:]_-]+$" required
 validate_set PROMETHEUS_APPNAME "$GRAFANA_APPNAME" "^[[:alnum:]_-]+$" required
 validate_set KUBE_CONTEXT "$KUBE_CONTEXT" "^[[:alnum:]_-]+$" required
@@ -88,7 +86,7 @@ grafana.ini:
     url: https://grafana.net
 
 nodeSelector:
-  hub.jupyter.org/node-purpose: core 
+  nodegroup-role: clustertools 
 
 datasources:
   datasources.yaml:

@@ -10,6 +10,7 @@ usage () {
   echo "settings.vars should contains at least these vars:"
   echo "NAMESPACE=cluster-tools" 1>&2
   echo "NGINX_APPNAME=nginx-ingress" 1>&2
+  echo "VELERO_APPNAME=velero" 1>&2
   echo "PROMETHEUS_APPNAME=prometheus" 1>&2
   echo "GRAFANA_APPNAME=grafana" 1>&2
   echo "AUTOSCALER_APPNAME=cluster-autoscaler" 1>&2
@@ -30,6 +31,7 @@ fi
 $GIT_ROOT/charts/eksctl-autoscaler/scripts/teardown_from_settings.sh $1
 $GIT_ROOT/charts/grafana/scripts/teardown_from_settings.sh $1
 $GIT_ROOT/charts/prometheus/scripts/teardown_from_settings.sh $1
+$GIT_ROOT/charts/velero/scripts/teardown_from_settings.sh $1
 
 if [ ! -z $DONT_REMOVE_NAMESPACE ]; then
   $GIT_ROOT/charts/nginx-ingress/scripts/teardown_from_settings.sh $1

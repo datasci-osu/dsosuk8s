@@ -18,6 +18,10 @@ spec:
         prometheus.io/scrape: 'true'
         prometheus.io/port: '8085'
     spec:
+{{- if .Values.nodeSelector }}
+      nodeSelector: 
+{{ toYaml .Values.nodeSelector | indent 8 }}
+{{- end }}
       serviceAccountName: cluster-autoscaler
       containers:
         - image: k8s.gcr.io/cluster-autoscaler:v1.12.3

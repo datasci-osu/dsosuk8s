@@ -6,7 +6,7 @@ source $GIT_ROOT/scripts/utils.src
 usage () {
   echo "Usage: $0  settings.vars" 1>&2
   echo "Where settings.vars contains at least these vars:"
-  echo "STORAGE_CLASS=gp2" 1>&2
+  echo "PROMETHEUS_STORAGE_CLASS=gp2" 1>&2
   echo "NAMESPACE=example-namespace" 1>&2
   echo "PROMETHEUS_APPNAME=example-drive" 1>&2
   echo "KUBE_CONTEXT=devContext"
@@ -24,7 +24,7 @@ source $1
 SCRIPT_DIR=$(realpath $(dirname ${BASH_SOURCE:-$_}))
 SETTINGS_DIR=$(realpath $(dirname $1))
 
-validate_set STORAGE_CLASS "$STORAGE_CLASS" "^[[:alnum:]-]+$" required
+validate_set PROMETHEUS_STORAGE_CLASS "$PROMETHEUS_STORAGE_CLASS" "^[[:alnum:]-]+$" required
 validate_set NAMESPACE "$NAMESPACE" "^[[:alnum:]_-]+$" required
 validate_set PROMETHEUS_APPNAME "$PROMETHEUS_APPNAME" "^[[:alnum:]_-]+$" required
 validate_set KUBE_CONTEXT "$KUBE_CONTEXT" "^[[:alnum:]_-]+$" required
@@ -43,23 +43,23 @@ TEMPFILE=$(mktemp)
 cat <<EOF > $TEMPFILE
 pushgateway:
   nodeSelector:
-    hub.jupyter.org/node-purpose: core
+    nodegroup-role: clustertools
 kubeStateMetrics:
   nodeSelector:
-    hub.jupyter.org/node-purpose: core
+    nodegroup-role: clustertools
 alertmonitor:
   nodeSelector:
-    hub.jupyter.org/node-purpose: core
+    nodegroup-role: clustertools
 alertmanager:
   persistentVolume:
-    storageClass: $STORAGE_CLASS
+    storageClass: $PROMETHEUS_STORAGE_CLASS
   nodeSelector:
-    hub.jupyter.org/node-purpose: core
+    nodegroup-role: clustertools
 server:
   persistentVolume:
-    storageClass: $STORAGE_CLASS
+    storageClass: $PROMETHEUS_STORAGE_CLASS
   nodeSelector:
-    hub.jupyter.org/node-purpose: core
+    nodegroup-role: clustertools
 
 nodeExporter:
   tolerations:

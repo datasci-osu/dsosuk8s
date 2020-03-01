@@ -1,0 +1,110 @@
+# for eksctl, managed nodegroups
+---
+apiVersion: eksctl.io/v1alpha5
+kind: ClusterConfig
+
+metadata:
+  name: hub-beta
+  region: us-west-2
+
+# default availabilityzones unless otherwise specified?
+availabilityZones: ["us-west-2a", "us-west-2b", "us-west-2c"]
+
+# eks now has managedNodeGroups, but they don't support taints, which are required for jupyterhub to put user pods in the right nodegroup. 
+# one could use 'kubectl taint' to add taints after creation, but new nodes created by an autoscaler won't have it
+# a potential workaround: https://github.com/jupyterhub/zero-to-jupyterhub-k8s/issues/299#issuecomment-413924333
+# but since this requires modifying the userdata, it can't be used with managedNodeGroups, and so we can just use taints: in the nodeGroup definition (which was added after that comment: https://github.com/weaveworks/eksctl/pull/703)
+# ALSO, as CJ found, nodegroups with EBS volumes cannot span availability zones, since EBS vols dont, effectively making HA incompatible with EBS: https://github.com/jupyterhub/zero-to-jupyterhub-k8s/issues/299#issuecomment-529029316
+# hence the jhcontrolplane nodegroup, which does use ebs volumes (in the current config) is restricted to just one availability zone
+# doing HA will require another storage solution (EFS?) or another cloud provider (GKE has so many fewer problems...)
+nodeGroups:
+  # for system tools - nginx-ingress, prometheus server, grafana, velero
+  - name: clustertools
+    instanceType: t3a.medium
+    availabilityZones: ["us-west-2b"]
+    iam: 
+      withAddonPolicies:
+        autoScaler: true
+    minSize: 1
+    maxSize: 4
+    desiredCapacity: 1
+    volumeSize: 20
+    labels: 
+      nodegroup-role: clustertools
+    tags:
+      nodegroup-role: clustertools
+    # https://github.com/weaveworks/eksctl/issues/1460#issuecomment-576366059
+    kubeletExtraConfig:
+      readOnlyPort: 0
+      protectKernelDefaults: true  # (setting this required the preBootstrapCommands below)
+      eventRecordQPS: 0       
+    preBootstrapCommands:
+      - "#!/bin/bash -xe"
+      - "cat > /etc/sysctl.d/90-kubelet.conf << EOF \nvm.overcommit_memory=1 \nkernel.panic=10 \nkernel.panic_on_oops=1 \nEOF"
+      - "sysctl -p /etc/sysctl.d/90-kubelet.conf" 
+      # Not sure if these are loaded by default on Amazon Linux 2, but worth blacklisting anyway RE https://kubernetes.io/docs/tasks/administer-cluster/securing-a-cluster/#preventing-containers-from-loading-unwanted-kernel-modules
+      - "echo blacklist dccp >> /etc/modprobe.d/kubernetes-blacklist.conf"
+      - "echo blacklist sctp >> /etc/modprobe.d/kubernetes-blacklist.conf"
+
+
+  # this nodegroup is used for jupyterhub core components (https://zero-to-jupyterhub.readthedocs.io/en/latest/administrator/optimization.html#using-a-dedicated-node-pool-for-users)
+  # t3.medium is EBS optimized - note that EACH NODE CAN SUPPORT A MAX OF 28 EBS ATTACHMENTS (actually 27; https://docs.aws.amazon.com/AWSEC2/latest/UserGuide/volume_limits.html)
+  - name: jhcontrolplane
+    instanceType: t3a.medium
+    availabilityZones: ["us-west-2b"]
+    iam: 
+      withAddonPolicies:
+        autoScaler: true
+    minSize: 1
+    maxSize: 10
+    desiredCapacity: 1
+    volumeSize: 30
+    labels:
+      nodegroup-role: jhcontrolplane 
+      hub.jupyter.org/node-purpose: core
+    tags:
+      nodegroup-role: jhcontrolplane
+    # https://github.com/weaveworks/eksctl/issues/1460#issuecomment-576366059
+    kubeletExtraConfig:
+      readOnlyPort: 0
+      protectKernelDefaults: true  # (setting this required the preBootstrapCommands below)
+      eventRecordQPS: 0       
+    preBootstrapCommands:
+      - "#!/bin/bash -xe"
+      - "cat > /etc/sysctl.d/90-kubelet.conf << EOF \nvm.overcommit_memory=1 \nkernel.panic=10 \nkernel.panic_on_oops=1 \nEOF"
+      - "sysctl -p /etc/sysctl.d/90-kubelet.conf" 
+      # Not sure if these are loaded by default on Amazon Linux 2, but worth blacklisting anyway RE https://kubernetes.io/docs/tasks/administer-cluster/securing-a-cluster/#preventing-containers-from-loading-unwanted-kernel-modules
+      - "echo blacklist dccp >> /etc/modprobe.d/kubernetes-blacklist.conf"
+      - "echo blacklist sctp >> /etc/modprobe.d/kubernetes-blacklist.conf"
+      # modprope nfs and nfsd lets hosts (and containers) serve nfs
+      - "modprobe nfs"
+      - "modprobe nfsd"
+
+  # user pod nodegroup
+  - name: jhworkers
+    instanceType: t3a.large
+    iam: 
+      withAddonPolicies:
+        autoScaler: true
+    minSize: 1
+    maxSize: 30
+    desiredCapacity: 1
+    volumeSize: 30
+    ###availabilityZones: ["us-west-2a", "us-west-2b", "us-west-2c"]
+    labels: 
+      nodegroup-role: jhusers
+      hub.jupyter.org/node-purpose: user
+    taints:
+      hub.jupyter.org/dedicated: user:NoSchedule
+    tags:
+      nodegroup-role: jhusers
+    preBootstrapCommands:
+      - "#!/bin/bash -xe"
+      - "cat > /etc/sysctl.d/90-kubelet.conf << EOF \nvm.overcommit_memory=1 \nkernel.panic=10 \nkernel.panic_on_oops=1 \nEOF"
+      - "sysctl -p /etc/sysctl.d/90-kubelet.conf" 
+      # Not sure if these are loaded by default on Amazon Linux 2, but worth blacklisting anyway RE https://kubernetes.io/docs/tasks/administer-cluster/securing-a-cluster/#preventing-containers-from-loading-unwanted-kernel-modules
+      - "echo blacklist dccp >> /etc/modprobe.d/kubernetes-blacklist.conf"
+      - "echo blacklist sctp >> /etc/modprobe.d/kubernetes-blacklist.conf"
+      # modprope nfs and nfsd lets hosts (and containers) serve nfs
+      - "modprobe nfs"
+      - "modprobe nfsd"

@@ -2,7 +2,7 @@
 
 deployments/*
 !deployments/
-deployments/devb.datasci.oregonstate.edu/*
-!deployments/devb.datasci.oregonstate.edu/
-!deployments/devb.datasci.oregonstate.edu/devB-example.vars
-!deployments/devb.datasci.oregonstate.edu/devB-monitoring.vars
+deployments/cluster.example.edu/*
+!deployments/cluster.example.edu/
+!deployments/cluster.example.edu/example-hub.vars
+!deployments/cluster.example.edu/cluster-bootstrap.vars
