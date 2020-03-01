@@ -1,2 +1,8 @@
-applications/glauth/glauth64
 *.swp
+
+deployments/*
+!deployments/
+deployments/cluster.example.edu/*
+!deployments/cluster.example.edu/
+!deployments/cluster.example.edu/example-hub.vars
+!deployments/cluster.example.edu/cluster-bootstrap.vars
