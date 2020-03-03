@@ -1,5 +1,16 @@
 # DS@OSU JupyterHub Canvas Integration Notes
 
+   * [DS@OSU JupyterHub Canvas Integration Notes](#dsosu-jupyterhub-canvas-integration-notes)
+      * [Step 1: Creating the App](#step-1-creating-the-app)
+      * [Step 2: Creating a Launch JupyterHub Button](#step-2-creating-a-launch-jupyterhub-button)
+         * [Link from a Module](#link-from-a-module)
+         * [Link from an Assignment](#link-from-an-assignment)
+      * [Step 3: usage:](#step-3-usage)
+         * [Permissions](#permissions)
+         * [Resource Usage](#resource-usage)
+         * [Student View](#student-view)
+
+
 You'll need the following information to connect your Canvas course to your DS@OSU JupyterHub, which will be provided
 via a secure channel (e.g. Box link):
 
