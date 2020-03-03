@@ -27,15 +27,15 @@ provided via a secure channel (e.g. Box link):
 
 First, login to Canvas and open the Course you wish to connect. In the course menu, Select "Settings" near the bottom:
 
-![Settings Link](docs_images/canvas_readme/settings_link.png)
+![Settings Link](docs_images/readme_canvas/settings_link.png)
 
 In the "Apps" Tab, click "View App Configurations":
 
-![View App Configurations](docs_images/canvas_readme/view_app_configs.png)
+![View App Configurations](docs_images/readme_canvas/view_app_configs.png)
 
 Click the "+ App" Button:
 
-![Plus App Button](docs_images/canvas_readme/plus_app_button.png)
+![Plus App Button](docs_images/readme_canvas/plus_app_button.png)
 
 In the window that pops up, enter your Launch URL, Consumer Key, and Shared Secret (via copy-and-paste). Also be sure to
 set the "Privacy" dropdown to Public (this lets the JupyterHub see the usernames of those logging in), and give the new
@@ -44,7 +44,7 @@ app a name (which is part of what students will see in the "launch" button, conf
 
 Examples shown:
 
-![Add App Screen](docs_images/canvas_readme/add_app_screen.png)
+![Add App Screen](docs_images/readme_canvas/add_app_screen.png)
 
 Once you click the "Submit" button your app is ready for use in other parts of Canvas!
 
@@ -61,15 +61,15 @@ finding the entry in the list, you may try entering the launch URL directly into
 You may also want to click the "Load in a new tab" checkbox to indicate that JupyterHub should be launched into a new
 browser tab.
 
-![Module Link Screen](docs_images/canvas_readme/module_link_screen.png)
+![Module Link Screen](docs_images/readme_canvas/module_link_screen.png)
 
 The resulting view in the Modules list:
 
-![Modules List](docs_images/canvas_readme/modules_list.png)
+![Modules List](docs_images/readme_canvas/modules_list.png)
 
 And the launch button displayed in the item page:
 
-![Module Launch](docs_images/canvas_readme/module_launch.png)
+![Module Launch](docs_images/readme_canvas/module_launch.png)
 
 ### Link from an Assignment
 
@@ -78,11 +78,11 @@ Linking from a Canvas assignment is similar. First, create a new assignment, and
 
 You may want to select "Load This Tool in a New Tab" to have the Hub opened in a new browser tab.  
 
-![Assignment External Tool](docs_images/canvas_readme/assignment_external_tool.png)
+![Assignment External Tool](docs_images/readme_canvas/assignment_external_tool.png)
 
 Here's the resulting assignment page:
 
-![Assignment Launch](docs_images/canvas_readme/assignment_launch.png)
+![Assignment Launch](docs_images/readme_canvas/assignment_launch.png)
 
 
 
@@ -102,7 +102,7 @@ When a user first logs in, they will be presented with the "Start my Server" but
 cloud-server. (In some cases this can take a few minutes if the cloud-based resources need to be created from scratch,
 in which case refreshing the page will work when the server is ready.)
 
-![Start My Server](docs_images/canvas_readme/start_my_server.png)
+![Start My Server](docs_images/readme_canvas/start_my_server.png)
 
 To keep costs low, please encourage your students to log out or close the browser window if they won't be using their
 server for an hour or more; doing so marks the server as "inactive" so it can can be shut down (after an hour of

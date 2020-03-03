@@ -27,9 +27,9 @@ Welcome to the DataScience@OregonState instructional platform. This is still a w
 
 Some screenshots (Initial JupyterLab Interface, a Python Notebook, and RStudio):
 
-<a href="https://raw.githubusercontent.com/oneilsh/dsosuk8s/userdocs/user_docs/docs_images/instructor_readme/launcher.png"><img src="docs_images/instructor_readme/launcher.png" width="30%"/></a>&nbsp;
-<a href="https://raw.githubusercontent.com/oneilsh/dsosuk8s/userdocs/user_docs/docs_images/instructor_readme/python_notebook_autocomplete.png"><img src="docs_images/instructor_readme/python_notebook_autocomplete.png" width="30%"/></a>&nbsp;
-<a href="https://raw.githubusercontent.com/oneilsh/dsosuk8s/userdocs/user_docs/docs_images/instructor_readme/rstudio.png"><img src="docs_images/instructor_readme/rstudio.png" width="30%"/></a>
+<a href="https://raw.githubusercontent.com/oneilsh/dsosuk8s/userdocs/user_docs/docs_images/readme_instructor/launcher.png"><img src="docs_images/readme_instructor/launcher.png" width="30%"/></a>&nbsp;
+<a href="https://raw.githubusercontent.com/oneilsh/dsosuk8s/userdocs/user_docs/docs_images/readme_instructor/python_notebook_autocomplete.png"><img src="docs_images/readme_instructor/python_notebook_autocomplete.png" width="30%"/></a>&nbsp;
+<a href="https://raw.githubusercontent.com/oneilsh/dsosuk8s/userdocs/user_docs/docs_images/readme_instructor/rstudio.png"><img src="docs_images/readme_instructor/rstudio.png" width="30%"/></a>
 
 <br />
 <br />
@@ -105,29 +105,29 @@ CPU cores and RAM it can use. This means only a certain number of user servers c
 
 To provide space for new users to login quickly, a number of "placeholder" servers are also run:
 
-<img src="docs_images/instructor_readme/placeholders1.png" width="100%" align="center"/>
+<img src="docs_images/readme_instructor/placeholders1.png" width="100%" align="center"/>
 
 Suppose that `userL` logs in, and their personal server isn't already running (it may be, if they were recently logged in); their
 personal server bumps a placeholder to another cloud machine (real user servers are not bumpable):
 
-<img src="docs_images/instructor_readme/placeholders2.png" width="100%" align="center"/>
+<img src="docs_images/readme_instructor/placeholders2.png" width="100%" align="center"/>
 
 This process is fast, because starting a new user server on an existing cloud machine is fast. Suppose now that `userM` logs in:
 this bumps a placeholder from Cloud Machine 3, and `userM` logs in quickly as their user server starts on Machine 3. But now there's 
 no place for the bumped placeholder; this triggers the creation of a new Cloud Machine for the placeholder to start on. 
 
-<img src="docs_images/instructor_readme/placeholders3.png" width="100%" align="center"/>
+<img src="docs_images/readme_instructor/placeholders3.png" width="100%" align="center"/>
 
 The new placeholder can't actually run until Cloud Machine 4 has fully booted, and this can take up to 10 minutes. Once it does,
 however, there's room for 6 more users to login with minimal wait:
 
-<img src="docs_images/instructor_readme/placeholders4.png" width="100%" align="center"/>
+<img src="docs_images/readme_instructor/placeholders4.png" width="100%" align="center"/>
 
 Now suppose, however, that 13 new users attempt to login simultaneously (and again, their servers are not already running as they haven't logged
 in recently). There is room for 11 of them on running cloud machines (bumping all of the placeholders), but 2 will have to also wait along
 with the placeholders for new Cloud Machines to boot up before they can start working.
 
-<img src="docs_images/instructor_readme/placeholders5.png" width="100%" align="center"/>
+<img src="docs_images/readme_instructor/placeholders5.png" width="100%" align="center"/>
 
 The placeholder servers are a nice solution when users login over time, but when many users log in simultaneously after a period of inactivity, 
 such as at the start of a morning lab class, there may be delays. 
@@ -135,7 +135,7 @@ such as at the start of a morning lab class, there may be delays.
 As an Admin, you can avoid this by pre-starting the servers for users of your hub ~20 minutes before the start of a class where this may be
 an issue, using the **Start All** button in the hub control panel Admin tab:
 
-<img src="docs_images/instructor_readme/admin_tab.png" width="100%" align="center"/>
+<img src="docs_images/readme_instructor/admin_tab.png" width="100%" align="center"/>
 
 This may trigger the creation of a number of cloud machines to hold these user servers, but if done in advance of class students won't have
 to wait while these are created.
