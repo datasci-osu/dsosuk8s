@@ -22,16 +22,16 @@ as Admin users. Admin users must set their password before they can successfully
 
 When accessing the Hub URL (e.g. `https://beta.datasci.oregonstate.edu/nmc-245`) for the first time, you'll see the login page...
 
-<img src="docs_images/instructor_readme/login_box.png" width="40%" align="center"/>
+<img src="docs_images/readme_nativeauth/login_box.png" width="40%" align="center"/>
 
 ... but, you won't be able to login (even as an Admin) unless you set a password. To do so, click the **Signup!** link to get to the signup page:
 
-<img src="docs_images/instructor_readme/signup_box.png" width="40%" align="center"/>
+<img src="docs_images/readme_nativeauth/signup_box.png" width="40%" align="center"/>
  
 Here, enter your username (e.g. `smithj`) and your chosen password, then click **Create User**. The box will clear and let you know your information
 has been submitted. 
 
-<img src="docs_images/instructor_readme/signup_box_submitted.png" width="40%" align="center"/>
+<img src="docs_images/readme_nativeauth/signup_box_submitted.png" width="40%" align="center"/>
 
 Now, click the **Login!** link to return to the login page, and login with your username and chosen password. Admins are pre-authorized to login, so
 you'll be logged into the JupyterLab interface.
@@ -43,18 +43,18 @@ and choose a username and password. However, they won't be able to login until t
 
 In the JupyterLab interface, every user has access to their "Hub Control Panel" from the File menu.
 
-<img src="docs_images/instructor_readme/file_hub_control_panel.png" width="70%" align="center"/>
+<img src="docs_images/readme_nativeauth/file_hub_control_panel.png" width="70%" align="center"/>
 
 When the control panel opens, the page will look like so:
 
-<img src="docs_images/instructor_readme/control_panel_tabs.png" width="100%" align="center"/>
+<img src="docs_images/readme_nativeauth/control_panel_tabs.png" width="100%" align="center"/>
 
 Non-admin users will only see tabs for "Home", "Token" and "Change Password", *not* "Admin" or "Authorize Users".
 
 Visiting the "Authorize Users" tab shows a list of usernames and their authorized status; clicking "Authorize" or "Unauthorize"
 changes their status. 
 
-<img src="docs_images/instructor_readme/authorize_user_tab.png" width="100%" align="center"/>
+<img src="docs_images/readme_nativeauth/authorize_user_tab.png" width="100%" align="center"/>
 
 Once authorized they will be able to login; by default newly authorized users are not Admins (though that can be changed). 
 
@@ -65,7 +65,7 @@ This means that users that are authorized but have not logged in yet will not be
 still show in this list (but they won't be able to login again until re-authorized). If you need to see entries for not-yet-logged-in
 users, you can add their usernames manually with the **Add Users** button. 
 
-<img src="docs_images/instructor_readme/admin_tab.png" width="100%" align="center"/>
+<img src="docs_images/readme_nativeauth/admin_tab.png" width="100%" align="center"/>
 
 Users can be removed with the **Delete User** button. *This does not delete their data in their `/home/username` directory.* It merely removes
 their password and authorization status. To regain access, they can go through the signup and authorization process again. 
