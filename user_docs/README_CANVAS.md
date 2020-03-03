@@ -1,5 +1,7 @@
 # DS@OSU JupyterHub Canvas Integration Notes
 
+Contents:
+
    * [DS@OSU JupyterHub Canvas Integration Notes](#dsosu-jupyterhub-canvas-integration-notes)
       * [Step 1: Creating the App](#step-1-creating-the-app)
       * [Step 2: Creating a Launch JupyterHub Button](#step-2-creating-a-launch-jupyterhub-button)
@@ -11,8 +13,8 @@
          * [Student View](#student-view)
 
 
-You'll need the following information to connect your Canvas course to your DS@OSU JupyterHub, which will be provided
-via a secure channel (e.g. Box link):
+If your Hub has been configured for Canvas acces, you'll need the following information to connect your Canvas course to your Hub, which will be 
+provided via a secure channel (e.g. Box link):
 
 * Launch URL
   * e.g. **https://hub-beta.datasci.oregonstate.edu/lti-demo/hub/lti/launch**
