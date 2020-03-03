@@ -13,6 +13,11 @@ Contents:
          * [Student View](#student-view)
 
 
+<br />
+<br />
+
+## Step 1: Creating the App
+
 If your Hub has been configured for Canvas acces, you'll need the following information to connect your Canvas course to your Hub, which will be 
 provided via a secure channel (e.g. Box link):
 
@@ -22,8 +27,6 @@ provided via a secure channel (e.g. Box link):
   * e.g. **e04bec07b28e311ef3a912137250f6997fca6710958d0ee16aa0add1abbf26e8**
 * Shared Secret
   * e.g. **95b51f2412d142c665eaefd2038267895aeff382c8b40e0eea039e136a8db5d3**
-
-## Step 1: Creating the App
 
 First, login to Canvas and open the Course you wish to connect. In the course menu, Select "Settings" near the bottom:
 
@@ -47,6 +50,9 @@ Examples shown:
 ![Add App Screen](docs_images/readme_canvas/add_app_screen.png)
 
 Once you click the "Submit" button your app is ready for use in other parts of Canvas!
+
+<br />
+<br />
 
 ## Step 2: Creating a Launch JupyterHub Button
 
@@ -86,6 +92,8 @@ Here's the resulting assignment page:
 
 
 
+<br />
+<br />
 
 ## Step 3: usage:
 
