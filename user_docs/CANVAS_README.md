@@ -14,6 +14,6 @@ which will be provided via a secure channel (e.g. Box link):
 
 First, login to Canvas and open the Course you wish to connect. In the course menu, Select "Settings" near the bottom:
 
-![Settings Link](images/settings_link.png)
+![Settings Link](docs_images/canvas_readme/settings_link.png)
 
 
