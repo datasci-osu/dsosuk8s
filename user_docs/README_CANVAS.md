@@ -118,6 +118,9 @@ inactivity) and save on computational resources. 
 
 Servers are forcefully stopped after 8 hours of runtime, even if the browser window is not closed. 
 
+Please see the [User Server Management](README_INSTRUCTOR.md#user-server-management) section of the Instructor Readme to learn
+how to provide the best experience for your students. (The [QuickStart](README_INSTRUCTOR.md#quickstart) section there is good too!)
+
 ### Student View
 
 It is possible to access the hub while in Canvas' "Student View"; when doing so the "fake student" will be given a
