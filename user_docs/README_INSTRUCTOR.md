@@ -25,9 +25,9 @@ Welcome to the DataScience@OregonState instructional platform. This is still a w
 
 Some screenshots (Initial JupyterLab Interface, a Python Notebook, and RStudio):
 
-<a href="https://raw.githubusercontent.com/oneilsh/dsosuk8s/userdocs/user_docs/images/launcher.png"><img src="images/launcher.png" width="30%"/></a>&nbsp;
-<a href="https://raw.githubusercontent.com/oneilsh/dsosuk8s/userdocs/user_docs/images/python_notebook_autocomplete.png"><img src="images/python_notebook_autocomplete.png" width="30%"/></a>&nbsp;
-<a href="https://raw.githubusercontent.com/oneilsh/dsosuk8s/userdocs/user_docs/images/rstudio.png"><img src="images/rstudio.png" width="30%"/></a>
+<a href="https://raw.githubusercontent.com/oneilsh/dsosuk8s/userdocs/user_docs/docs_images/instructor_readme/launcher.png"><img src="docs_images/instructor_readme/launcher.png" width="30%"/></a>&nbsp;
+<a href="https://raw.githubusercontent.com/oneilsh/dsosuk8s/userdocs/user_docs/docs_images/instructor_readme/python_notebook_autocomplete.png"><img src="docs_images/instructor_readme/python_notebook_autocomplete.png" width="30%"/></a>&nbsp;
+<a href="https://raw.githubusercontent.com/oneilsh/dsosuk8s/userdocs/user_docs/docs_images/instructor_readme/rstudio.png"><img src="docs_images/instructor_readme/rstudio.png" width="30%"/></a>
 
 <br />
 <br />
@@ -107,16 +107,16 @@ as Admin users.
 
 When accessing the Hub URL (e.g. `https://beta.datasci.oregonstate.edu/nmc-245`) for the first time, you'll see the login page...
 
-<img src="images/login_box.png" width="40%" align="center"/>
+<img src="docs_images/instructor_readme/login_box.png" width="40%" align="center"/>
 
 ... but, you won't be able to login (even as an Admin) unless you set a password. To do so, click the **Signup!** link to get to the signup page:
 
-<img src="images/signup_box.png" width="40%" align="center"/>
+<img src="docs_images/instructor_readme/signup_box.png" width="40%" align="center"/>
  
 Here, enter your username (e.g. `smithj`) and your chosen password, then click **Create User**. The box will clear and let you know your information
 has been submitted. 
 
-<img src="images/signup_box_submitted.png" width="40%" align="center"/>
+<img src="docs_images/instructor_readme/signup_box_submitted.png" width="40%" align="center"/>
 
 Now, click the **Login!** link to return to the login page, and login with your username and chosen password. Admins are pre-authorized to login, so
 you'll be logged into the JupyterLab interface.
@@ -128,18 +128,18 @@ and choose a username and password. However, they won't be able to login until t
 
 In the JupyterLab interface, every user has access to their "Hub Control Panel" from the File menu.
 
-<img src="images/file_hub_control_panel.png" width="70%" align="center"/>
+<img src="docs_images/instructor_readme/file_hub_control_panel.png" width="70%" align="center"/>
 
 When the control panel opens, the page will look like so:
 
-<img src="images/control_panel_tabs.png" width="100%" align="center"/>
+<img src="docs_images/instructor_readme/control_panel_tabs.png" width="100%" align="center"/>
 
 Non-admin users will only see tabs for "Home", "Token" and "Change Password", *not* "Admin" or "Authorize Users".
 
 Visiting the "Authorize Users" tab shows a list of usernames and their authorized status; clicking "Authorize" or "Unauthorize"
 changes their status. 
 
-<img src="images/authorize_user_tab.png" width="100%" align="center"/>
+<img src="docs_images/instructor_readme/authorize_user_tab.png" width="100%" align="center"/>
 
 Once authorized they will be able to login; by default newly authorized users are not Admins (though that can be changed). 
 
@@ -150,7 +150,7 @@ This means that users that are authorized but have not logged in yet will not be
 still show in this list (but they won't be able to login again until re-authorized). If you need to see entries for not-yet-logged-in
 users, you can add their usernames manually with the **Add Users** button. 
 
-<img src="images/admin_tab.png" width="100%" align="center"/>
+<img src="docs_images/instructor_readme/admin_tab.png" width="100%" align="center"/>
 
 Users can be removed with the **Delete User** button. *This does not delete their data in their `/home/username` directory.* It merely removes
 their password and authorization status. To regain access, they can go through the signup and authorization process again. 
@@ -180,29 +180,29 @@ CPU cores and RAM it can use. This means only a certain number of user servers c
 
 To provide space for new users to login quickly, a number of "placeholder" servers are also run:
 
-<img src="images/placeholders1.png" width="100%" align="center"/>
+<img src="docs_images/instructor_readme/placeholders1.png" width="100%" align="center"/>
 
 Suppose that `userL` logs in, and their personal server isn't already running (it may be, if they were recently logged in); their
 personal server bumps a placeholder to another cloud machine (real user servers are not bumpable):
 
-<img src="images/placeholders2.png" width="100%" align="center"/>
+<img src="docs_images/instructor_readme/placeholders2.png" width="100%" align="center"/>
 
 This process is fast, because starting a new user server on an existing cloud machine is fast. Suppose now that `userM` logs in:
 this bumps a placeholder from Cloud Machine 3, and `userM` logs in quickly as their user server starts on Machine 3. But now there's 
 no place for the bumped placeholder; this triggers the creation of a new Cloud Machine for the placeholder to start on. 
 
-<img src="images/placeholders3.png" width="100%" align="center"/>
+<img src="docs_images/instructor_readme/placeholders3.png" width="100%" align="center"/>
 
 The new placeholder can't actually run until Cloud Machine 4 has fully booted, and this can take up to 10 minutes. Once it does,
 however, there's room for 6 more users to login with minimal wait:
 
-<img src="images/placeholders4.png" width="100%" align="center"/>
+<img src="docs_images/instructor_readme/placeholders4.png" width="100%" align="center"/>
 
 Now suppose, however, that 13 new users attempt to login simultaneously (and again, their servers are not already running as they haven't logged
 in recently). There is room for 11 of them on running cloud machines (bumping all of the placeholders), but 2 will have to also wait along
 with the placeholders for new Cloud Machines to boot up before they can start working.
 
-<img src="images/placeholders5.png" width="100%" align="center"/>
+<img src="docs_images/instructor_readme/placeholders5.png" width="100%" align="center"/>
 
 The placeholder servers are a nice solution when users login over time, but when many users log in simultaneously after a period of inactivity, 
 such as at the start of a morning lab class, there may be delays. 
@@ -210,7 +210,7 @@ such as at the start of a morning lab class, there may be delays.
 As an Admin, you can avoid this by pre-starting the servers for users of your hub ~20 minutes before the start of a class where this may be
 an issue, using the **Start All** button in the hub control panel Admin tab:
 
-<img src="images/admin_tab.png" width="100%" align="center"/>
+<img src="docs_images/instructor_readme/admin_tab.png" width="100%" align="center"/>
 
 This may trigger the creation of a number of cloud machines to hold these user servers, but if done in advance of class students won't have
 to wait while these are created.
