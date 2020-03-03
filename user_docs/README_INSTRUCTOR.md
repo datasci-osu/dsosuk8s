@@ -44,9 +44,10 @@ will help you get the most from the platform. Nevertheless, here are some import
    example `https://beta.datasci.oregonstate.edu/nmc-245/`, and different classes access different Hubs/URLs. Within a Hub, some users
    (instructors & TAs) have "Admin"-level access with special permissions.
 
-2. **Login and User Management:** We currently support two options for user login: the "Native Authenticator" (which supports Hub-managed accounts
-   and passwords) and Canvas-based access. For information on using the Native Authenticator, see the [Native Authenticator Readme](README_NATIVEAUTH.md). For information on 
-   access via Canvas, see the [Canvas Readme](README_CANVAS.md).
+2. **Login and User Management:** We currently support two options for user login: Canvas-based access, and the "Native Authenticator" (which supports Hub-managed accounts
+   and passwords). 
+   For information on access via Canvas, see the [Canvas Readme](README_CANVAS.md).
+   For information on using the Native Authenticator, see the [Native Authenticator Readme](README_NATIVEAUTH.md). 
 
 2. **Cloud-Based Servers:** Eacher user's "interface" (shown in the screenshots above) is running as an individual server (Docker container, actually) in 
    the cloud. This has some implications for Admins--for example, user servers may be shut down after a period of inactivity (e.g. 1. hour), or after
