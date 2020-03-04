@@ -14,7 +14,7 @@ ingress and cluster auto-scaling setup, and potential gotchas with storage volum
 
 ### grafana_prometheus
 
-JSON model for monitoring clusters with Rancher-deployed monitoring.
+JSON model for monitoring clusters with Grafana backed by Prometheus.
 
 ## Kubernetes and JupyterHub
 
@@ -34,8 +34,8 @@ only be attached to a pod if there's no PVC already attaching it to another pod.
 when a PVC is created connecting a pod to a volume kubernetes handles the job of ensuring that the pod containers run on the same node
 as the volume, or detaches and re-attaches the PV (EBS vol) to a node where the pod can run. 
 
-For reasons desribed below, we use two nodegroups, a "Core" nodegroup and a "User" nodegroup, and only run pods requesting PVs on the "Core" nodegroup.
-Thus, the physical architecture looks like so:
+For reasons desribed below we use three nodegroups: a "cluster-tools" nodegroup, a "jhcontrolplane" nodegroup and a "jhusers" nodegroup. 
+Pods accessing persistent volumes are not run on the jhusers nodegroup. Thus, the physical architecture looks like so:
 
 <img src="images/physical_layout.png" width="50%"/>
 
