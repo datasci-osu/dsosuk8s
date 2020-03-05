@@ -47,7 +47,7 @@ jupyterhub:
     image:
       name: oneilsh/ktesting-datascience-notebook
       tag: "1d47a65a" # as of https://github.com/oneilsh/dsosuk8s/tree/caa236856df68732e62913bda5d0d05c0937b419
-    defaultUrl: "/lab"
+    defaultUrl: "/lab/tree/{username}"
     cmd: ["start-singleuser.sh", "--allow-root"]  # don't think I need to add --allow-root... 
     storage:
       type: none
@@ -91,6 +91,9 @@ jupyterhub:
       tag: "d746c46f"   # as of https://github.com/oneilsh/dsosuk8s/tree/caa236856df68732e62913bda5d0d05c0937b419
 
     extraConfig:
+      basedir: |
+        c.KubeSpawner.notebook_dir = "/home"
+
       nfspriv: |
         from kubernetes import client
         def modify_pod_hook(spawner, pod):

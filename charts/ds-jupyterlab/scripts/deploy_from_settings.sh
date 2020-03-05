@@ -122,7 +122,7 @@ jupyterhub:
     image:
       name: oneilsh/ktesting-datascience-notebook
       tag: "$USER_IMAGE" 
-    defaultUrl: "/lab"
+    defaultUrl: "/lab/tree/{username}"
 
     extraEnv:
       NFS_SVC_HOME: "$DRIVE_APPNAME"   # same as above

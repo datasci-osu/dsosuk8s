@@ -60,7 +60,7 @@ check_admin_config() {
   
   # if no setting for location for config info, set one
   if [[ -z $ADMIN_HOME_DIR ]]; then
-    export ADMIN_HOME_DIR=/home/hub_local
+    export ADMIN_HOME_DIR=/home/.hub_local
   fi
   if [[ -z $DATA_HOME_DIR ]]; then
     export DATA_HOME_DIR=/home/hub_data_share
@@ -183,14 +183,19 @@ check_nb_user() {
   
   if [[ ! -d /home/$NB_USER ]]; then
     # these permissions and ownership set things up nicely for class usage - instructors mostly all powerful (file permission-wise), students normally-powerful
-    chown $NB_UID:$ADMIN_GROUPNAME /tmp/$NB_USER 
+    chown $NB_UID:$ADMIN_GROUPNAME /tmp/$NB_USER
+    # the image contains a 'work' folder in the default user, let's remove that...
+    rm -rf /tmp/$NB_USER/work
+    # create a README.md file in the home dir instead - using |s instead of / for sed because $JUPYTERHUB_BASE_URL contains /s
+    cat /usr/local/bin/various/STUDENT_README.md | sed -r "s|@@JUPYTERHUB_BASE_URL@@|$JUPYTERHUB_BASE_URL|" | sed -r "s|@@NB_USER@@|$NB_USER|" >> /tmp/$NB_USER/README.md 
+    
+    # make sure they have a startup folder for pyhton notebooks
+    mkdir -p /tmp/$NB_USER/.ipython/profile_default/startup
+    
+    
     # make sure we have group read on everything, some aren't in the .npm cache dir in the inherited docker image
     chmod -R 770 /tmp/$NB_USER                      
     
-    # make a link to $DATA_HOME_DIR
-    ln -s $DATA_HOME_DIR /tmp/$NB_USER/$(basename $DATA_HOME_DIR)
-    # make sure they have a startup folder for pyhton notebooks
-    mkdir -p /tmp/$NB_USER/.ipython/profile_default/startup
 
     # re-own inner contents
     # chown dotfiles (note, this trick will fail on single-letter dotfiles e.g. '.a')
@@ -201,7 +206,7 @@ check_nb_user() {
     # TODO: this was outside and referencing /home/$NB_USER, but I was occasionally getting errors e.g.  /home/juser/.ipython/profile_default/startup/001_autoexec.py: No such file or directory
     # maybe an nfs thing? Anyway, putting it here means users can remove it and they won't come back, which might be undesirable
     # make sure they source the autosourced_by_rprofiles, even if they try to remove it ;)
-    grep -qxF "source(\"$ADMIN_HOME_DIR/autosourced_by_rprofiles.R\")" /tmp/$NB_USER/.Rprofile || echo "source(\"$ADMIN_HOME_DIR/autosourced_by_rprofiles.R\")" >> /tmp/$NB_USER/.Rprofile
+    grep -sqxF "source(\"$ADMIN_HOME_DIR/autosourced_by_rprofiles.R\")" /tmp/$NB_USER/.Rprofile || echo "source(\"$ADMIN_HOME_DIR/autosourced_by_rprofiles.R\")" >> /tmp/$NB_USER/.Rprofile
     # make sure they exec the autoexec_by_python_notebooks, even if they try to remove it ;)
     echo "exec(open(\"$ADMIN_HOME_DIR/autoexec_by_python_notebooks.py\").read())" > /tmp/$NB_USER/.ipython/profile_default/startup/001_autoexec.py 
     chown $ADMIN_USERNAME:$ADMIN_GROUPNAME /tmp/$NB_USER/.ipython/profile_default/startup/001_autoexec.py
@@ -228,7 +233,9 @@ check_nb_user() {
 
 update_etc_files() {
   # add entries from the persisted etc_passwd_additions to the container /etc/passwd
+  echo "Updating files in /etc; post add to /etc/passwd: "
   cat $ADMIN_HOME_DIR/automanaged/etc_passwd_additions >> /etc/passwd
+  cat /etc/passwd
   
   # group entries are persisted in $ADMIN_HOME_DIR/automanaged/{etc_group_admins,etc_group_users} as single-col lists
   # we need to first remove the entries from /etc/group if they happen to be there already
