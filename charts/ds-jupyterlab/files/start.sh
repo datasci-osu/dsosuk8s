@@ -233,9 +233,7 @@ check_nb_user() {
 
 update_etc_files() {
   # add entries from the persisted etc_passwd_additions to the container /etc/passwd
-  echo "Updating files in /etc; post add to /etc/passwd: "
   cat $ADMIN_HOME_DIR/automanaged/etc_passwd_additions >> /etc/passwd
-  cat /etc/passwd
   
   # group entries are persisted in $ADMIN_HOME_DIR/automanaged/{etc_group_admins,etc_group_users} as single-col lists
   # we need to first remove the entries from /etc/group if they happen to be there already
@@ -297,9 +295,13 @@ fi
 #echo "export DATA_HOME_DIR=$DATA_HOME_DIR" >> /etc/rstudio/rsession-profile
 #echo "export ADMIN_HOME_DIR=$ADMIN_HOME_DIR" >> /etc/rstudio/rsession-profile
 #echo "source $ADMIN_HOME_DIR/hubrc" >> /etc/rstudio/rsession-profile
+export PATH=$ADMIN_HOME_DIR/bin:$PATH
+export PYTHONPATH=$ADMIN_HOME_DIR/python_libs/lib/$PYTHONVERSION/site-packages
+export PATH=$ADMIN_HOME_DIR/python_libs/bin:$PATH
+export R_LIBS_SITE=$ADMIN_HOME_DIR/R_libs
 
 ln -s $ADMIN_HOME_DIR/hubrc /etc/profile.d/hubrc.sh
 
 # using bash -c causes the stuff in /etc/profile to be picked up
 #exec sudo -E -H -u $NB_USER PATH=$PATH XDG_CACHE_HOME=/home/$NB_USER/.cache PYTHONPATH=${PYTHONPATH:-} LD_LIBRARY_PATH=${LD_LIBRARY_PATH:-} bash -c "$cmd"  
-exec sudo -E -H -u $NB_USER PATH=$PATH XDG_CACHE_HOME=/home/$NB_USER/.cache PYTHONPATH=${PYTHONPATH:-} LD_LIBRARY_PATH=${LD_LIBRARY_PATH:-} bash -c "$cmd"  
+exec sudo -E -H -u $NB_USER PATH=$PATH R_LIBS_SITE=${R_LIBS_SITE:-} XDG_CACHE_HOME=/home/$NB_USER/.cache PYTHONPATH=${PYTHONPATH:-} LD_LIBRARY_PATH=${LD_LIBRARY_PATH:-} bash -c "$cmd"  
