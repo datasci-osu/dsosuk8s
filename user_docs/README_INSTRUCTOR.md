@@ -76,10 +76,10 @@ will help you get the most from the platform. Nevertheless, here are some import
    files created in user home directories are by default read+write for their owner and Admins, with no access for non-Admin users. Files
    added to `/home/hub_data_share` are by default read+write for Admins and read-only for others. 
 
-6. **For Command-Line Users:** Admins have read+write access to `/home/hub_local`, others have read-only access. Hub-wide Python and R packages are installed to subdirectories 
-   here, and the file `/home/hub_local/hubrc` is used to configure the environment for every user on login (akin to lines added to all users' `.bashrc` 
-   files; actually `/etc/profile.d/hubrc.sh` is linked to this file). Executable scripts and programs may be placed in `/home/hub_local/bin` (which is added to every users' `$PATH` via the `hubrc` file--if
-   compiling software, use `--prefix=/home/hub_local`). Some environment variables reference these locations; `env` shows a list these and others.
+6. **For Command-Line Users:** Admins have read+write access to `/home/.hub_local` (you'll need to get there on the terminal, dotfiles are hidden by JupyterLab), others have read-only access. Hub-wide Python and R packages are installed to subdirectories 
+   here, and the file `/home/.hub_local/hubrc` is used to configure the environment for every user on login (akin to lines added to all users' `.bashrc` 
+   files; actually `/etc/profile.d/hubrc.sh` is linked to this file). Executable scripts and programs may be placed in `/home/.hub_local/bin` (which is added to every users' `$PATH` via the `hubrc` file--if
+   compiling software, use `--prefix=/home/.hub_local`). Some environment variables reference these locations; `env` shows a list these and others.
 
 6. **Data Storage:** The `/home` directory and all its contents listed above exist on a single shared network drive. Currently there are no per-user
    limits within this space, so theoretically any user can fill the entire space accidentally. (Implementing per-user quotas is [on the todo list](https://github.com/oneilsh/dsosuk8s/issues/28)).
