@@ -2,16 +2,20 @@ apiVersion: apps/v1
 kind: StatefulSet
 metadata:
   name: nfs-{{ .Release.Name }}-dep
+  labels:
+    app: drive
 spec:
   serviceName: {{ .Release.Name }}
   replicas: 1
   selector:
     matchLabels:
-      app: nfs-{{ .Release.Name }}-pod
+      app: drive       # this seems necessary as well to get the app: drive label onto the pvc? (even though this is a selector and the app-release selector should be enough?)
+      app-release: nfs-{{ .Release.Name }}-pod
   template:
     metadata:
       labels:
-        app: nfs-{{ .Release.Name }}-pod
+        app: drive
+        app-release: nfs-{{ .Release.Name }}-pod
     spec:
       nodeSelector:
         hub.jupyter.org/node-purpose: core   # install on same nodes as jupyterhub core services
@@ -40,6 +44,8 @@ spec:
   volumeClaimTemplates:
   - metadata:
       name: storagevol
+      labels: 
+        app: drive
     spec:
       accessModes: [ "ReadWriteOnce" ]
       resources:
