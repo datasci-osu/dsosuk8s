@@ -15,10 +15,10 @@ WORKDIR /home/jovyan/nativeauthenticator
 RUN pip3 install -e .
 
 RUN pip3 install jupyterhub-ltiauthenticator
-RUN pip3 install git+https://github.com/oneilsh/ltiauthenticator.git
+RUN pip3 install git+https://github.com/oneilsh/ltiauthenticator.git@master
 
-#TAG v1.2.1
-#TAG added-ltiauth 
+#TAG v1.2.2
+#TAG ext-roles-removed
 
 WORKDIR /srv/jupyterhub
 
