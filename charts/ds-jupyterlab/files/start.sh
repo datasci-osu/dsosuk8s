@@ -207,6 +207,8 @@ check_nb_user() {
     # maybe an nfs thing? Anyway, putting it here means users can remove it and they won't come back, which might be undesirable
     # make sure they source the autosourced_by_rprofiles, even if they try to remove it ;)
     grep -sqxF "source(\"$ADMIN_HOME_DIR/autosourced_by_rprofiles.R\")" /tmp/$NB_USER/.Rprofile || echo "source(\"$ADMIN_HOME_DIR/autosourced_by_rprofiles.R\")" >> /tmp/$NB_USER/.Rprofile
+    chown $NB_UID:$ADMIN_GROUPNAME /tmp/$NB_USER/.Rprofile
+    chmod 664 /tmp/$NB_USER/.Rprofile
     # make sure they exec the autoexec_by_python_notebooks, even if they try to remove it ;)
     echo "exec(open(\"$ADMIN_HOME_DIR/autoexec_by_python_notebooks.py\").read())" > /tmp/$NB_USER/.ipython/profile_default/startup/001_autoexec.py 
     chown $ADMIN_USERNAME:$ADMIN_GROUPNAME /tmp/$NB_USER/.ipython/profile_default/startup/001_autoexec.py
@@ -301,6 +303,8 @@ export PATH=$ADMIN_HOME_DIR/python_libs/bin:$PATH
 export R_LIBS_SITE=$ADMIN_HOME_DIR/R_libs
 
 ln -s $ADMIN_HOME_DIR/hubrc /etc/profile.d/hubrc.sh
+HOSTNM=$(echo $JUPYTERHUB_BASE_URL | tr -d '/')
+hostname $HOSTNM
 
 # using bash -c causes the stuff in /etc/profile to be picked up
 #exec sudo -E -H -u $NB_USER PATH=$PATH XDG_CACHE_HOME=/home/$NB_USER/.cache PYTHONPATH=${PYTHONPATH:-} LD_LIBRARY_PATH=${LD_LIBRARY_PATH:-} bash -c "$cmd"  
