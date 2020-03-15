@@ -38,6 +38,11 @@ do_mount() {
   # mount the NFS, soft mount in case the server hiccups (to prevent user pods from going zombie), but 10 second timeout to prevent potential issues (based on recs for EFS, which I'd guess generalize? https://docs.aws.amazon.com/efs/latest/ug/mounting-fs-nfs-mount-settings.html)
   echo "mounting $NFS_SVC_HOME"
   mount -o soft,timeo=100 $NFS_SVC_HOME:/ /home
+  chown $ADMIN_UID:$ADMIN_GID /home
+  if [ -d /home/lost+found/ ] && [ $(ls -1a /home/lost+found/ | wc -l) == "2" ]; then
+    echo "/home/lost+found empty, deleting"
+    rm -rf /home/lost+found
+  fi
   echo "done mounting..."
 }
 
