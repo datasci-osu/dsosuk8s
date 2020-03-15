@@ -108,6 +108,7 @@ jupyterhub:
 
       authsetting: |
         import os
+        import json
 
         env_auth_type = os.environ["AUTH_TYPE"]
 
@@ -152,12 +153,10 @@ jupyterhub:
             os.environ['LTI_CLIENT_KEY']: os.environ['LTI_CLIENT_SECRET']
           } 
 
-          user_admin_roles_comma_sep = os.environ["LTI_ADMIN_ROLES"]  # so we can pass in a var like "Instructor,TA"
-          user_admin_roles = [ entry.strip() for entry in user_admin_roles_comma_sep.split(",") ]  
-          
-          c.LTIExtraAuthenticator.user_id_key = os.environ["LTI_ID_KEY"] #"custom_canvas_user_login_id"
-          c.LTIExtraAuthenticator.user_id_regex = os.environ["LTI_ID_REGEX"] #"(^[^@]+).*"
-          c.LTIExtraAuthenticator.user_admin_roles = user_admin_roles #["Instructor"]
+          # take JSON-encoded environment vars 
+          c.LTIExtraAuthenticator.user_id_keys = json.loads(os.environ["LTI_ID_KEYS"]) #eg '["custom_canvas_user_login_id", "lis_person_contact_email_primary", "custom_canvas_user_login_id"]'
+          c.LTIExtraAuthenticator.user_id_regexes = json.loads(os.environ["LTI_ID_REGEXES"]) #eg '["(^[^@]+)@oregonstate.edu$", "(^[^@]+@[^@]+$)", "(^[0-9a-f]{6,6})[0-9a-f]*$"]'
+          c.LTIExtraAuthenticator.user_admin_roles = json.loads(os.environ["LTI_ADMIN_ROLES"]) #eg '["Instructor", "TeachingAssistant", "ContentDeveloper"]'
 
         else:
           from jupyterhub.auth import DummyAuthenticator

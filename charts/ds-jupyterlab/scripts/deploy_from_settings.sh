@@ -23,9 +23,9 @@ usage () {
   echo "KUBE_CONTEXT=devB" 1>&2
   echo "" 1>&2
   echo "If AUTH_TYPE=lti, the following or similar should also be set:" 1>&2
-  echo "LTI_ID_KEY=custom_canvas_user_login_id  # the key returned by the LTI API holding usernames" 1>&2
-  echo "LTI_ID_REGEX='(^[^@]+).*'               # regex to extract username from key with (this extracts before the @ in an email)" 1>&2
-  echo "LTI_ADMIN_ROLES='Administrator,:role:ims/lis/Instructor'   # LTI 'roles' to grant jupterhub admin access to, matched to suffixed returned by LTI API." 1>&2
+  echo "LTI_ID_KEYS='[\"custom_canvas_user_login_id\"]  # the key returned by the LTI API holding usernames" 1>&2
+  echo "LTI_ID_REGEXES='[\"(^[^@]+).*\"]'               # regex to extract username from key with (this extracts before the @ in an email)" 1>&2
+  echo "LTI_ADMIN_ROLES='[\"Instructor\"]'   # LTI 'roles' to grant jupterhub admin access to, matched to suffixed returned by LTI API." 1>&2
   echo "" 1>&2
   exit 1
 }
@@ -58,9 +58,14 @@ validate_set NAMESPACE "$NAMESPACE" "^[[:alnum:]_-]+$" required
 validate_set KUBE_CONTEXT "$KUBE_CONTEXT" "^[[:alnum:]_-]+$" required
 
 if [ $AUTH_TYPE == "lti" ]; then
-  validate_set LTI_ID_KEY "$LTI_ID_KEY" "^[[:alnum:]_-]+$" required
-  validate_set LTI_ID_REGEX "$LTI_ID_REGEX" ".*" required
-  validate_set LTI_ADMIN_ROLES "$LTI_ADMIN_ROLES" "^([[:alnum:]:/_-]+\,)*([[:alnum:]:/_-]+)$" required
+  if [[ -z $LTI_ID_KEYS || -z $LTI_ID_REGEXES || -z $LTI_ADMIN_ROLES ]]; then
+    echo "Whoops, all of LTI_ID_KEYS, LTI_ID_REGEXES, and LTI_ADMIN_ROLES should be set." 1>&2
+    echo "They should also all be valid JSON strings, e.g. '[\"custom_canvas_user_login_id\", \"user_id\"]' for LTI_ID_KEYS." 1>&2
+    exit 1
+  fi
+#  validate_set LTI_ID_KEYS "$LTI_ID_KEYS" ".*$" required
+#  validate_set LTI_ID_REGEXES "$LTI_ID_REGEXES" ".*" required
+#  validate_set LTI_ADMIN_ROLES "$LTI_ADMIN_ROLES" ".*" required
 fi
 
 kubectl config use-context $KUBE_CONTEXT
@@ -90,9 +95,9 @@ jupyterhub:
       LTI_CLIENT_KEY: $LTI_CLIENT_KEY
       LTI_CLIENT_SECRET: $LTI_CLIENT_SECRET
       ADMIN_USERS: $ADMIN_USERS
-      LTI_ID_KEY: "${LTI_ID_KEY:-}"
-      LTI_ID_REGEX: "${LTI_ID_REGEX:-}"
-      LTI_ADMIN_ROLES: "${LTI_ADMIN_ROLES:-}"
+      LTI_ID_KEYS: '${LTI_ID_KEYS:-}'
+      LTI_ID_REGEXES: '${LTI_ID_REGEXES:-}'
+      LTI_ADMIN_ROLES: '${LTI_ADMIN_ROLES:-}'
     baseUrl: "$BASE_URL"
     image:
       name: oneilsh/ktesting-k8s-hub
