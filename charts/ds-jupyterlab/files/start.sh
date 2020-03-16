@@ -226,6 +226,8 @@ check_nb_user() {
   # if the user is labeled an admin, ensure they are in the admins group, otherwise ensure they aren't
   if [[ "$ADMIN_USER" == "True" ]]; then
     grep -E "^$NB_USER\$" $ADMIN_HOME_DIR/automanaged/etc_group_admins || echo $NB_USER >> $ADMIN_HOME_DIR/automanaged/etc_group_admins
+    ## and remove group permissions so admins can get some privacy, sheesh - actually, let's not, but we could someday
+    # chmod -R og-rwx /home/$NB_USER
   else
     sed -r -i "/^$NB_USER$/d" $ADMIN_HOME_DIR/automanaged/etc_group_admins
   fi
