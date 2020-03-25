@@ -1,0 +1,47 @@
+<EntityDescriptor xmlns="urn:oasis:names:tc:SAML:2.0:metadata" xmlns:ds="http://www.w3.org/2000/09/xmldsig#" xmlns:shibmd="urn:mace:shibboleth:metadata:1.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" entityID="https://login.oregonstate.edu/idp/shibboleth">
+
+    <IDPSSODescriptor protocolSupportEnumeration="urn:oasis:names:tc:SAML:2.0:protocol">
+
+        <Extensions>
+            <shibmd:Scope regexp="false">oregonstate.edu</shibmd:Scope>
+        </Extensions>
+
+        <KeyDescriptor>
+            <ds:KeyInfo>
+                <ds:X509Data>
+                    <ds:X509Certificate>
+MIIDPzCCAiegAwIBAgIUEfvjo0YbOpCuYoilEkORPgg2kOEwDQYJKoZIhvcNAQEF
+BQAwIDEeMBwGA1UEAxMVbG9naW4ub3JlZ29uc3RhdGUuZWR1MB4XDTEyMTAxMjE5
+NDk1NloXDTMyMTAxMjE5NDk1NlowIDEeMBwGA1UEAxMVbG9naW4ub3JlZ29uc3Rh
+dGUuZWR1MIIBIjANBgkqhkiG9w0BAQEFAAOCAQ8AMIIBCgKCAQEAg9NvfUSFgi3N
+s7kiPBjUgBB5WOezJo4yGOaOR5H1AiKdbcWz7xXbK47AG8ysj0C1BZV0x7g0G1GI
+SMBn6rWU5nMMOn0/yoICt1aAlgrcCY4FkKnWUBi4H4Qzt16QGFT8hz3/BdD+/G+N
+V59hGEOIdwr5RVV+2ELLobeMEGQ5fyffc0DYvxq55gN7FvtgYWjLzRrLOC+9nhAU
+YlCi8HHyNkSqLVEX/rKBsURQrGUG/D/1EXlRrpA29LxBrcg91iQoRSH/78rs43WH
+VOra3IONWJxClt0wGLvyiGh8/Ty5zZbV4UYwYNeqOhHtFAnyqQ0kSXOqfHNMsCZB
+wcvYFND2ywIDAQABo3EwbzBOBgNVHREERzBFghVsb2dpbi5vcmVnb25zdGF0ZS5l
+ZHWGLGh0dHBzOi8vbG9naW4ub3JlZ29uc3RhdGUuZWR1L2lkcC9zaGliYm9sZXRo
+MB0GA1UdDgQWBBSgIqH+urOXUrrM+yCzxSm8v5Jf4TANBgkqhkiG9w0BAQUFAAOC
+AQEANnnFrilv6DoifHhRTOZRtfuJFP/3x10kqrJqyGPd/GAiXiXfO6mEnmOiSlC3
+9K07KbOCt/qsoWoW0QQzZgB36CCyuKi7ZZ4zp5oUzQnqPTNPgdaBkj+mwngQ3hjr
+sxXJdu3UN4dUZ8OyDgTO1I3NsA7VYDewpA/DdfrAdisN0coEW7ppeU7BVHFNxBvS
+yfbBaXLdxVLWOh3nAAha2tXUr0FRbZU3rREOVBPKuamYWmGES7Q2WphbBwfOcghx
+CHcq133UmHyK8LQ6SbbyiTBBQuivbhPELucJzIeUoJ7U089J5huDBQendCNS534D
+HcsvwYzQX/yDdIlusEse97Zcnw==
+
+                    </ds:X509Certificate>
+                </ds:X509Data>
+            </ds:KeyInfo>
+        </KeyDescriptor>
+        
+        <NameIDFormat>urn:oasis:names:tc:SAML:2.0:nameid-format:transient</NameIDFormat>
+        <NameIDFormat>urn:oasis:names:tc:SAML:2.0:nameid-format:persistent</NameIDFormat>
+
+        <SingleSignOnService Binding="urn:oasis:names:tc:SAML:2.0:bindings:HTTP-POST" Location="https://login.oregonstate.edu/idp/profile/SAML2/POST/SSO"/>
+
+        <SingleSignOnService Binding="urn:oasis:names:tc:SAML:2.0:bindings:HTTP-POST-SimpleSign" Location="https://login.oregonstate.edu/idp/profile/SAML2/POST-SimpleSign/SSO"/>
+        
+        <SingleSignOnService Binding="urn:oasis:names:tc:SAML:2.0:bindings:HTTP-Redirect" Location="https://login.oregonstate.edu/idp/profile/SAML2/Redirect/SSO"/>
+    </IDPSSODescriptor>
+
+</EntityDescriptor>

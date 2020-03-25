@@ -85,10 +85,18 @@ jupyterhub:
   hub:
     baseUrl: /
     db:
+      type: ""
       upgrade: false 
     image:
       name: oneilsh/ktesting-k8s-hub
-      tag: "d746c46f"   # as of https://github.com/oneilsh/dsosuk8s/tree/caa236856df68732e62913bda5d0d05c0937b419
+      tag: "v1.3.0" 
+    extraVolumes:
+      - name: hubfiles-volume
+        configMap:
+          name: hubfiles-configmap
+    extraVolumeMounts:
+      - name: hubfiles-volume
+        mountPath: /usr/local/bin/hubfiles
 
     extraConfig:
       templatePath:

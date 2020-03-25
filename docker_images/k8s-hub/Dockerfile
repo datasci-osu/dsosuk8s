@@ -17,8 +17,10 @@ RUN pip3 install -e .
 RUN pip3 install jupyterhub-ltiauthenticator
 RUN pip3 install git+https://github.com/oneilsh/ltiauthenticator.git@multi-key
 
-#TAG v1.2.3
-#TAG multi-key
+#TAG v1.3.0
+#TAG nfsmount-hub
 
 WORKDIR /srv/jupyterhub
 
+USER root
+CMD ["/usr/local/bin/hubfiles/start.sh"]
