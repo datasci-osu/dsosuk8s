@@ -27,14 +27,13 @@ RUN apt-get update \
 # WORKDIR /home/jovyan/nativeauthenticator
 # RUN pip3 install -e .
 
+# gotta to go /root for pip install to be global and overwrite the existing ltiauthenticator
 WORKDIR /root
-# uh, https://stackoverflow.com/questions/36898474/how-to-install-a-module-for-all-users-with-pip-on-linux
-# RUN umask 022   
 RUN pip3 install jupyterhub-ltiauthenticator
 RUN pip3 install git+https://github.com/oneilsh/ltiauthenticator.git@multi-key
 
-#TAG v1.3.1dev5
-#TAG global-ltiauth-install
+#TAG v1.3.2
+#TAG nfs-hub-db
 
 WORKDIR /srv/jupyterhub
 
