@@ -50,7 +50,7 @@ fi
 if [[ ! -d $ADMIN_HOME_DIR/automanaged/hub_user_db ]] ; then
   mkdir -p $ADMIN_HOME_DIR/automanaged/hub_user_db
   chown -R $ADMIN_USERNAME:$ADMIN_GROUPNAME $ADMIN_HOME_DIR/automanaged/hub_user_db
-  chmod -R 775 $ADMIN_HOME_DIR/automanaged/hub_user_db
+  chmod -R 770 $ADMIN_HOME_DIR/automanaged/hub_user_db
 fi
 
 echo "relinking /srv/jupyterhub..."
@@ -64,4 +64,4 @@ ls -lah /srv/jupyterhub
 
 
 cd /srv/jupyterhub
-exec sudo -E -H -u $ADMIN_USERNAME jupyterhub --config /etc/jupyterhub/jupyterhub_config.py
+exec sudo -E -H -u $ADMIN_USERNAME -- sh -c 'umask 0007 && jupyterhub --config /etc/jupyterhub/jupyterhub_config.py'
