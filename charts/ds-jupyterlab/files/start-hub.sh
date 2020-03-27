@@ -56,7 +56,7 @@ fi
 echo "relinking /srv/jupyterhub..."
 
 rm -rf /srv/jupyterhub
-ln -s /srv/jupyterhub $ADMIN_HOME_DIR/automanaged/hub_user_db
+ln -s $ADMIN_HOME_DIR/automanaged/hub_user_db /srv/jupyterhub
 
 echo "relinking done;"
 ls -lah /srv

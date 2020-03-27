@@ -1,0 +1,21 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  labels:
+    app: jupyterhub
+    component: hub
+  name: hub
+spec:
+  template:
+    spec:
+      containers:
+      - name: hub
+        command:
+        #- /bin/sh
+        #- "-c"
+        #- "sleep 10000"
+        - /usr/local/bin/start-hub.sh
+        securityContext:
+          capabilities:
+            add:
+            - SYS_ADMIN

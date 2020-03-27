@@ -98,6 +98,7 @@ jupyterhub:
       LTI_ID_KEYS: '${LTI_ID_KEYS:-}'
       LTI_ID_REGEXES: '${LTI_ID_REGEXES:-}'
       LTI_ADMIN_ROLES: '${LTI_ADMIN_ROLES:-}'
+      NFS_SVC_HOME: "$DRIVE_APPNAME"   # same as above
     baseUrl: "$BASE_URL"
     image:
       name: oneilsh/ktesting-k8s-hub
@@ -145,7 +146,8 @@ jupyterhub:
 EOF
 
 
-helm upgrade $HUB_APPNAME $SCRIPT_DIR/.. --namespace $NAMESPACE --timeout 5m0s --atomic --cleanup-on-fail --install --values $TEMPFILE
+helm upgrade $HUB_APPNAME $SCRIPT_DIR/.. --namespace $NAMESPACE --timeout 4m0s --atomic --cleanup-on-fail --install --values $TEMPFILE --post-renderer $SCRIPT_DIR/../kustomizations/kustomizer.sh
+#helm template $HUB_APPNAME $SCRIPT_DIR/.. --namespace $NAMESPACE --values $TEMPFILE --post-renderer $SCRIPT_DIR/../kustomizations/kustomizer.sh
 
 rm $TEMPFILE
 

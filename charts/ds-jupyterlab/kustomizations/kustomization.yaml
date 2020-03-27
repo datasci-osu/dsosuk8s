@@ -1,0 +1,4 @@
+resources:
+  - all.yaml
+patchesStrategicMerge:
+  - patch-hub-container.yaml

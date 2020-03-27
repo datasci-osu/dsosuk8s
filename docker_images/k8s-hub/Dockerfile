@@ -1,5 +1,18 @@
 FROM jupyterhub/k8s-hub:0.9-484ce8e 
 
+USER root
+
+RUN apt-get update \
+ && apt-get install -yq --no-install-recommends \
+    htop \
+    nfs-common \
+    nfs-kernel-server \
+    subversion \
+    sudo \
+    vim \
+ && apt-get clean && rm -rf /var/lib/apt/lists/*
+
+
 # The master has a bunch of bugfixes that need to be pulled
 #RUN pip3 install jupyterhub-nativeauthenticator
 
@@ -9,18 +22,23 @@ FROM jupyterhub/k8s-hub:0.9-484ce8e
 # to use the fancy template (https://github.com/jupyterhub/nativeauthenticator/pull/79)
 # add c.JupyterHub.template_paths = ["/usr/local/lib/nativeauthenticator/nativeauthenticator/templates/"] to config
 # (/home/jovyan is the container user, so that's where we have write/install privs other than /tmp)
-WORKDIR /home/jovyan
-RUN git clone https://github.com/oneilsh/nativeauthenticator.git
-WORKDIR /home/jovyan/nativeauthenticator
-RUN pip3 install -e .
+# WORKDIR /home/jovyan
+# RUN git clone https://github.com/oneilsh/nativeauthenticator.git
+# WORKDIR /home/jovyan/nativeauthenticator
+# RUN pip3 install -e .
 
+WORKDIR /root
+# uh, https://stackoverflow.com/questions/36898474/how-to-install-a-module-for-all-users-with-pip-on-linux
+# RUN umask 022   
 RUN pip3 install jupyterhub-ltiauthenticator
 RUN pip3 install git+https://github.com/oneilsh/ltiauthenticator.git@multi-key
 
-#TAG v1.3.0
-#TAG nfsmount-hub
+#TAG v1.3.1dev5
+#TAG global-ltiauth-install
 
 WORKDIR /srv/jupyterhub
 
-USER root
-CMD ["/usr/local/bin/hubfiles/start.sh"]
+
+# TODO: These can prolly be removed since I'm now specifying the command with kustomize (helm post install)
+ENTRYPOINT ["/bin/sh", "-c"]
+CMD ["/usr/local/bin/start-hub.sh"]
