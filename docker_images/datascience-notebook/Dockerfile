@@ -94,9 +94,10 @@ RUN apt-get update \
 RUN pip install bash_kernel
 RUN python -m bash_kernel.install
 RUN pip install jupyter_contrib_nbextensions && jupyter contrib nbextension install 
+RUN pip install nbresuse
 
-#TAG v1.1.4
-#TAG added-nbextensions
+#TAG v1.1.5
+#TAG added-nbresuse
 
 USER $NB_USER
 

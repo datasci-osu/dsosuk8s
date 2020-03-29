@@ -110,7 +110,7 @@ jupyterhub:
 
     extraConfig:
       templatePath:
-        c.JupyterHub.template_paths = ['/home/.hub_local/announcement_templates']
+        c.JupyterHub.template_paths = ['/nfs_home/.hub_local/announcement_templates']
       basedir: |
         c.KubeSpawner.notebook_dir = "/home"
 
