@@ -116,13 +116,18 @@ check_admin_config() {
   fi
   
   PYTHONVERSION=`python -c 'import sys; v = sys.version_info; print("python" + str(v[0]) + "." + str(v[1]))'`
-  if [[ ! -d $ADMIN_HOME_DIR/python_libs/lib/$PYTHONVERSION/site-packages ]] ; then
+  if [[ ! -d $ADMIN_HOME_DIR/python_libs/lib/$PYTHONVERSION/site-packages/ ]] ; then
     mkdir -p $ADMIN_HOME_DIR/python_libs/lib/$PYTHONVERSION/site-packages
+    mkdir -p $ADMIN_HOME_DIR/python_libs/jupyterlab
+    rm -rf /opt/conda/share/jupyter/lab/staging
+    cp -r /opt/conda/share/jupyter/lab/* $ADMIN_HOME_DIR/python_libs/jupyterlab/
     echo "Hub-wide python packages can be installed here, but note that you must use $ADMIN_HOME_DIR/bin/hubpip to make the installations work properly." > $ADMIN_HOME_DIR/python_libs/README.txt
     chown -R $ADMIN_USERNAME:$ADMIN_GROUPNAME $ADMIN_HOME_DIR/python_libs
     chmod -R 775 $ADMIN_HOME_DIR/python_libs
     chmod 664 $ADMIN_HOME_DIR/python_libs/README.txt
   fi
+
+
    
   if [[ ! -f $ADMIN_HOME_DIR/autoexec_by_python_notebooks.py ]] ; then
     cp -L /usr/local/bin/various/autoexec_by_python_notebooks.py $ADMIN_HOME_DIR/autoexec_by_python_notebooks.py
@@ -286,6 +291,7 @@ main_setup() {
   # note that this is specific to the image RStudio install
   PATH="${PATH}:/usr/lib/rstudio-server/bin"
   LD_LIBRARY_PATH="/usr/lib/R/lib:/lib:/usr/lib/x86_64-linux-gnu:/usr/lib/jvm/java-7-openjdk-amd64/jre/lib/amd64/server:/opt/conda/lib/R/lib"
+  JUPYTERLAB_DIR=$ADMIN_HOME_DIR/python_libs/jupyterlab
 }
 
 main_setup
@@ -315,4 +321,4 @@ hostname $HOSTNM
 
 # using bash -c causes the stuff in /etc/profile to be picked up
 #exec sudo -E -H -u $NB_USER PATH=$PATH XDG_CACHE_HOME=/home/$NB_USER/.cache PYTHONPATH=${PYTHONPATH:-} LD_LIBRARY_PATH=${LD_LIBRARY_PATH:-} bash -c "$cmd"  
-exec sudo -E -H -u $NB_USER PATH=$PATH R_LIBS_SITE=${R_LIBS_SITE:-} XDG_CACHE_HOME=/home/$NB_USER/.cache PYTHONPATH=${PYTHONPATH:-} LD_LIBRARY_PATH=${LD_LIBRARY_PATH:-} bash -c "$cmd"  
+exec sudo -E -H -u $NB_USER PATH=$PATH R_LIBS_SITE=${R_LIBS_SITE:-} XDG_CACHE_HOME=/home/$NB_USER/.cache JUPYTERLAB_DIR=${JUPYTERLAB_DIR:-} PYTHONPATH=${PYTHONPATH:-} LD_LIBRARY_PATH=${LD_LIBRARY_PATH:-} bash -c "$cmd"
