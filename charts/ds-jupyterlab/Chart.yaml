@@ -1,17 +1,20 @@
-name: ds-jupyterlab
-version: 0.1.1
-appVersion: 0.9
-description: JupyerLab with Python, Julia, R Support (no RStudio)
-icon: file://../icon.svg
+apiVersion: v1
+description: JupyerLab with Python, Julia, R, RStudio, Shiny
+icon: file://icon.svg
+engine: gotpl
+home: https://github.com/oneilsh/ktesting
 keywords:
+- jupyter
 - lab
 - python
 - R
 - julia
-home: https://github.com/oneilsh/ktesting
-sources:
-  - https://github.com/oneilsh/ktesting
+- rstudio
+- shiny
 maintainers:
-- name: Shawn
-  email: oneilsh@gmail.com
-engine: gotpl
+- email: oneilsh@gmail.com
+  name: Shawn
+name: ds-jupyterlab
+sources:
+- https://github.com/oneilsh/ktesting
+version: 1.1.1
