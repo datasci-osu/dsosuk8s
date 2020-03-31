@@ -1,8 +1,8 @@
 apiVersion: v1
 description: JupyerLab with Python, Julia, R, RStudio, Shiny
-icon: file://icon.svg
 engine: gotpl
 home: https://github.com/oneilsh/ktesting
+icon: file://icon.svg
 keywords:
 - jupyter
 - lab
@@ -17,4 +17,4 @@ maintainers:
 name: ds-jupyterlab
 sources:
 - https://github.com/oneilsh/ktesting
-version: 1.1.1
+version: 1.1.1+4dba869

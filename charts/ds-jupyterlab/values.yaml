@@ -46,7 +46,7 @@ jupyterhub:
       guarantee: null
     image:
       name: oneilsh/ktesting-datascience-notebook
-      tag: "1d47a65a" # as of https://github.com/oneilsh/dsosuk8s/tree/caa236856df68732e62913bda5d0d05c0937b419
+      tag: "v1.1.5"
     defaultUrl: "/lab/tree/{username}"
     cmd: ["start-singleuser.sh", "--allow-root"]  # don't think I need to add --allow-root... 
     storage:
@@ -90,7 +90,7 @@ jupyterhub:
       upgrade: false 
     image:
       name: oneilsh/ktesting-k8s-hub
-      tag: "v1.3.0" 
+      tag: "v1.3.2" 
     uid: 0
     fsgid: 0
     extraVolumes:
