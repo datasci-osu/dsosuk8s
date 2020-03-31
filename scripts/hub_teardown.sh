@@ -28,7 +28,7 @@ fi
 $GIT_ROOT/charts/ds-jupyterlab/scripts/teardown_from_settings.sh $1
 
 if [ ! -z $DONT_REMOVE_NAMESPACE ]; then
-  $GIT_ROOT/charts/drive/scripts/teardown_from_settings.sh $1
+  $GIT_ROOT/charts/nfs-drive/scripts/teardown_from_settings.sh $1
 else
-  $GIT_ROOT/charts/drive/scripts/teardown_from_settings.sh $1 --remove-namespace
+  $GIT_ROOT/charts/nfs-drive/scripts/teardown_from_settings.sh $1 --remove-namespace
 fi

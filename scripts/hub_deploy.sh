@@ -36,6 +36,6 @@ if [ "$#" -ne 1 ]; then
   exit 1
 fi
 
-$GIT_ROOT/charts/drive/scripts/deploy_from_settings.sh "$@"
+$GIT_ROOT/charts/nfs-drive/scripts/deploy_from_settings.sh "$@"
 $GIT_ROOT/charts/ds-jupyterlab/scripts/deploy_from_settings.sh "$@"
 

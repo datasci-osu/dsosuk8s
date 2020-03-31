@@ -2,10 +2,9 @@ apiVersion: v1
 entries:
   ds-jupyterlab:
   - apiVersion: v1
-    created: "2020-03-31T14:35:40.885882-07:00"
+    created: "2020-03-31T15:15:42.408591-07:00"
     description: JupyerLab with Python, Julia, R, RStudio, Shiny
-    digest: fff9cbea1b633a0bdf68f386e2df3d818582bc1667bf48ae4da0be7e1cf5e485
-    home: https://github.com/oneilsh/ktesting
+    digest: a9c56d09960db42677f7c6bc01838cc1cd763be346b92b68723d63dfe0cf1d26
     icon: file://icon.svg
     keywords:
     - jupyter
@@ -16,12 +15,141 @@ entries:
     - rstudio
     - shiny
     maintainers:
-    - email: oneilsh@gmail.com
-      name: Shawn
+    - email: shawn.oneil@oregonstate.edu
+      name: Shawn T O'Neil
     name: ds-jupyterlab
-    sources:
-    - https://github.com/oneilsh/ktesting
     urls:
     - ds-jupyterlab-1.1.1.tgz
     version: 1.1.1
-generated: "2020-03-31T14:35:40.871584-07:00"
+  eksctl-autoscaler:
+  - apiVersion: v1
+    created: "2020-03-31T15:15:42.409689-07:00"
+    description: Autoscaler for eksctl-based clusters, based on https://github.com/kubernetes/autoscaler/tree/master/cluster-autoscaler/cloudprovider/aws,
+      specifically auto-discovery but using kubernetes.io/cluster/eksdevd tag instead
+      of adding a special tag as indicated by the docs.
+    digest: c236857feaf890490cdadea4126a7fbf4f4fb4dbc60ca73f6a1c27164f348010
+    icon: file://icon.png
+    keywords:
+    - kubernetes
+    - aws
+    - eks
+    - autoscaler
+    maintainers:
+    - email: shawn.oneil@oregonstate.edu
+      name: Shawn T O'Neil
+    name: eksctl-autoscaler
+    urls:
+    - eksctl-autoscaler-1.tgz
+    version: "1"
+  grafana:
+  - apiVersion: v1
+    appVersion: 6.6.0
+    created: "2020-03-31T15:15:42.41259-07:00"
+    description: The leading tool for querying and visualizing time series and metrics.
+      (Fork for custom deployment by Shawn O'Neil)
+    digest: 24693ba14fad680c7523e176273575bdea4552f8b10b53bf9c0cd301edf0c7e0
+    home: https://grafana.net
+    icon: https://raw.githubusercontent.com/grafana/grafana/master/public/img/logo_transparent_400x.png
+    kubeVersion: ^1.8.0-0
+    maintainers:
+    - email: zanhsieh@gmail.com
+      name: zanhsieh
+    - email: rluckie@cisco.com
+      name: rtluckie
+    - email: maor.friedman@redhat.com
+      name: maorfr
+    - email: shawn.oneil@oregonstate.edu
+      name: Shawn T O'Neil
+    name: grafana
+    sources:
+    - https://github.com/grafana/grafana
+    urls:
+    - grafana-4.6.3.tgz
+    version: 4.6.3
+  nfs-drive:
+  - apiVersion: v1
+    created: "2020-03-31T15:15:42.413944-07:00"
+    description: Spawns an NFS server for use by applications.
+    digest: 760d51f83cd02428eb679a095ed5b33902063411d3772b58713499251f29a759
+    icon: file://icon.svg
+    keywords:
+    - nfs
+    - drive
+    - volume
+    maintainers:
+    - email: shawn.oneil@oregonstate.edu
+      name: Shawn T O'Neil
+    name: nfs-drive
+    urls:
+    - nfs-drive-1.tgz
+    version: "1"
+  nginx-ingress:
+  - apiVersion: v1
+    created: "2020-03-31T15:15:42.41613-07:00"
+    description: Nginx ingress controller built on https://github.com/nginxinc/kubernetes-ingress/tree/master/deployments/helm-chart.
+    digest: 6b8e33356b378fcecfea1e9e3ce2c710174a368374ef3b2192cbc551a0eed1bc
+    icon: file://icon.svg
+    keywords:
+    - nginx
+    - ingress
+    maintainers:
+    - email: shawn.oneil@oregonstate.edu
+      name: Shawn T O'Neil
+    name: nginx-ingress
+    urls:
+    - nginx-ingress-1.tgz
+    version: "1"
+  prometheus:
+  - apiVersion: v1
+    appVersion: 2.15.2
+    created: "2020-03-31T15:15:42.421378-07:00"
+    description: Prometheus is a monitoring system and time series database. (Fork
+      for custom deployment by Shawn O'Neil)
+    digest: 0aee584cbbf8c447d80d0fa541e5d88d38f0c09ecadee3c0e72e16c4fa4706f7
+    home: https://prometheus.io/
+    icon: https://raw.githubusercontent.com/prometheus/prometheus.github.io/master/assets/prometheus_logo-cb55bb5c346.png
+    maintainers:
+    - email: gianrubio@gmail.com
+      name: gianrubio
+    - email: zanhsieh@gmail.com
+      name: zanhsieh
+    - email: shawn.oneil@oregonstate.edu
+      name: Shawn T O'Neil
+    name: prometheus
+    sources:
+    - https://github.com/prometheus/alertmanager
+    - https://github.com/prometheus/prometheus
+    - https://github.com/prometheus/pushgateway
+    - https://github.com/prometheus/node_exporter
+    - https://github.com/kubernetes/kube-state-metrics
+    urls:
+    - prometheus-10.4.0.tgz
+    version: 10.4.0
+  velero:
+  - apiVersion: v1
+    appVersion: 1.2.0
+    created: "2020-03-31T15:15:42.425992-07:00"
+    description: A Helm chart for velero (Fork for custom deployment by Shawn O'Neil)
+    digest: e67fa1d258f64116799163359ed3249a76e965ffa0bb0c6c6dc01368601d2925
+    home: https://github.com/vmware-tanzu/velero
+    icon: https://cdn-images-1.medium.com/max/1600/1*-9mb3AKnKdcL_QD3CMnthQ.png
+    maintainers:
+    - email: d-caruso@hotmail.it
+      name: domcar
+    - email: hfernandez@mesosphere.com
+      name: hectorj2f
+    - email: brubakern@vmware.com
+      name: nrb
+    - email: carlisiac@vmware.com
+      name: carlisia
+    - email: ashisham@vmware.com
+      name: ashish-amarnath
+    - email: shawn.oneil@oregonstate.edu
+      name: Shawn T O'Neil
+    name: velero
+    sources:
+    - https://github.com/vmware-tanzu/velero
+    urls:
+    - velero-2.8.8.tgz
+    version: 2.8.8
+generated: "2020-03-31T15:15:42.401537-07:00"

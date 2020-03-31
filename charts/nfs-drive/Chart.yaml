@@ -1,10 +1,11 @@
 apiVersion: v1
-name: nginx-ingress
+name: nfs-drive
 icon: file://icon.svg
-description: Nginx ingress controller built on https://github.com/nginxinc/kubernetes-ingress/tree/master/deployments/helm-chart.
+description: Spawns an NFS server for use by applications.
 keywords:
-- nginx
-- ingress
+- nfs
+- drive
+- volume
 maintainers:
 - email: shawn.oneil@oregonstate.edu
   name: Shawn T O'Neil

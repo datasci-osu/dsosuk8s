@@ -44,7 +44,7 @@ kubectl config set-context --current --namespace $DIRNAME
 # name the release with the dirname as well since helm release names must be unique cluster-wide
 if ! kubectl get pods -n $DIRNAME | grep -E ".nfsdrive-$DIRNAME.*Running.*"; then
   # setting namespace probably not necessary (since helm releases aren't really namespaced), but shouldn't hurt
-  helm upgrade nfsdrive-$DIRNAME $SCRIPT_DIR/../../charts/drive/v0.8/ \
+  helm upgrade nfsdrive-$DIRNAME $SCRIPT_DIR/../../charts/nfs-drive/v0.8/ \
 	--install \
 	--namespace $DIRNAME \
 	--set size=2Gi \

@@ -101,7 +101,7 @@ For per-Hub shared storage, we are currently using in-cluster NFS servers backed
 These applications are deployed as StatefulSets of size 1, 
 to prevent accidental data loss in the case of node or container crash, or accidental deletion of the servers. However, the nature of these EBS-backed
 volumes is that they can get "stuck" if they are deleted *before* other components accessing them. (Though it's not unfixable.) See the `app-readme.md`
-file in `charts/drive/latest/` for details. (Earlier iteractions deployed them as Deployments, meaning the volumes would be automatically removed
+file in `charts/nfs-drive/latest/` for details. (Earlier iteractions deployed them as Deployments, meaning the volumes would be automatically removed
 when the deployment was deleted. This should be reasonably safe as it reschedules in the event of node or container failure, and only doesn't protect
 against accidental deletion via admin error.)
 
