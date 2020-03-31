@@ -10,8 +10,6 @@ usage () {
   echo "AUTH_TYPE=lti" 1>&2
   echo "ADMIN_USERS=oneils,smithj" 1>&2
   echo "BASE_URL=/example-hub/" 1>&2
-  echo "HUB_IMAGE=v1.2.1"
-  echo "USER_IMAGE=v1.1.4" 1>&2
   echo "NUM_PLACEHOLDERS=2" 1>&2
   echo "MEM_GUARANTEE=0.5G" 1>&2
   echo "MEM_LIMIT=1G" 1>&2
@@ -21,6 +19,7 @@ usage () {
   echo "CLUSTER_HOSTNAME=dev.host.edu" 1>&2
   echo "NAMESPACE=example" 1>&2
   echo "KUBE_CONTEXT=devB" 1>&2
+  echo "SECURITY_SALT=anything-alphanumeric-and-_s" 1>&2 
   echo "" 1>&2
   echo "If AUTH_TYPE=lti, the following or similar should also be set:" 1>&2
   echo "LTI_ID_KEYS='[\"custom_canvas_user_login_id\"]  # the key returned by the LTI API holding usernames" 1>&2
@@ -44,8 +43,6 @@ validate_set HUB_APPNAME "$HUB_APPNAME" "^[[:alnum:]_-]+$" required
 validate_set AUTH_TYPE "$AUTH_TYPE" "^(lti|saml|native|dummy)$" required
 validate_set ADMIN_USERS "$ADMIN_USERS" "^([[:alnum:]]+\,)*([[:alnum:]]+)$" required
 validate_set BASE_URL "$BASE_URL" "^/[[:alnum:]_-]+/$" required
-validate_set HUB_IMAGE "$HUB_IMAGE" ".*" required
-validate_set USER_IMAGE "$USER_IMAGE" ".*" required
 validate_set NUM_PLACEHOLDERS "$NUM_PLACEHOLDERS" "^[[:digit:]]+$" required
 validate_set MEM_GUARANTEE "$MEM_GUARANTEE" "^([[:digit:]]*\.)?([[:digit:]]+)G$" required
 validate_set MEM_LIMIT "$MEM_LIMIT" "^([[:digit:]]*\.)?([[:digit:]]+)G$" required
@@ -56,6 +53,7 @@ validate_set HUB_APPNAME "$HUB_APPNAME" ".*" required
 validate_set CLUSTER_HOSTNAME "$CLUSTER_HOSTNAME" "^([[:alnum:]_-]+\.)*([[:alnum:]_-]+)$" required
 validate_set NAMESPACE "$NAMESPACE" "^[[:alnum:]_-]+$" required
 validate_set KUBE_CONTEXT "$KUBE_CONTEXT" "^[[:alnum:]_-]+$" required
+validate_set SECURITY_SALT "$SECURITY_SALT" "^[[:alnum:]_-]+$" required
 
 if [ $AUTH_TYPE == "lti" ]; then
   if [[ -z $LTI_ID_KEYS || -z $LTI_ID_REGEXES || -z $LTI_ADMIN_ROLES ]]; then
@@ -80,8 +78,8 @@ echo "${yellow}Installing $HUB_APPNAME ... ${white}"
 echo ""
 
 # keys needed for canvas repeatable, hashed based on URL, kube context name, and admin users list
-LTI_CLIENT_KEY=$(echo ${CLUSTER_HOSTNAME}${BASE_URL}${KUBE_CONTEXT}${ADMIN_USERS} | sha256sum | awk '{print $1}')
-LTI_CLIENT_SECRET=$(echo ${ADMIN_USERS}${BASE_URL}${CLUSTER_HOSTNAME}${KUBE_CONTEXT} | sha256sum | awk '{print $1}')
+LTI_CLIENT_KEY=$(echo ${CLUSTER_HOSTNAME}${BASE_URL}${KUBE_CONTEXT}${ADMIN_USERS}${SECURITY_SALT} | sha256sum | awk '{print $1}')
+LTI_CLIENT_SECRET=$(echo ${SECURITY_SALT}${ADMIN_USERS}${BASE_URL}${CLUSTER_HOSTNAME}${KUBE_CONTEXT} | sha256sum | awk '{print $1}')
 
 #cat <<EOF | helm template $SCRIPT_DIR/.. --values -
 # this bug: https://github.com/helm/helm/issues/7002
@@ -100,9 +98,6 @@ jupyterhub:
       LTI_ADMIN_ROLES: '${LTI_ADMIN_ROLES:-}'
       NFS_SVC_HOME: "$DRIVE_APPNAME"   # same as above
     baseUrl: "$BASE_URL"
-    image:
-      name: oneilsh/ktesting-k8s-hub
-      tag: "$HUB_IMAGE"
 
   scheduling:
     userPlaceholder:
@@ -125,16 +120,9 @@ jupyterhub:
     cpu:
       limit: $CPU_LIMIT
       guarantee: $CPU_GUARANTEE
-    image:
-      name: oneilsh/ktesting-datascience-notebook
-      tag: "$USER_IMAGE" 
-    defaultUrl: "/lab/tree/{username}"
 
     extraEnv:
       NFS_SVC_HOME: "$DRIVE_APPNAME"   # same as above
-
-    uid: 0
-    fsGid: 0
 
   ingress:
     hosts:

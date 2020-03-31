@@ -20,16 +20,16 @@ jupyterhub:
         matchNodePurpose: require
     userPlaceholder:
       enabled: true
-      replicas: 5
+      replicas: 1
 
   cull:
     enabled: true
     timeout: 3600    # cull inactive servers after this long
     every: 600       # how often to check 
-    maxAge: 0        # cull servers this old, even if active (0 disables)
+    maxAge: 28800        # cull servers this old, even if active (0 disables)
 
   proxy:
-    # TODO: don't hard code this; either generate psuedo-randomly, or ask user for salt and generate
+    # this should get replaced when deployed with scripts/deploy_from_settings.sh
     secretToken: "78767972dd3d0db5a98fb56554f4484daa57bc35bd73dc61aafebed8ac9fe3df"
     service: 
       type: ClusterIP
@@ -39,11 +39,11 @@ jupyterhub:
   singleuser:
     # looks like these should be set null to delete the key (including those defaulted in the jupyterhub chart) for the c.Spawner limits below to be used
     memory:
-      limit: null
-      guarantee: null
+      limit: 1.0G
+      guarantee: 0.5G
     cpu:
-      limit: null
-      guarantee: null
+      limit: 1.0
+      guarantee: 0.1
     image:
       name: oneilsh/ktesting-datascience-notebook
       tag: "v1.1.5"
@@ -78,10 +78,10 @@ jupyterhub:
       nginx.org/mergeable-ingress-type: "minion"
       nginx.org/websocket-services: "proxy-public"
     hosts:
-    - eksdevd.dsosu.us 
+    - dummy.value.org 
     tls:
     - hosts:
-      - eksdevd.dsosu.us
+      - dummy.value.org
 
   hub:
     baseUrl: /
