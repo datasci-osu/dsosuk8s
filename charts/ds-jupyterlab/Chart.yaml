@@ -17,4 +17,4 @@ maintainers:
 name: ds-jupyterlab
 sources:
 - https://github.com/oneilsh/ktesting
-version: 1.1.1+4dba869
+version: 1.1.1
