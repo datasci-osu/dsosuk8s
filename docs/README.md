@@ -1,0 +1,3 @@
+# DS@OSU Charts Repo
+
+This is the Helm chart repo - see index.yaml.
