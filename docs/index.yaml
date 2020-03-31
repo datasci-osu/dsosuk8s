@@ -1,0 +1,27 @@
+apiVersion: v1
+entries:
+  ds-jupyterlab:
+  - apiVersion: v1
+    created: "2020-03-31T14:35:40.885882-07:00"
+    description: JupyerLab with Python, Julia, R, RStudio, Shiny
+    digest: fff9cbea1b633a0bdf68f386e2df3d818582bc1667bf48ae4da0be7e1cf5e485
+    home: https://github.com/oneilsh/ktesting
+    icon: file://icon.svg
+    keywords:
+    - jupyter
+    - lab
+    - python
+    - R
+    - julia
+    - rstudio
+    - shiny
+    maintainers:
+    - email: oneilsh@gmail.com
+      name: Shawn
+    name: ds-jupyterlab
+    sources:
+    - https://github.com/oneilsh/ktesting
+    urls:
+    - ds-jupyterlab-1.1.1.tgz
+    version: 1.1.1
+generated: "2020-03-31T14:35:40.871584-07:00"
