@@ -1,7 +1,5 @@
 #!/bin/bash
 
-GIT_ROOT=$(git rev-parse --show-toplevel)
-
 black="$(tput setaf 0)"
 red="$(tput setaf 1)"
 green="$(tput setaf 2)"
@@ -16,27 +14,34 @@ validate_set () {
   local paramname=$1
   local paramvalue=$2
   local regex=$3
-  local required=$4
+  local default=$4
 
-  if [ $# != 4 ] || ! $(echo $required | grep -Eq "required|notrequired"); then
-    echo "${red}Error, validate_set usage: validate_set <VARNAME> <value> <regex> <required|notrequired>" 1>&2
-    echo "<value> may be an empty string (if notrequired is set) but cannot be nothing:" 1>&2
-    echo "validate_set MYVAR \"\$1\" \".*\" notrequired  # works if \$1 is not set" 1>&2
-    echo "validate_set MYVAR \$1 \".*\" notrequired    # does not works if \$1 is not set." 1>&2
-    echo "got: '$@' ${white}"
+
+  if [ $# != 4 ]; then
+    echo "${red}Error, validate_set usage: validate_set <VARNAME> <value> <regex> <default>" 1>&2
+    echo "<value> and <default> may be empty strings but cannot be nothing;" 1>&2
+    echo "<default> will only be used if <value> is an empty string" 1>&2
+    echo "# set SOME_INT to 3" 1>&2
+    echo "validate_set SOME_INT 3 '^[[:digit:]+]$' ''" 1>&2
+    echo "# set SOME_INT to the value of \$INPUT, checking against the regex, with a default of 0 if \$INPUT isn't set or is set to '':" 1>&2
+    echo "# (note that if the regex doesn't match it will error no matter what, so this will only use the default if \$INPUT isn't set or is empty AND the regex matches '')" 1>&2
+    echo "validate_set SOME_INT \"\$INPUT\" '^([[:digit:]+])?$' 0" 1>&2
+    echo "got: '$@' ${white}" 1>&2
     exit 1
   fi
 
   if [ "${paramvalue}" != "" ]; then
     if $(echo ${paramvalue} | grep -Eq "${regex}"); then
-      eval "${paramname}=${paramvalue}"
+      eval "${paramname}=\"${paramvalue}\""
     else
       echo "${red}Error, '${paramname}' value '${paramvalue}' does not match regex \"${regex}\". Exiting.${white}" 1>&2
       exit 1
     fi
   else
-    if [ "${required}" == "required" ]; then
-      echo "${red}Error, ${paramname} is required. Exiting.${white}" 1>&2
+    if $(echo ${default} | grep -Eq "${regex}"); then
+      eval "${paramname}=\"${default}\""
+    else
+      echo "${red}Error, \"${paramname}\" default value \"${default}\" does not match regex \"${regex}\". Exiting.${white}" 1>&2
       exit 1
     fi
   fi
@@ -51,4 +56,31 @@ find-up () {
     curpath=${curpath%/*}
   done
   echo "$curpath"
+}
+
+md5sum-dir () {
+  if [ $# != 1 ]; then
+    echo "Usage: md5sum-dir <path>" 1>&2
+  fi
+  find $1 -exec md5sum {} \; 2>/dev/null | awk '{print $1}' | sort | md5sum | awk '{print $1}'
+}
+
+safe-delete-namespace () {
+  if [ $# != 2 ]; then
+    echo "Usage: safe-delete-namespace kube-context namespace" 1>&2
+  fi
+
+  local KUBE_CONTEXT=$1
+  local NAMESPACE=$2
+
+  kubectl config use-context $KUBE_CONTEXT
+
+  echo "${yellow}Trying to delete namespace, checking if empty... ${white}"
+  result=$(kubectl get all --namespace $NAMESPACE)
+  if [ ! -z "$result" ]; then
+    echo "${yellow}Warning: Not removing namespace $NAMESPACE, resources still exist:\n\n$result" 1>&2
+    exit 1
+  fi
+
+  kubectl delete namespace $NAMESPACE
 }

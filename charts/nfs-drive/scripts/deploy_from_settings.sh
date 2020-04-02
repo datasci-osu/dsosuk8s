@@ -1,16 +1,20 @@
 #!/bin/bash
 
-GIT_ROOT=$(git rev-parse --show-toplevel)
-source $GIT_ROOT/scripts/utils.src
+set -e 
+
+SCRIPT_DIR=$(realpath $(dirname ${BASH_SOURCE:-$_}))
+SETTINGS_DIR=$(realpath $(dirname $1))
+source $SCRIPT_DIR/utils.src
 
 usage () {
   echo "Usage: $0  settings.vars" 1>&2
   echo "Where settings.vars contains at least these vars:" 1>&2
-  echo "HOMEDRIVE_SIZE=4Gi" 1>&2
-  echo "NAMESPACE=example-namespace" 1>&2
-  echo "DRIVE_APPNAME=example-drive" 1>&2
+  echo "APPNAME=example-deployment" 1>&2
   echo "KUBE_CONTEXT=devContext" 1>&2
   echo "" 1>&2
+  echo "The following can also be set (defaults shown):" 1>&2
+  echo "HOMEDRIVE_SIZE=40Gi" 1>&2
+  echo "NAMESPACE=\$APPNAME" 1>&2
   exit 1
 }
 
@@ -21,13 +25,12 @@ fi
 
 source $1
 
-SCRIPT_DIR=$(realpath $(dirname ${BASH_SOURCE:-$_}))
-SETTINGS_DIR=$(realpath $(dirname $1))
 
-validate_set HOMEDRIVE_SIZE "$HOMEDRIVE_SIZE" "^([[:digit:]]*\.)?([[:digit:]]+)Gi$" required
-validate_set NAMESPACE "$NAMESPACE" "^[[:alnum:]_-]+$" required
-validate_set DRIVE_APPNAME "$DRIVE_APPNAME" "^[[:alnum:]_-]+$" required
-validate_set KUBE_CONTEXT "$KUBE_CONTEXT" "^[[:alnum:]_-]+$" required
+validate_set APPNAME "$APPNAME" "^[[:alnum:]_-]+$" ""
+validate_set DRIVE_APPNAME "homedrive-$APPNAME" "^[[:alnum:]_-]+$" ""
+validate_set HOMEDRIVE_SIZE "$HOMEDRIVE_SIZE" "^([[:digit:]]*\.)?([[:digit:]]+)Gi$" 40Gi
+validate_set NAMESPACE "$NAMESPACE" "^[[:alnum:]_-]+$" "$APPNAME"
+validate_set KUBE_CONTEXT "$KUBE_CONTEXT" "^[[:alnum:]_-]+$" ""
 
 kubectl config use-context $KUBE_CONTEXT
 
@@ -44,7 +47,7 @@ cat <<EOF > $TEMPFILE
 size: ${HOMEDRIVE_SIZE}
 EOF
 
-helm upgrade $DRIVE_APPNAME $SCRIPT_DIR/.. --namespace $NAMESPACE --timeout 5m0s --atomic --cleanup-on-fail --install --values $TEMPFILE
+helm upgrade $DRIVE_APPNAME $SCRIPT_DIR/.. --namespace $NAMESPACE --timeout 4m0s --atomic --cleanup-on-fail --install --values $TEMPFILE
 
 rm $TEMPFILE
 

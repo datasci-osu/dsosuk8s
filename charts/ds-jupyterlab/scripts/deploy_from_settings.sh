@@ -1,30 +1,42 @@
 #!/bin/bash -e
 
-GIT_ROOT=$(git rev-parse --show-toplevel)
-source $GIT_ROOT/scripts/utils.src
+set -e
+
+SCRIPT_DIR=$(realpath $(dirname ${BASH_SOURCE:-$_}))
+SETTINGS_DIR=$(realpath $(dirname $1))
+source $SCRIPT_DIR/utils.src
 
 usage () {
-  echo "Usage: $0  settings.vars" 1>&2
-  echo "Where settings.vars contains at least these vars (examples shown):" 1>&2
-  echo "HUB_APPNAME=example-hub" 1>&2
-  echo "AUTH_TYPE=lti" 1>&2
-  echo "ADMIN_USERS=oneils,smithj" 1>&2
-  echo "BASE_URL=/example-hub/" 1>&2
-  echo "NUM_PLACEHOLDERS=2" 1>&2
-  echo "MEM_GUARANTEE=0.5G" 1>&2
-  echo "MEM_LIMIT=1G" 1>&2
-  echo "CPU_GUARANTEE=0.1" 1>&2
-  echo "CPU_LIMIT=2" 1>&2
-  echo "DRIVE_APPNAME=example-drive" 1>&2
+  echo "${red}Usage: $0  settings.vars ${white}" 1>&2
+  echo "${red}This script assumes a corresponding nfs-drive app has already been created, and should be called from hub_deploy.sh.${white}"
+  echo "${red}Where settings.vars contains at least these vars (examples shown): ${white}" 1>&2
+  echo "APPNAME=example-deployment" 1>&2
   echo "CLUSTER_HOSTNAME=dev.host.edu" 1>&2
-  echo "NAMESPACE=example" 1>&2
   echo "KUBE_CONTEXT=devB" 1>&2
   echo "SECURITY_SALT=anything-alphanumeric-and-_s" 1>&2 
   echo "" 1>&2
-  echo "If AUTH_TYPE=lti, the following or similar should also be set:" 1>&2
-  echo "LTI_ID_KEYS='[\"custom_canvas_user_login_id\"]  # the key returned by the LTI API holding usernames" 1>&2
-  echo "LTI_ID_REGEXES='[\"(^[^@]+).*\"]'               # regex to extract username from key with (this extracts before the @ in an email)" 1>&2
-  echo "LTI_ADMIN_ROLES='[\"Instructor\"]'   # LTI 'roles' to grant jupterhub admin access to, matched to suffixed returned by LTI API." 1>&2
+  echo "${yellow}The following are optional but recommended to be set (defaults shown): ${white}" 1>&2
+  echo "NUM_PLACEHOLDERS=3" 1>&2
+  echo "MEM_GUARANTEE=0.5G" 1>&2
+  echo "MEM_LIMIT=1G" 1>&2
+  echo "CPU_GUARANTEE=0.1" 1>&2
+  echo "CPU_LIMIT=1" 1>&2
+  echo "" 1>&2
+  echo "${yellow}The following can also be optionally set (defaults shown): ${white}" 1>&2 
+  echo "AUTH_TYPE=lti              # (lti|native|dummy)" 1>&2
+  echo "ADMIN_USERS=oneils,smithj  # ignored if AUTH_TYPE is lti" 1>&2
+  echo "BASE_URL=/\$APPNAME/" 1>&2
+  echo "HUB_APPNAME=hub-\$APPNAME" 1>&2
+  echo "DRIVE_APPNAME=homedrive-\$APPNAME" 1>&2
+  echo "NAMESPACE=\$APPNAME" 1>&2
+  echo "" 1>&2
+  echo "${yellow}If AUTH_TYPE=lti, the following or similar can also be set (defaults shown for OSU Canvas, note JSON encoding): ${white}" 1>&2
+  echo "${blue}# the keys returned by the LTI API holding usernames to search against ${white}" 1>&2
+  echo "LTI_ID_KEYS='[\"custom_canvas_user_login_id\", \"lis_person_contact_email_primary\", \"custom_canvas_user_login_id\"]'" 1>&2
+  echo "${blue}# regexes to extract username from first matching key with ${white}" 1>&2
+  echo "LTI_ID_REGEXES='[\"(^[^@]+)@oregonstate.edu$\", \"(^[^@]+@[^@]+$)\", \"(^[0-9a-f]{6,6})[0-9a-f]*$\"]'" 1>&2
+  echo "${blue}# LTI 'roles' to grant jupterhub admin access to. ${white}" 1>&2
+  echo "LTI_ADMIN_ROLES='[\"Instructor\", \"TeachingAssistant\", \"ContentDeveloper\"]'" 1>&2
   echo "" 1>&2
   exit 1
 }
@@ -36,35 +48,29 @@ fi
 
 source $1
 
-SCRIPT_DIR=$(realpath $(dirname ${BASH_SOURCE:-$_}))
-SETTINGS_DIR=$(realpath $(dirname $1))
 
-validate_set HUB_APPNAME "$HUB_APPNAME" "^[[:alnum:]_-]+$" required
-validate_set AUTH_TYPE "$AUTH_TYPE" "^(lti|saml|native|dummy)$" required
-validate_set ADMIN_USERS "$ADMIN_USERS" "^([[:alnum:]]+\,)*([[:alnum:]]+)$" required
-validate_set BASE_URL "$BASE_URL" "^/[[:alnum:]_-]+/$" required
-validate_set NUM_PLACEHOLDERS "$NUM_PLACEHOLDERS" "^[[:digit:]]+$" required
-validate_set MEM_GUARANTEE "$MEM_GUARANTEE" "^([[:digit:]]*\.)?([[:digit:]]+)G$" required
-validate_set MEM_LIMIT "$MEM_LIMIT" "^([[:digit:]]*\.)?([[:digit:]]+)G$" required
-validate_set CPU_GUARANTEE "$CPU_GUARANTEE" "^([[:digit:]]*\.)?([[:digit:]]+)$" required
-validate_set CPU_LIMIT "$CPU_LIMIT" "^([[:digit:]]*\.)?([[:digit:]]+)$" required
-validate_set DRIVE_APPNAME "$DRIVE_APPNAME" ".*" required
-validate_set HUB_APPNAME "$HUB_APPNAME" ".*" required
-validate_set CLUSTER_HOSTNAME "$CLUSTER_HOSTNAME" "^([[:alnum:]_-]+\.)*([[:alnum:]_-]+)$" required
-validate_set NAMESPACE "$NAMESPACE" "^[[:alnum:]_-]+$" required
-validate_set KUBE_CONTEXT "$KUBE_CONTEXT" "^[[:alnum:]_-]+$" required
-validate_set SECURITY_SALT "$SECURITY_SALT" "^[[:alnum:]_-]+$" required
+validate_set APPNAME "$APPNAME" "^[[:alnum:]_-]+$" ""
+validate_set CLUSTER_HOSTNAME "$CLUSTER_HOSTNAME" "^([[:alnum:]_-]+\.)*([[:alnum:]_-]+)$" ""
+validate_set KUBE_CONTEXT "$KUBE_CONTEXT" "^[[:alnum:]_-]+$" ""
+validate_set SECURITY_SALT "$SECURITY_SALT" "^[[:alnum:]_-]+$" ""
 
-if [ $AUTH_TYPE == "lti" ]; then
-  if [[ -z $LTI_ID_KEYS || -z $LTI_ID_REGEXES || -z $LTI_ADMIN_ROLES ]]; then
-    echo "Whoops, all of LTI_ID_KEYS, LTI_ID_REGEXES, and LTI_ADMIN_ROLES should be set." 1>&2
-    echo "They should also all be valid JSON strings, e.g. '[\"custom_canvas_user_login_id\", \"user_id\"]' for LTI_ID_KEYS." 1>&2
-    exit 1
-  fi
-#  validate_set LTI_ID_KEYS "$LTI_ID_KEYS" ".*$" required
-#  validate_set LTI_ID_REGEXES "$LTI_ID_REGEXES" ".*" required
-#  validate_set LTI_ADMIN_ROLES "$LTI_ADMIN_ROLES" ".*" required
-fi
+validate_set ADMIN_USERS "$ADMIN_USERS" "^(([[:alnum:]]+\,)*([[:alnum:]]+))?$" ""
+validate_set AUTH_TYPE "$AUTH_TYPE" "^(lti|saml|native|dummy)$" lti
+validate_set BASE_URL "$BASE_URL" "^/[[:alnum:]_-]+/$" "/$APPNAME/"
+validate_set NUM_PLACEHOLDERS "$NUM_PLACEHOLDERS" "^[[:digit:]]+$" 3
+validate_set MEM_GUARANTEE "$MEM_GUARANTEE" "^([[:digit:]]*\.)?([[:digit:]]+)G$" 0.5G
+validate_set MEM_LIMIT "$MEM_LIMIT" "^([[:digit:]]*\.)?([[:digit:]]+)G$" 1.0G
+validate_set CPU_GUARANTEE "$CPU_GUARANTEE" "^([[:digit:]]*\.)?([[:digit:]]+)$" 0.1
+validate_set CPU_LIMIT "$CPU_LIMIT" "^([[:digit:]]*\.)?([[:digit:]]+)$" 1.0
+validate_set DRIVE_APPNAME "$DRIVE_APPNAME" "^[[:alnum:]_-]+$" "homedrive-$APPNAME"
+validate_set HUB_APPNAME "$HUB_APPNAME" "^[[:alnum:]_-]+$" "hub-$APPNAME"
+validate_set NAMESPACE "$NAMESPACE" "^[[:alnum:]_-]+$" "$APPNAME"
+# JSON doesn't support single quotes (at least not python's json.loads), so we have to use double-quotes internally
+validate_set LTI_ID_KEYS "$LTI_ID_KEYS" ".+" "[\\\"custom_canvas_user_login_id\\\", \\\"lis_person_contact_email_primary\\\", \\\"custom_canvas_user_login_id\\\"]"
+validate_set LTI_ID_REGEXES "$LTI_ID_REGEXES" ".+" "[\\\"(^[^@]+)@oregonstate.edu$\\\", \\\"(^[^@]+@[^@]+$)\\\", \\\"(^[0-9a-f]{6,6})[0-9a-f]*$\\\"]"
+validate_set LTI_ADMIN_ROLES "$LTI_ADMIN_ROLES" ".+" "[\\\"Instructor\\\", \\\"TeachingAssistant\\\", \\\"ContentDeveloper\\\"]"
+
+### TODO SHAWN: continue refactor from here...
 
 kubectl config use-context $KUBE_CONTEXT
 
@@ -89,10 +95,11 @@ cat <<EOF > $TEMPFILE
 jupyterhub:
   hub:
     extraEnv:
-      AUTH_TYPE: $AUTH_TYPE
-      LTI_CLIENT_KEY: $LTI_CLIENT_KEY
-      LTI_CLIENT_SECRET: $LTI_CLIENT_SECRET
-      ADMIN_USERS: $ADMIN_USERS
+      AUTH_TYPE: "$AUTH_TYPE"
+      LTI_CLIENT_KEY: "$LTI_CLIENT_KEY"
+      LTI_CLIENT_SECRET: "$LTI_CLIENT_SECRET"
+      ADMIN_USERS: "$ADMIN_USERS"
+      # and we use single quotes here cuz the json has double quotes inside...
       LTI_ID_KEYS: '${LTI_ID_KEYS:-}'
       LTI_ID_REGEXES: '${LTI_ID_REGEXES:-}'
       LTI_ADMIN_ROLES: '${LTI_ADMIN_ROLES:-}'
@@ -126,16 +133,14 @@ jupyterhub:
 
   ingress:
     hosts:
-    - $CLUSTER_HOSTNAME
+    - "$CLUSTER_HOSTNAME"
     tls:
     - hosts:
-      - $CLUSTER_HOSTNAME
+      - "$CLUSTER_HOSTNAME"
 
 EOF
 
-
 helm upgrade $HUB_APPNAME $SCRIPT_DIR/.. --namespace $NAMESPACE --timeout 4m0s --atomic --cleanup-on-fail --install --values $TEMPFILE --post-renderer $SCRIPT_DIR/../kustomizations/kustomizer.sh
-#helm template $HUB_APPNAME $SCRIPT_DIR/.. --namespace $NAMESPACE --values $TEMPFILE --post-renderer $SCRIPT_DIR/../kustomizations/kustomizer.sh
 
 rm $TEMPFILE
 
@@ -146,8 +151,8 @@ else
   echo "${green}Finished! Your hub is at ${blue}https://$CLUSTER_HOSTNAME$BASE_URL ${white}"
 fi
 if [ $AUTH_TYPE == "lti" ]; then
-  echo "${green}Your LTI_CLIENT_KEY is ${blue}$LTI_CLIENT_KEY ${white}"
-  echo "${green}Your LTI_CLIENT_SECRET is ${blue}$LTI_CLIENT_SECRET ${white}"
+  echo "${green}Your Consumer Key is ${blue}$LTI_CLIENT_KEY ${white}"
+  echo "${green}Your Shared Secret is ${blue}$LTI_CLIENT_SECRET ${white}"
 fi
 echo ""
 

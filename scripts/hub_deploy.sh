@@ -1,41 +1,60 @@
 #!/bin/bash -e
 
-GIT_ROOT=$(git rev-parse --show-toplevel)
+
+SCRIPT_DIR=$(realpath $(dirname ${BASH_SOURCE:-$_}))
+GIT_ROOT=$(git -C $SCRIPT_DIR rev-parse --show-toplevel)
 source $GIT_ROOT/scripts/utils.src
 
+VARS_PATH=$(realpath $1)
+
 usage () {
-  echo "Usage: $0  settings.vars" 1>&2
-  echo "Where settings.vars contains at least these vars (examples shown):" 1>&2
-  echo "HUB_APPNAME=example-hub" 1>&2
-  echo "AUTH_TYPE=lti" 1>&2
-  echo "ADMIN_USERS=oneils,smithj" 1>&2
-  echo "BASE_URL=/example-hub/" 1>&2
-  echo "HUB_IMAGE=v1.2.1"
-  echo "USER_IMAGE=v1.1.4" 1>&2
-  echo "NUM_PLACEHOLDERS=2" 1>&2
+  echo "${red}Usage: $0  settings.vars ${white}" 1>&2
+  echo "${red}This script assumes a corresponding nfs-drive app has already been created, and should be called from hub_deploy.sh.${white}"
+  echo "${red}Where settings.vars contains at least these vars (examples shown): ${white}" 1>&2
+  echo "APPNAME=example-deployment" 1>&2
+  echo "CLUSTER_HOSTNAME=dev.host.edu" 1>&2
+  echo "KUBE_CONTEXT=devB" 1>&2
+  echo "SECURITY_SALT=anything-alphanumeric-and-_s" 1>&2 
+  echo "DRIVE_CHART=https://datasci-osu.github.io/dsosuk8s/nfs-drive-1.1.0.tgz" 1>&2
+  echo "HUB_CHART=https://datasci-osu.github.io/dsosuk8s/ds-jupyterlab-1.2.0.tgz" 1>&2
+  echo "" 1>&2
+  echo "${yellow}The following are optional but recommended to be set (defaults shown): ${white}" 1>&2
+  echo "NUM_PLACEHOLDERS=3" 1>&2
   echo "MEM_GUARANTEE=0.5G" 1>&2
   echo "MEM_LIMIT=1G" 1>&2
   echo "CPU_GUARANTEE=0.1" 1>&2
-  echo "CPU_LIMIT=2" 1>&2
-  echo "HOMEDRIVE_SIZE=4Gi" 1>&2
-  echo "DRIVE_APPNAME=example-drive" 1>&2
-  echo "CLUSTER_HOSTNAME=dev.host.edu" 1>&2
-  echo "NAMESPACE=example" 1>&2
-  echo "KUBE_CONTEXT=devB" 1>&2
+  echo "CPU_LIMIT=1" 1>&2
+  echo "HOMEDRIVE_SIZE=40Gi" 1>&2
   echo "" 1>&2
-  echo "If AUTH_TYPE=lti, the following or similar should also be set:" 1>&2
-  echo "LTI_ID_KEY=custom_canvas_user_login_id  # the key returned by the LTI API holding usernames" 1>&2
-  echo "LTI_ID_REGEX='(^[^@]+).*'               # regex to extract username from key with (this extracts before the @ in an email)" 1>&2
-  echo "LTI_ADMIN_ROLES='Administrator,:role:ims/lis/Instructor'   # LTI 'roles' to grant jupterhub admin access to, matched to suffixed returned by LTI API." 1>&2
-  echo "" 1>&2
+  echo "A number of other options can be set (but use good defaults for a Canvas deployment at OSU), see the deploy_from_settings.sh scripts in the charts." 1>&2
   exit 1
 }
+
+source $VARS_PATH
+
+validate_set DRIVE_CHART "$DRIVE_CHART" "((^https://datasci-osu\.github\.io)|(http://127.0.0.1)).+nfs-drive-.+\.tgz" ""
+validate_set HUB_CHART "$HUB_CHART" "((^https://datasci-osu\.github\.io)|(http://127.0.0.1)).+ds-jupyterlab-.+\.tgz" ""
 
 if [ "$#" -ne 1 ]; then
   usage
   exit 1
 fi
 
-$GIT_ROOT/charts/nfs-drive/scripts/deploy_from_settings.sh "$@"
-$GIT_ROOT/charts/ds-jupyterlab/scripts/deploy_from_settings.sh "$@"
+tempdir=$(mktemp -d)
+echo "${green}Pulling charts to temp dir $tempdir...${white}"
+cd $tempdir
+
+
+for CHART in $DRIVE_CHART $HUB_CHART ; do
+  echo "${green}pulling $CHART...${white}"
+  CHARTDIR=$(helm show chart $CHART | grep '^name: ' | sed -r 's/^name: //')
+  helm pull --untar $CHART
+
+  echo "${green}Running $CHART scripts/deploy_from_settings.sh...${white}"
+  chmod u+x $CHARTDIR/scripts/*.sh || true                # don't fail if they don't exist
+  chmod u+x $CHARTDIR/kustomizations/*.sh || true
+  $CHARTDIR/scripts/deploy_from_settings.sh $VARS_PATH
+done
+
+
 
