@@ -58,6 +58,12 @@ find-up () {
   echo "$curpath"
 }
 
+md5sum-dir () {
+  if [ $# != 1 ]; then
+    echo "Usage: md5sum-dir <path>" 1>&2
+  fi
+  find $1 -exec md5sum {} \; 2>/dev/null | awk '{print $1}' | sort | md5sum | awk '{print $1}'
+}
 
 safe-delete-namespace () {
   if [ $# != 2 ]; then
