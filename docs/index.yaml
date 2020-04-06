@@ -2,7 +2,27 @@ apiVersion: v1
 entries:
   ds-jupyterlab:
   - apiVersion: v1
-    created: "2020-04-02T14:57:17.556058-07:00"
+    created: "2020-04-06T16:32:39.644135-07:00"
+    description: JupyerLab with Python, Julia, R, RStudio, Shiny
+    digest: 51b494a0e72e465fc1790c60ddd1ab786b154cc73b5e569664d5153e0ab0a39a
+    icon: file://icon.svg
+    keywords:
+    - jupyter
+    - lab
+    - python
+    - R
+    - julia
+    - rstudio
+    - shiny
+    maintainers:
+    - email: shawn.oneil@oregonstate.edu
+      name: Shawn T O'Neil
+    name: ds-jupyterlab
+    urls:
+    - ds-jupyterlab-1.2.1-dev.tgz
+    version: 1.2.1-dev
+  - apiVersion: v1
+    created: "2020-04-06T16:32:39.635108-07:00"
     description: JupyerLab with Python, Julia, R, RStudio, Shiny
     digest: 81712dce119c28f82526e08ca8c8a347f1a8824689b0efff3989a40e3fd5bb0d
     icon: file://icon.svg
@@ -23,11 +43,11 @@ entries:
     version: 1.2.0
   eksctl-autoscaler:
   - apiVersion: v1
-    created: "2020-04-02T14:57:17.556854-07:00"
+    created: "2020-04-06T16:32:39.644989-07:00"
     description: Autoscaler for eksctl-based clusters, based on https://github.com/kubernetes/autoscaler/tree/master/cluster-autoscaler/cloudprovider/aws,
       specifically auto-discovery but using kubernetes.io/cluster/eksdevd tag instead
       of adding a special tag as indicated by the docs.
-    digest: 76984742378965d60509dbbb6d2e2077ce340288ef47c76507d33a4a50544bfe
+    digest: e29e4f8415fff9e1209b7265d6ceda33424a148d95c242edd62b8eb079e17edc
     icon: file://icon.png
     keywords:
     - kubernetes
@@ -44,10 +64,10 @@ entries:
   grafana:
   - apiVersion: v1
     appVersion: 6.6.0
-    created: "2020-04-02T14:57:17.559602-07:00"
+    created: "2020-04-06T16:32:39.647619-07:00"
     description: The leading tool for querying and visualizing time series and metrics.
       (Fork for custom deployment by Shawn O'Neil)
-    digest: df4cad651671cb6c8b40c7a3a294983eb5643f4d72751bb1f3b6a7fd2a1505d6
+    digest: 7fbf67459dad6464863036b0523253f479afe6b0ce4ccfed1c7686dbd0efa64e
     home: https://grafana.net
     icon: https://raw.githubusercontent.com/grafana/grafana/master/public/img/logo_transparent_400x.png
     kubeVersion: ^1.8.0-0
@@ -68,9 +88,9 @@ entries:
     version: 4.6.3
   nfs-drive:
   - apiVersion: v1
-    created: "2020-04-02T14:57:17.560293-07:00"
+    created: "2020-04-06T16:32:39.648728-07:00"
     description: Spawns an NFS server for use by applications.
-    digest: 01782997d593ca164c251e28d30757a2986ce4617113ccec767106dc790b5441
+    digest: a3c3f63278497f087ba282ff76a4fb7b5e3ddf4cc21bac8704f6eb73bbef4943
     icon: file://icon.svg
     keywords:
     - nfs
@@ -85,9 +105,9 @@ entries:
     version: 1.1.0
   nginx-ingress:
   - apiVersion: v1
-    created: "2020-04-02T14:57:17.562009-07:00"
+    created: "2020-04-06T16:32:39.651137-07:00"
     description: Nginx ingress controller built on https://github.com/nginxinc/kubernetes-ingress/tree/master/deployments/helm-chart.
-    digest: b4caa365925a560b29039604d99648724d6c7ff60b9eca69e39102fca4587a71
+    digest: 7c6dd7194481051d1637757c153137fa5aad5c1692d261798701f283d76b1460
     icon: file://icon.svg
     keywords:
     - nginx
@@ -102,10 +122,10 @@ entries:
   prometheus:
   - apiVersion: v1
     appVersion: 2.15.2
-    created: "2020-04-02T14:57:17.566528-07:00"
+    created: "2020-04-06T16:32:39.658803-07:00"
     description: Prometheus is a monitoring system and time series database. (Fork
       for custom deployment by Shawn O'Neil)
-    digest: 40570d49d0bcab92049c103d8a63c8f3093d0c9fd9a3e59e917b46c67fd1e9a2
+    digest: 3d047c122bbdcad720169c0c63fb356618730dc20dfae48eae5debe207108ea4
     home: https://prometheus.io/
     icon: https://raw.githubusercontent.com/prometheus/prometheus.github.io/master/assets/prometheus_logo-cb55bb5c346.png
     maintainers:
@@ -128,9 +148,9 @@ entries:
   velero:
   - apiVersion: v1
     appVersion: 1.2.0
-    created: "2020-04-02T14:57:17.570686-07:00"
+    created: "2020-04-06T16:32:39.662422-07:00"
     description: A Helm chart for velero (Fork for custom deployment by Shawn O'Neil)
-    digest: bb4e22a6219b4d6d968589b9a4369f8221b11b8e0e8c16d0fce4724ca0f4a457
+    digest: 3f48d2bf574f0eeb7b5c9053c4f46525840c233a35b470a0f7cf4781b6c18fe9
     home: https://github.com/vmware-tanzu/velero
     icon: https://cdn-images-1.medium.com/max/1600/1*-9mb3AKnKdcL_QD3CMnthQ.png
     maintainers:
@@ -152,4 +172,4 @@ entries:
     urls:
     - velero-2.8.8.tgz
     version: 2.8.8
-generated: "2020-04-02T14:57:17.549522-07:00"
+generated: "2020-04-06T16:32:39.627554-07:00"
