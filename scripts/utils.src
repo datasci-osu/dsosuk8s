@@ -84,3 +84,60 @@ safe-delete-namespace () {
 
   kubectl delete namespace $NAMESPACE
 }
+
+
+
+create-dir-structure () {
+  if [ $# != 1 ]; then
+    echo "Usage: create-dir-structure <structure.txt>" 1>&2
+    echo "Where <structure.txt> describes how a directory/file structure should be created (tab-seperated), e.g." 1>&2
+    echo "Relative and absolute paths can be used for source and dest; everything is done recursive; mkdir has special meaning" 1>&2
+    echo "The last field indicates whether the operation should be done 'always' or only if the existing version is not present. " 1>&2
+    echo "This allows for changes in files to be not overwritten if present." 1>&2
+    echo "Similarly, permsonly can be used to always reset user:group and mode, but leave contents if present." 1>&2
+    echo "" 1>&2
+    echo "root  root  0755  mkdir  always  ./home" 1>&2
+    echo "smithj  everyone  0755  mkdir  always  /home/smithj/docs" 1>&2
+    echo "smithj  everyone  0755  templates/README.txt  ifnotpresent  /home/smithj/docs/README.txt" 1>&2
+    echo "" 1>&2
+    echo "Environment variables can be present for interpolation:" 1>&2
+    echo "\$USERNAME  \$GROUPNAME  0755  templates/README.txt  permsonly  /home/\$USERNAME/docs/README.txt" 1>&2
+    echo "" 1>&2
+    exit 1
+  fi
+
+  while read -r user group mode source replace dest ; do
+    local rUSER=$(eval echo $user)
+    local rGROUP=$(eval echo $group)
+    local rMODE=$(eval echo $mode)
+    local rSOURCE=$(eval echo $source)
+    local rDEST=$(eval echo $dest)
+    local rREPLACE=$(eval echo $replace)
+
+    if [ -e $rDEST ] && [ "$rREPLACE" == "ifnotpresent" ]; then
+      echo "${yellow}Skipping $rDEST which already exists with ifnotpresent rule. ${white}"
+    elif [ -e $rDEST ] && [ "$rREPLACE" == "permsonly" ]; then
+      echo "${yellow}Changing ownership and permissions only $rDEST which already exists with permsonly rule. ${white}"
+      chown -R $rUSER:$rGROUP $rDEST
+      chmod -R $rMODE $rDEST
+    elif [ "$rREPLACE" == "ifnotpresent" ] || [ "$rREPLACE" == "always" ]; then
+      if [ "$rSOURCE" == "mkdir" ]; then
+	echo "${yellow}(Re)Creating directory $rDEST ${white}"
+        mkdir -p $rDEST
+      else
+	echo "${yellow}Copying $rSOURCE to $rDEST ${white}"
+        dir=$(dirname $rDEST)
+        mkdir -p $dir
+        cp -r $rSOURCE $rDEST
+      fi
+
+      echo "${yellow}Setting owner/permissions to $rUSER:$rGROUP $rMODE on $rDEST ${white}"
+      chown -R $rUSER:$rGROUP $rDEST
+      chmod -R $rMODE $rDEST
+    fi
+ 
+  echo ""   
+
+ done < $1
+}
+

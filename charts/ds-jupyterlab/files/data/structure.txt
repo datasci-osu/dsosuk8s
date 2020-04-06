@@ -1,0 +1,12 @@
+$ADMIN_UID	$ADMIN_GID	2775	mkdir	always	/home
+$ADMIN_UID	$ADMIN_GID	2775	mkdir	always	/home/.hub_local
+$ADMIN_UID	$ADMIN_GID	2775	mkdir	always	/home/hub_data_share
+$ADMIN_UID	$ADMIN_GID	2775	mkdir	always	/home/.hub_local/automanaged
+$ADMIN_UID	$ADMIN_GID	664	data/etc_group_admins	permsonly	/home/.hub_local/automanaged/etc_group_admins
+$ADMIN_UID	$ADMIN_GID	664	data/etc_group_users	permsonly	/home/.hub_local/automanaged/etc_group_users
+$ADMIN_UID	$ADMIN_GID	664	data/etc_passwd_additions	permsonly	/home/.hub_local/automanaged/etc_group_users
+$ADMIN_UID	$ADMIN_GID	2770	mkdir	permsonly	/home/.hub_local/automanaged/hub_user_db
+
+$USER	$GROUP	0755	mkdir	./home/	always
+$USER	$GROUP	0755	mkdir	./home/.hub_local	always
+soneil	staff	0650	various/hubrc   ./home/.hub_local/hubrc	ifnotpresent
