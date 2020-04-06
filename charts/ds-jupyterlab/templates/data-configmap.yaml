@@ -1,0 +1,7 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: data-configmap
+data:
+  # https://stackoverflow.com/a/57027513
+  {{- (.Files.Glob "files/data/*").AsConfig | nindent 2 }}  

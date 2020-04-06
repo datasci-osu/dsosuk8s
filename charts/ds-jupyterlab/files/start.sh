@@ -6,7 +6,7 @@
 set -e
 
 # source some utilities
-source data/common.src
+source /usr/local/bin/data/common.src
 
 
 update_root_files() {

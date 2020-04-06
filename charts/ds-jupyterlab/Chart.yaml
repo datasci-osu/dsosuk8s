@@ -13,8 +13,11 @@ maintainers:
 - email: shawn.oneil@oregonstate.edu
   name: Shawn T O'Neil
 name: ds-jupyterlab
-version: 1.2.0
+version: 1.2.1-dev
 changeLog:
+  v1.2.1-dev:
+    minor:
+    - refactoring start.sh and volume files
   v1.2.0:
     minor: 
     - Update deploy scripts to use more defaults.

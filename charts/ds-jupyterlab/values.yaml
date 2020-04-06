@@ -52,9 +52,9 @@ jupyterhub:
     storage:
       type: none
       extraVolumes:
-        - name: various-volume
+        - name: data-volume
           configMap:
-            name: various-configmap
+            name: data-configmap
         - name: start-volume
           configMap:
             name: start-configmap
@@ -63,8 +63,8 @@ jupyterhub:
         - name: start-volume
           mountPath: /usr/local/bin/start.sh
           subPath: start.sh
-        - name: various-volume
-          mountPath: /usr/local/bin/various
+        - name: data-volume
+          mountPath: /usr/local/bin/data
 
     extraEnv:
       NFS_SVC_HOME: ""
@@ -94,16 +94,16 @@ jupyterhub:
     uid: 0
     fsgid: 0
     extraVolumes:
-      - name: hubfiles-volume
+      - name: data-volume
         configMap:
-          name: hubfiles-configmap
+          name: data-configmap
       - name: start-hub-volume
         configMap:
           name: start-hub-configmap
           defaultMode: 0554
     extraVolumeMounts:
-      - name: hubfiles-volume
-        mountPath: /usr/local/bin/hubfiles
+      - name: data-volume
+        mountPath: /usr/local/bin/data
       - name: start-hub-volume
         mountPath: /usr/local/bin/start-hub.sh
         subPath: start-hub.sh

@@ -4,7 +4,7 @@
 # link /srv/jupyterhub to it so that the hub db info is written to the nfs share, and finally run jupyterhub with sudo in that dir
 cd /tmp
 
-source data/common.src 
+source /usr/local/bin/data/common.src 
 
 set_common_vars
 create_uids_gids

@@ -23,4 +23,3 @@ $NB_USER	$USER_GID	0770	mkdir	permsonly	/home/.hub_local/$NB_USER/.ipython
 $NB_USER	$USER_GID	0770	mkdir	permsonly	/home/.hub_local/$NB_USER/.ipython/profile_default
 $NB_USER	$USER_GID	0770	mkdir	permsonly	/home/.hub_local/$NB_USER/.ipython/profile_default/startup
 $ADMIN_UID	$ADMIN_GID	0664	data/001_autoexec.py	always	/home/.hub_local/$NB_USER/.ipython/profile_default/startup/001_autoexec.py
-
