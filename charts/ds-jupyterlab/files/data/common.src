@@ -1,0 +1,108 @@
+create-dir-structure () {
+  if [ $# != 1 ]; then
+    echo "Usage: create-dir-structure <structure.txt>" 1>&2
+    echo "Where <structure.txt> describes how a directory/file structure should be created (tab-seperated), e.g." 1>&2
+    echo "Relative and absolute paths can be used for source and dest; everything is done recursive; mkdir has special meaning" 1>&2
+    echo "The last field indicates whether the operation should be done 'always' or only if the existing version is not present. " 1>&2
+    echo "This allows for changes in files to be not overwritten if present." 1>&2
+    echo "Similarly, permsonly can be used to always reset user:group and mode, but leave contents if present (permsonly does not recurse)." 1>&2
+    echo "" 1>&2
+    echo "root  root  0755  mkdir  always  ./home" 1>&2
+    echo "smithj  everyone  0755  mkdir  always  /home/smithj/docs" 1>&2
+    echo "smithj  everyone  0755  templates/README.txt  ifnotpresent  /home/smithj/docs/README.txt" 1>&2
+    echo "" 1>&2
+    echo "Environment variables can be present for interpolation:" 1>&2
+    echo "\$USERNAME  \$GROUPNAME  0755  templates/README.txt  permsonly  /home/\$USERNAME/docs/README.txt" 1>&2
+    echo "" 1>&2
+    exit 1
+  fi
+
+  while read -r user group mode source replace dest ; do
+    local rUSER=$(eval echo $user)
+    local rGROUP=$(eval echo $group)
+    local rMODE=$(eval echo $mode)
+    local rSOURCE=$(eval echo $source)
+    local rDEST=$(eval echo $dest)
+    local rREPLACE=$(eval echo $replace)
+    echo "interpolated line: $rUSER  $rGROUP  $rMODE  $rSOURCE  $rREPLACE  $rDEST"
+
+    if [ -e $rDEST ] && [ "$rREPLACE" == "ifnotpresent" ]; then
+      echo "Skipping $rDEST which already exists with ifnotpresent rule."
+    elif [ -e $rDEST ] && [ "$rREPLACE" == "permsonly" ]; then
+      echo "Changing ownership and permissions only $rDEST which already exists with permsonly rule."
+      chown $rUSER:$rGROUP $rDEST
+      chmod $rMODE $rDEST
+    else
+      if [ "$rSOURCE" == "mkdir" ]; then
+	echo "(Re)Creating directory $rDEST"
+        mkdir -p $rDEST
+      else
+	echo "Copying $rSOURCE to $rDEST"
+        cp -L -r $rSOURCE $rDEST
+      fi
+
+      echo "Setting owner/permissions to $rUSER:$rGROUP $rMODE on $rDEST"
+      chown -R $rUSER:$rGROUP $rDEST
+      chmod -R $rMODE $rDEST
+    fi
+ 
+  done < $1
+}
+
+
+set_common_vars() {
+  ADMIN_HOME_DIR=/home/.hub_local
+
+  ADMIN_USERNAME=dsadmin
+  ADMIN_GROUPNAME=dsadmins
+  USER_GROUPNAME=dsusers
+  ADMIN_GID=102               # ssh group is 101 by default
+  USER_GID=103
+  ADMIN_UID=1001
+}
+
+create_uids_gids() {
+  addgroup --gid $ADMIN_GID $ADMIN_GROUPNAME
+  addgroup --gid $USER_GID $USER_GROUPNAME
+  adduser --no-create-home --uid $ADMIN_UID --gid $ADMIN_GID --disabled-password --disabled-login --gecos "" $ADMIN_USERNAME
+  adduser $ADMIN_USERNAME users
+}
+
+stage_home_temp_copy() {
+  
+  local NB_USER=$1
+  # move things to /tmp to work on since we'll be NFS mounting over /home
+  # make a copy of the jovyan home to $NB_USER HOME
+  mv /home/jovyan /tmp/jovyan               
+  mv /tmp/jovyan /tmp/$NB_USER
+  rm -rf /tmp/$NB_USER/work
+}
+
+
+do_mount() {
+  local NFS_SVC_HOME=$1
+  local DEST=$2
+  # mount the NFS, soft mount in case the server hiccups (to prevent user pods from going zombie), but 10 second timeout to prevent potential issues (based on recs for EFS, which I'd guess generalize? https://docs.aws.amazon.com/efs/latest/ug/mounting-fs-nfs-mount-settings.html)
+  mount -o soft,timeo=100 $NFS_SVC_HOME:/ $DEST
+  if [ -d $DEST/lost+found/ ] && [ $(ls -1a $DEST/lost+found/ | wc -l) == "2" ]; then
+    echo "$DEST/lost+found empty, deleting"
+    rm -rf $DEST/lost+found
+  fi
+  echo "done mounting..."
+}
+
+
+get_uid() {
+  # set user's UID to psuedorandom number in range 2000 -- 2^30 using some bash and modulus tricks
+
+  # TODO: use a scheme that picks a random number not in use within $ADMIN_HOME_DIR/automanaged/etc_passwd_additions (below) to avoid UID collisions, incredibly rare though they may be
+  # Since UID assignment is persisted in the mount, this should stay with the user even if they are removed+re-added within the hub.
+  local USERNAME=$1
+  local BIG=1073741824
+  local PSEUDO=$(md5sum <<< "$USERNAME")
+  local NB_UID=$(( (((0x${PSEUDO%% *} % $BIG) + $BIG) % $BIG) + 2000))
+  echo $NB_UID
+}
+
+
+
