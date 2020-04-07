@@ -24,32 +24,29 @@ create-dir-structure () {
     local rSOURCE=$(eval echo $source)
     local rDEST=$(eval echo $dest)
     local rREPLACE=$(eval echo $replace)
+    echo "interpolated line: $rUSER  $rGROUP  $rMODE  $rSOURCE  $rREPLACE  $rDEST"
 
     if [ -e $rDEST ] && [ "$rREPLACE" == "ifnotpresent" ]; then
-      echo "${yellow}Skipping $rDEST which already exists with ifnotpresent rule. ${white}"
+      echo "Skipping $rDEST which already exists with ifnotpresent rule."
     elif [ -e $rDEST ] && [ "$rREPLACE" == "permsonly" ]; then
-      echo "${yellow}Changing ownership and permissions only $rDEST which already exists with permsonly rule. ${white}"
+      echo "Changing ownership and permissions only $rDEST which already exists with permsonly rule."
       chown $rUSER:$rGROUP $rDEST
       chmod $rMODE $rDEST
-    elif [ "$rREPLACE" == "ifnotpresent" ] || [ "$rREPLACE" == "always" ]; then
+    else
       if [ "$rSOURCE" == "mkdir" ]; then
-	echo "${yellow}(Re)Creating directory $rDEST ${white}"
+	echo "(Re)Creating directory $rDEST"
         mkdir -p $rDEST
       else
-	echo "${yellow}Copying $rSOURCE to $rDEST ${white}"
-        dir=$(dirname $rDEST)
-        mkdir -p $dir
-        cp -r $rSOURCE $rDEST
+	echo "Copying $rSOURCE to $rDEST"
+        cp -L -r $rSOURCE $rDEST
       fi
 
-      echo "${yellow}Setting owner/permissions to $rUSER:$rGROUP $rMODE on $rDEST ${white}"
+      echo "Setting owner/permissions to $rUSER:$rGROUP $rMODE on $rDEST"
       chown -R $rUSER:$rGROUP $rDEST
       chmod -R $rMODE $rDEST
     fi
  
-  echo ""   
-
- done < $1
+  done < $1
 }
 
 
@@ -71,7 +68,7 @@ create_uids_gids() {
   adduser $ADMIN_USERNAME users
 }
 
-stage_home_tmp_copy() {
+stage_home_temp_copy() {
   
   local NB_USER=$1
   # move things to /tmp to work on since we'll be NFS mounting over /home

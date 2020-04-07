@@ -11,10 +11,10 @@ spec:
       containers:
       - name: hub
         command:
-        - /bin/sh
-        - "-c"
-        - "sleep 10000"
-        #- /usr/local/bin/start-hub.sh
+        #- /bin/sh
+        #- "-c"
+        #- "sleep 10000"
+        - /usr/local/bin/start-hub.sh
         securityContext:
           capabilities:
             add:

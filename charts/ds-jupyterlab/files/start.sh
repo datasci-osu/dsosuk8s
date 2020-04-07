@@ -32,12 +32,12 @@ update_root_files() {
 update_user_files() {
   if [ "$FIRST_LOGIN" == "true" ]; then
     cat /usr/local/bin/data/STUDENT_README.md | sed -r "s|@@JUPYTERHUB_BASE_URL@@|$JUPYTERHUB_BASE_URL|" | sed -r "s|@@NB_USER@@|$NB_USER|" >> /home/$NB_USER/README.md 
-    chown $NB_USER:$USER_GID /home/$NB_USER/README.md
+    chown $NB_UID:$USER_GID /home/$NB_USER/README.md
     chmod 664 /home/$NB_USER/README.md
   fi
   
   grep -sqxF "source(\"$ADMIN_HOME_DIR/autosourced_by_rprofiles.R\")" /home/$NB_USER/.Rprofile || echo "source(\"$ADMIN_HOME_DIR/autosourced_by_rprofiles.R\")" >> /home/$NB_USER/.Rprofile
-  chown $NB_UID:$ADMIN_GROUPNAME /home/$NB_USER/.Rprofile
+  chown $NB_UID:$ADMIN_GID /home/$NB_USER/.Rprofile
   chmod 664 /home/$NB_USER/.Rprofile
 }
 
@@ -47,6 +47,7 @@ update_etc_files() {
   if [[ "$ADMIN_USER" == "True" ]]; then
     # make sure they are in admins group
     grep -E "^$NB_USER\$" $ADMIN_HOME_DIR/automanaged/etc_group_admins || echo $NB_USER >> $ADMIN_HOME_DIR/automanaged/etc_group_admins
+    
     # and make sure they have an admin etc_passwd addition
     grep -E "^$NB_USER:x:$NB_UID:$ADMIN_GID" $ADMIN_HOME_DIR/automanaged/etc_passwd_additions || echo "$NB_USER:x:$NB_UID:$ADMIN_GID:,,,:/home/$NB_USER:/bin/bash" >> $ADMIN_HOME_DIR/automanaged/etc_passwd_additions
     # and that they *don't* have a non-admin etc_passwd addition
@@ -56,8 +57,9 @@ update_etc_files() {
   else
     # remove their entry from admins group if they are there
     sed -r -i "/^$NB_USER$/d" $ADMIN_HOME_DIR/automanaged/etc_group_admins
+
     # and make sure they have a user etc_passwd addition
-    grep -E "^$NB_USER:x:$NB_UID:$USER_GID" $ADMIN_HOME_DIR/automanaged/etc_passwd_additions || echo "$NB_USER:x:$NB_UID:$ADMIN_GID:,,,:/home/$NB_USER:/bin/bash" >> $ADMIN_HOME_DIR/automanaged/etc_passwd_additions
+    grep -E "^$NB_USER:x:$NB_UID:$USER_GID" $ADMIN_HOME_DIR/automanaged/etc_passwd_additions || echo "$NB_USER:x:$NB_UID:$USER_GID:,,,:/home/$NB_USER:/bin/bash" >> $ADMIN_HOME_DIR/automanaged/etc_passwd_additions
     # and that they *don't* have an admin etc_passwd addition
     sed -r -i "/^$NB_USER:x:$NB_UID:$ADMIN_GID/d" $ADMIN_HOME_DIR/automanaged/etc_passwd_additions || true
   fi
@@ -81,7 +83,7 @@ update_etc_files() {
 
 
 main_setup() {
-  cd /tmp
+  cd /usr/local/bin
 
   # we're writing to an NFS filesystem, if lots of people login at the same time there could be a lot of I/O to specific files
   # do a quick random sleepytime to try and spread them out in that case (not sure if this is really needed or really helps honestly)
@@ -96,13 +98,13 @@ main_setup() {
   do_mount $NFS_SVC_HOME /home
 
   if [ -e /home/$NB_USER ]; then
-    export FIRST_LOGIN=true
-  else
     export FIRST_LOGIN=false
+  else
+    export FIRST_LOGIN=true
   fi
 
   export PYTHONVERSION=`python -c 'import sys; v = sys.version_info; print("python" + str(v[0]) + "." + str(v[1]))'`
-  create-dir-structure $STRUCTURE_FILE
+  create-dir-structure /usr/local/bin/data/structure.txt
   
   # for hub-admin-adjustable jupyterlab (extensions, kernels, etc) we need the jupyterlab data dir to be in the mount
   # and copy the existing data dir contents there
@@ -154,4 +156,14 @@ export R_LIBS_SITE=$ADMIN_HOME_DIR/R_libs
 
 # using bash -c causes the stuff in /etc/profile to be picked up
 #exec sudo -E -H -u $NB_USER PATH=$PATH XDG_CACHE_HOME=/home/$NB_USER/.cache PYTHONPATH=${PYTHONPATH:-} LD_LIBRARY_PATH=${LD_LIBRARY_PATH:-} bash -c "$cmd"  
-exec sudo -E -H -u $NB_USER PATH=$PATH FIRST_LOGIN=$FIRST_LOGIN R_LIBS_SITE=${R_LIBS_SITE:-} XDG_CACHE_HOME=/home/$NB_USER/.cache JUPYTERLAB_DIR=${JUPYTERLAB_DIR:-} PYTHONPATH=${PYTHONPATH:-} LD_LIBRARY_PATH=${LD_LIBRARY_PATH:-} bash -c "$cmd"
+exec sudo -E -H -u $NB_USER \
+  PATH=$PATH \
+  FIRST_LOGIN=$FIRST_LOGIN \
+  R_LIBS_SITE=${R_LIBS_SITE:-} \
+  XDG_CACHE_HOME=/home/$NB_USER/.cache \
+  JUPYTERLAB_DIR=${JUPYTERLAB_DIR:-} \
+  PYTHONPATH=${PYTHONPATH:-} \
+  LD_LIBRARY_PATH=${LD_LIBRARY_PATH:-} \
+  ADMIN_HOME_DIR=${ADMIN_HOME_DIR} \
+  ADMIN_USER=${ADMIN_USER} \
+  bash -c "$cmd"

@@ -2,9 +2,9 @@ apiVersion: v1
 entries:
   ds-jupyterlab:
   - apiVersion: v1
-    created: "2020-04-06T16:32:39.644135-07:00"
+    created: "2020-04-07T10:51:02.88379-07:00"
     description: JupyerLab with Python, Julia, R, RStudio, Shiny
-    digest: 51b494a0e72e465fc1790c60ddd1ab786b154cc73b5e569664d5153e0ab0a39a
+    digest: ec89125f5f0cd31d50d3f3cf7edcb3ed0977d043e9ecbb61344f449a8445308b
     icon: file://icon.svg
     keywords:
     - jupyter
@@ -22,7 +22,7 @@ entries:
     - ds-jupyterlab-1.2.1-dev.tgz
     version: 1.2.1-dev
   - apiVersion: v1
-    created: "2020-04-06T16:32:39.635108-07:00"
+    created: "2020-04-07T10:51:02.876784-07:00"
     description: JupyerLab with Python, Julia, R, RStudio, Shiny
     digest: 81712dce119c28f82526e08ca8c8a347f1a8824689b0efff3989a40e3fd5bb0d
     icon: file://icon.svg
@@ -43,7 +43,7 @@ entries:
     version: 1.2.0
   eksctl-autoscaler:
   - apiVersion: v1
-    created: "2020-04-06T16:32:39.644989-07:00"
+    created: "2020-04-07T10:51:02.885332-07:00"
     description: Autoscaler for eksctl-based clusters, based on https://github.com/kubernetes/autoscaler/tree/master/cluster-autoscaler/cloudprovider/aws,
       specifically auto-discovery but using kubernetes.io/cluster/eksdevd tag instead
       of adding a special tag as indicated by the docs.
@@ -64,7 +64,7 @@ entries:
   grafana:
   - apiVersion: v1
     appVersion: 6.6.0
-    created: "2020-04-06T16:32:39.647619-07:00"
+    created: "2020-04-07T10:51:02.888006-07:00"
     description: The leading tool for querying and visualizing time series and metrics.
       (Fork for custom deployment by Shawn O'Neil)
     digest: 7fbf67459dad6464863036b0523253f479afe6b0ce4ccfed1c7686dbd0efa64e
@@ -88,7 +88,7 @@ entries:
     version: 4.6.3
   nfs-drive:
   - apiVersion: v1
-    created: "2020-04-06T16:32:39.648728-07:00"
+    created: "2020-04-07T10:51:02.889251-07:00"
     description: Spawns an NFS server for use by applications.
     digest: a3c3f63278497f087ba282ff76a4fb7b5e3ddf4cc21bac8704f6eb73bbef4943
     icon: file://icon.svg
@@ -105,7 +105,7 @@ entries:
     version: 1.1.0
   nginx-ingress:
   - apiVersion: v1
-    created: "2020-04-06T16:32:39.651137-07:00"
+    created: "2020-04-07T10:51:02.892572-07:00"
     description: Nginx ingress controller built on https://github.com/nginxinc/kubernetes-ingress/tree/master/deployments/helm-chart.
     digest: 7c6dd7194481051d1637757c153137fa5aad5c1692d261798701f283d76b1460
     icon: file://icon.svg
@@ -122,7 +122,7 @@ entries:
   prometheus:
   - apiVersion: v1
     appVersion: 2.15.2
-    created: "2020-04-06T16:32:39.658803-07:00"
+    created: "2020-04-07T10:51:02.89743-07:00"
     description: Prometheus is a monitoring system and time series database. (Fork
       for custom deployment by Shawn O'Neil)
     digest: 3d047c122bbdcad720169c0c63fb356618730dc20dfae48eae5debe207108ea4
@@ -148,7 +148,7 @@ entries:
   velero:
   - apiVersion: v1
     appVersion: 1.2.0
-    created: "2020-04-06T16:32:39.662422-07:00"
+    created: "2020-04-07T10:51:02.902983-07:00"
     description: A Helm chart for velero (Fork for custom deployment by Shawn O'Neil)
     digest: 3f48d2bf574f0eeb7b5c9053c4f46525840c233a35b470a0f7cf4781b6c18fe9
     home: https://github.com/vmware-tanzu/velero
@@ -172,4 +172,4 @@ entries:
     urls:
     - velero-2.8.8.tgz
     version: 2.8.8
-generated: "2020-04-06T16:32:39.627554-07:00"
+generated: "2020-04-07T10:51:02.869334-07:00"
