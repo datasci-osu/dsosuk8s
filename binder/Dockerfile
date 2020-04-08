@@ -15,4 +15,11 @@ RUN echo "install.packages(\"learnr\", repos=\"https://cran.rstudio.com\")" | R 
 RUN echo "install.packages(\"shinydashboard\", repos=\"https://cran.rstudio.com\")" | R --no-save
 RUN echo "install.packages(\"leaflet\", repos=\"https://cran.rstudio.com\")" | R --no-save
 
+RUN mkdir -p /var/log/shiny-server
+RUN chmod -R o+w /var/log/
+ENV SHINY_LOG_STDERR=1
+ENV SHINY_LOG_LEVEL=TRACE
+
+
 USER $NB_USER
+
