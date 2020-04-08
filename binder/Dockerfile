@@ -9,4 +9,10 @@ RUN apt-get update \
     less \
     tmux
 
+# need to install rmarkdown, learnr, shinydashboard, leaflet (all cran, for learnr and bus-dashboard demo)
+echo "install.packages(\"rmarkdown\", repos=\"https://cran.rstudio.com\")" | R --no-save
+echo "install.packages(\"learnr\", repos=\"https://cran.rstudio.com\")" | R --no-save
+echo "install.packages(\"shinydashboard\", repos=\"https://cran.rstudio.com\")" | R --no-save
+echo "install.packages(\"leaflet\", repos=\"https://cran.rstudio.com\")" | R --no-save
+
 USER $NB_USER

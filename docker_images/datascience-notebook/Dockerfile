@@ -96,8 +96,11 @@ RUN python -m bash_kernel.install
 RUN pip install jupyter_contrib_nbextensions && jupyter contrib nbextension install 
 RUN pip install nbresuse
 
-#TAG v1.1.5
-#TAG added-nbresuse
+# fixup for shiny-server bookmarks (don't want to make adjustment in the jupyter-rsession-proxy where the shiny config is generated from)
+RUN chmod o+w /var/lib/shiny-server
+
+#TAG v1.1.6
+#TAG shinyfix
 
 USER $NB_USER
 

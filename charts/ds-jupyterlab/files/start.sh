@@ -124,7 +124,8 @@ main_setup() {
 
   # go the new dir rather than leaving CWD to be the no-longer existing original
   cd /home/$NB_USER
-
+  # remove /tmp/username (esquisse library and/or shiny server are trying to write there and failing because it already exists)
+  rm -rf /tmp/$NB_USER
 
   # Add $CONDA_DIR/bin to sudo secure_path
   # (sets the PATH of the sudo to whatever is listed, this sed adds to whatever is there already)
