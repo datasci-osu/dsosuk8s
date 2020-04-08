@@ -1,4 +1,4 @@
-FROM oneilsh/ktesting-datascience-notebook:v1.1.5
+FROM oneilsh/ktesting-datascience-notebook:v1.1.6
 
 RUN pip install --no-cache-dir nbgitpuller==0.8.0
 
