@@ -1,0 +1,8 @@
+if(rstudioapi::isAvailable()) {
+  launchers <- try(system("find ~ -name rstudio-launch.R 2>/dev/null || true", intern = TRUE))
+  if(length(launchers) > 0) {
+    for(launcher in launchers) {
+      source(launcher)
+    }
+  }
+}
