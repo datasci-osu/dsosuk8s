@@ -15,8 +15,8 @@ RUN echo "install.packages(\"learnr\", repos=\"https://cran.rstudio.com\")" | R 
 RUN echo "install.packages(\"shinydashboard\", repos=\"https://cran.rstudio.com\")" | R --no-save
 RUN echo "install.packages(\"leaflet\", repos=\"https://cran.rstudio.com\")" | R --no-save
 
-COPY Rprofile /home/$NB_USER/.Rprofile
-RUN chmod 644 /home/$NB_USER/.Rprofile
+COPY ./binder/Rprofile /home/$NB_USER/.Rprofile
+
 
 USER $NB_USER
 
