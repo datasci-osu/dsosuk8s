@@ -42,7 +42,7 @@ as the volume, or detaches and re-attaches the PV (EBS vol) to a node where the 
 For reasons desribed below we use three nodegroups: a "cluster-tools" nodegroup, a "jhcontrolplane" nodegroup and a "jhusers" nodegroup. 
 Pods accessing persistent volumes are not run on the jhusers nodegroup. Thus, the physical architecture looks like so:
 
-<img src="images/physical_layout.png" width="50%"/>
+<img src="images/physical_layout_3groups.png" width="50%"/>
 
 ### JupyterHub Hubs
 
