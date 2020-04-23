@@ -74,4 +74,6 @@ changeLog:
     - Added ability for admins to install JLab extensions (needs ~2G RAM to build)
 ```
 
-`hub_deploy.sh` and `hub_teardown.sh` (in the main `scripts` folder) have been configured to 
+`hub_deploy.sh` and `hub_teardown.sh` (in the main `scripts` folder) have been configured to read the chart location and deploy that specific chart version (by downloading an unpacking it) and running the contained `scripts/deploy_from_settings.sh`, allowing for fully-versioned deployments while still doing easy last-mile customization etc. 
+
+This has not yet been implemented for `bootstrap_cluster_deploy.sh` and `bootstrap_cluster_teardown.sh`, which install/remove the grafana, prometheus, velero, eksctl-autoscaler, and nginx charts to bootstrap a cluster making it ready for hub deployments. 
