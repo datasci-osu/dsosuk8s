@@ -43,4 +43,35 @@ In the latter cases, we've avoided modifying templates to make future updates ea
 
 ### Chart Versioning
 
-This repos `docs` folder is not 
+This repo's `docs` folder is not documentation - it's a [Helm chart repository](https://medium.com/@mattiaperi/create-a-public-helm-chart-repository-with-github-pages-49b180dbb417) hosted by GitHub pages (using the `docs` folder option for GitHub pages rather than the `gh-pages` branch).
+
+The `helm_repo_build.sh` script in the main `scripts` folder builds chart tarballs from sources and updates the main repo index. Chart version information is augmented with changelog info via semantic versioning (non-standard for helm charts, but it seemed logical):
+
+```
+# in Chart.yaml
+# ...
+
+changeLog:
+  v1.3.2:
+    minor:
+    - fixing shiny server
+  v1.3.1:
+    patch:
+    - refactored start.sh and volume files
+    minor: 
+    - user admin can be switched on/off (requires user-server restart)
+  v1.2.0:
+    minor: 
+    - Update deploy scripts to use more defaults.
+  v1.1.2:
+    patch: 
+    - slight cleanup values.yaml and deploy scripts
+  v1.1.1: 
+    major:
+    - First properly versioned chart (yay)
+    minor:
+    - Recently working RAM meter in user UI
+    - Added ability for admins to install JLab extensions (needs ~2G RAM to build)
+```
+
+`hub_deploy.sh` and `hub_teardown.sh` (in the main `scripts` folder) have been configured to 
