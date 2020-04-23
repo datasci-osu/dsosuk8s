@@ -2,7 +2,7 @@
 
 deployments/*
 !deployments/
-deployments/cluster.example.edu/*
-!deployments/cluster.example.edu/
-!deployments/cluster.example.edu/example-hub.vars
-!deployments/cluster.example.edu/cluster-bootstrap.vars
+deployments/example.cluster.edu/*
+!deployments/example.cluster.edu/
+!deployments/example.cluster.edu/example-hub.vars
+!deployments/example.cluster.edu/cluster-bootstrap.vars
