@@ -14,7 +14,12 @@ ingress and cluster auto-scaling setup, and potential gotchas with storage volum
 
 ### grafana_prometheus
 
-JSON model for monitoring clusters with Grafana backed by Prometheus.
+JSON model for monitoring JupyterHub deployments on clusters with Grafana backed by Prometheus. (Based partially on https://grafana.mybinder.org/.)
+
+
+### velero
+
+Script and resources for creating AWS S3 bucket for velero installs to point to.
 
 ## Kubernetes and JupyterHub
 
