@@ -52,17 +52,6 @@ The `helm_repo_build.sh` script in the main `scripts` folder builds chart tarbal
 # ...
 
 changeLog:
-  v1.3.2:
-    minor:
-    - fixing shiny server
-  v1.3.1:
-    patch:
-    - refactored start.sh and volume files
-    minor: 
-    - user admin can be switched on/off (requires user-server restart)
-  v1.2.0:
-    minor: 
-    - Update deploy scripts to use more defaults.
   v1.1.2:
     patch: 
     - slight cleanup values.yaml and deploy scripts
