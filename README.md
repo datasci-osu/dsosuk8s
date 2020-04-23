@@ -35,9 +35,11 @@ Jupyter Docker Stack, we support:
 * Instructors can install scripts and R and Python packages for everyone
 * Additional hooks for instructors to customize all user environments
 
-## Prereqs
+## About these docs, Prereqs
 
-This repo assumes the local machine has installed [`kubectl`](https://kubernetes.io/docs/tasks/tools/install-kubectl/),
+READMEs in this repo are intended for kubernetes administrators; end-user documents are maintained in the `user_docs` folder (though more recent and complete documentation is available via an OSU Canvas studio site with integrated "playground" hub access). 
+
+Development assumes the local machine has installed [`kubectl`](https://kubernetes.io/docs/tasks/tools/install-kubectl/),
 the local [`helm` client](https://helm.sh/docs/intro/install/), and `docker` (on mac,
 [`docker-desktop`](https://hub.docker.com/editions/community/docker-ce-desktop-mac)).
 
@@ -58,9 +60,7 @@ this way you'll need [`eksctl`](https://eksctl.io/), an AWS account, and the
 This README doesn't contain all the documentation - it's distributed within each subdirectory. Summarized here, in the
 order one might want to check out:
 
-### binder
 
-Enables the Jupyter single-user image to be deployed on BinderHub with this repo. 
 
 ### charts
 
@@ -69,18 +69,17 @@ chart also has a `scripts` subdirectory for last-mile configuration and deployme
 
 ### cluster
 
-Information and configuration for Kubernetes clusters and cluster monitoring. 
+Information and configuration for Kubernetes clusters, ingress controller, cluster monitoring with prometheus and grafana, and cluster backup with velero. 
 
 ### deployments
 
 Organized by cluster hostname, contains settings files for hub and cluster-tools deployments. Only an example subfolder
-is included in this git repo to keep hub URLs private.
+is included in this git repo to keep running hub URLs private.
 
 ### docker_images
 
 Docker image definitions. Note that subdirectories here have a special structure used by the build and push scripts (in
 `scripts`, below).
-
 
 ### kubernetes_dev
 
@@ -100,3 +99,8 @@ teardown.
 ### user_docs
 
 User-facing documentation. 
+
+
+### binder
+
+Enables the Jupyter single-user image to be deployed on BinderHub with this repo. 
