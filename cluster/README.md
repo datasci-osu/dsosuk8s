@@ -99,6 +99,10 @@ dataset examples), but security implications will need to be considered (to prev
 Not all kubernetes resources are associated with a namespace: persistent volumes (PVs) are not, because they represent physical components 
 (same for nodes). PVCs on the other hand do live in namespaces along with the pod they are associated with.
 
+Cluster-level tools are generally deployed either in the `kube-system` namespace (that's a requirement of the autoscaler), `velero` (the default for velero), or otherwise `cluster-tools`. 
 
+The base JupyterHub chart is constructed in such a way that *only one* jupyterhub may be deployed per-namespace, so we generally name the namespace the same as the overall hub "name", and this also corresponds to the access/launch URL (this is all setup by `hub_deploy.sh`).
+
+<img src="images/single_namespace_w_url.png" width="50%"/>
 
  
