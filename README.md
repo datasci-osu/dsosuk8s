@@ -40,8 +40,8 @@ Jupyter Docker Stack, we support:
 READMEs in this repo are intended for kubernetes administrators; end-user documents are maintained in the `user_docs` folder (though more recent and complete documentation is available via an OSU Canvas studio site with integrated "playground" hub access). 
 
 Development assumes the local machine has installed [`kubectl`](https://kubernetes.io/docs/tasks/tools/install-kubectl/),
-the local [`helm` client](https://helm.sh/docs/intro/install/), and `docker` (on mac,
-[`docker-desktop`](https://hub.docker.com/editions/community/docker-ce-desktop-mac)).
+the local [`helm3` client](https://helm.sh/docs/intro/install/), and `docker` (on mac,
+[`docker-desktop`](https://hub.docker.com/editions/community/docker-ce-desktop-mac)), and [`kustomize`](https://kustomize.io/).
 
 Using `alias k=kubectl` in your `.bashrc` is a great tip :) 
 
@@ -51,7 +51,7 @@ relatively painless.
 
 The kubernetes cluster configurations in this repo target AWS EKS using the `eksctl` utility; to work with AWS clusters
 this way you'll need [`eksctl`](https://eksctl.io/), an AWS account, and the
-[`aws`](https://docs.aws.amazon.com/cli/latest/userguide/cli-chap-welcome.html) command-line utility preferably with
+[`aws`](https://docs.aws.amazon.com/cli/latest/userguide/cli-chap-welcome.html) command-line utility with
 [credentials](https://docs.aws.amazon.com/cli/latest/userguide/cli-configure-files.html) setup.
 
 
@@ -92,13 +92,18 @@ singleuser servers, avoiding the need to redeploy JupyterHub and use the spawner
 
 ### scripts
 
-Scripts for working with docker images (building and pushing to dockerhub) and application/cluster deployment and
+Scripts for working with docker images (building and pushing to dockerhub), helm repos, and application/cluster deployment and
 teardown.
 
 
 ### user_docs
 
 User-facing documentation. 
+
+
+### docs
+
+Not documentation at all, instead, a [Helm chart repository](https://medium.com/@mattiaperi/create-a-public-helm-chart-repository-with-github-pages-49b180dbb417) hosted by GitHub pages (using the `docs` folder option for GitHub pages rather than the `gh-pages` branch).
 
 
 ### binder
