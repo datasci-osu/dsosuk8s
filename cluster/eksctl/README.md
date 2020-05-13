@@ -7,55 +7,20 @@ via access key) and `kubectl`.
 ## Cluster Deployment and Configuration
 
 EKS clusters deployed by `eksctl` (or created with the AWS console) are rather bare -- they don't come with some important kubernetes tools,
-specifically a cluster-autoscaler or ingress controller. This may as well be, as we've created special deployments of these services for use with
-Rancher and the `eksctl`-deployed clusters described here. This general workflow assume you have:
+specifically a cluster-autoscaler or ingress controller. This may as well be, as we've created special deployments of these services for use with the JupyterHub chart (allowing multiple hubs to share the same hostname via nginx-ingress master/minion annotations). 
 
-* Access to a Rancher deployment in which to import newly created clusters, with this repo added as a "Catalog", and 
-* A domain name for the cluster (e.g. `clusterA.datasci.oregonstate.edu`) which can be CNAMEd to an AWS load balancer, and a corresponding certificate (cert and key files) 
+Deploying and user a cluster assumes you have a domain name for the cluster (e.g. `clusterA.datasci.oregonstate.edu`) which can be CNAMEd to an AWS load balancer, and a corresponding certificate (cert and key files). 
 
 (Note that this configuration does SSL termination at the ingress controller, ie, on first entry to the cluster.)
 
 First, cluster creation and import:
 
+0. Make sure your `aws` CLI credentials are set - `source <repo>/scripts/source_env.sh` is a helper for this and a few other aliases.
 1. Deploy the cluster with `eksctl create cluster -f <clusterconfig.yaml>`
 2. Get coffee - EKS clusters take forever.
 3. Check that you can see the nodes and are talking to the cluster just created with `kubectl get nodes` and `kubectl config current-context`
-4. Import it in Rancher (Global -> Add Cluster -> Import Existing, Follow directions)
 
-Next, setup ingress:
-
-1. Navigate to the cluster "System" project (the ingress could live anywhere, but this works well)
-2. Apps -> Launch -> nginx-ingress
-   * Name: `nginx-ingress-<clustername>`
-   * Namespace: `nginx-ingress`
-   * SSL Cert: result of `base64 my.cert | tr -d '\n'` copied and pasted
-   * SSL Key: result of `base64 my.key | tr -d '\n'` copied and pasted
-   * Max upload size: e.g. `2000m` (needs testing)
-   * Master hostname: the DNS name for the cluster (e.g. `clusterA.datasci.oregonstate.edu`) (this is important because we utilize master/minion in the ingress controller to allow the same hostname to be used by different hubs on different URL paths)
-3. Find the A record name for the L4 load balancer created, either in Resources -> Load Balancing in Rancher, or in the EC2 console; point your CNAME at this A record
-
-Setup autoscaler:
-
-1. Navigate to the cluster "System" project (the autoscaler and ingress could live anywhere, but this works well)
-2. Apps -> Launch -> eksctl-autoscaler
-   * Name: `eksctl-autoscaler`
-   * Namespace: `kube-system` (it *must* be kube-system) 
-   * Cluster Name: `<clustername>` (as specified in config yaml used by `eksctl`; this sets the auto-discover appropriately, see Scaling below)
-
-Setup monitoring with Prometheus & Grafana:
-
-1. Navigate to cluster via Global -> `<clustername>`; "Cluster" Tab
-2. Click "Enable Monitoring". Settings used other than defaults (but not known if any good):
-   * Data retention: 96h
-   * Enable persistent storage for prometheus: True
-   * Prometheus storage size: 50Gi
-   * Enable persistent storage for grafana: True
-   * Grafana storage: 10Gi
-3. Once up, go back to "Cluster" tab, and select the Grafana icon (sun-like logo)
-   * Login with default admin/admin
-   * Change admin password
-   * Create new dashboard, import json from `grafana_prometheus` folder.
-    
+Following this, the cluster can be bootstrapped with `scripts/bootstrap_cluster_deploy.sh <vars>` - see `cluster_bootstrap.vars` in `deployments/example.clustere.edu` for an example, and note that the domain name and other information will need to be set.
 
 
 ## Cluster Config Details
@@ -110,8 +75,7 @@ EC2 instances are **[limited](https://docs.aws.amazon.com/AWSEC2/latest/UserGuid
 This is less of a concern in our architecture because we are utilizing a single PV per Hub - standard JupyterHub kubernetes deployments that deploy a PV
 per user may be more prone to exceeding these limits. We specify some CPU and memory request for storage 
 
-As noted above, `preBootstrapCommands` are used to enable NFS at the node level. There is also a section on enabling Docker bridge networking, needed
-for BinderHub (and probably not for JupyterHub). (See comments in YAML file). 
+As noted above, `preBootstrapCommands` are used to enable NFS at the node level. 
 
 Lastly, EBS volumes can be tranferred between nodes if needed when pods are moved or rescheduled (within and between nodegroups), but *not between availability zones*. Thus, the "core" nodegroup
 is restricted to running in a single availabity zone, lest a pod hosting a volume be tranferred to a node in another AZ, and the EBS volumes cannot
@@ -125,17 +89,14 @@ docker image churn during development).
 ### Node Labels, Tags, and Taints
 
 The main node label utilized by JupyterHub in scheduling components to the correct nodegroup is `hub.jupyter.org/node-purpose` (set to either `"core"`
-or `"user"` - we also add a label for `role:`, either `"jhcontrolplane"` or `"workers"` (not used actually and should be removed before 
-double-checking since it's redundant with the hub.jupyter.org label; same for the `nodegroup-role:` tag), and one for `volatile:`, either `"true"` or `"false"`. Volatile is intended to indicate if nodes are likely to come and go (as with the
-user nodegroup) or not (as with the "core" nodegroup). This label is currently used by both the storage/NFS "drive" chart and the nginx-ingress chart 
-(and should probably be replaced with either the hub.jupyter.org label or as a user-parameter, since it's also redundant).
+or `"user"` - we also add a label for `nodegroup-role:`, either `"jhcontrolplane"`, `"jhusers"`, or `"clustertools"`, used by charts for targetting nodegroups. 
 
 The `hub.jupyter.org/dedicated: user:NoSchedule` "taint" associated with the user nodegroup is important for JH's scheduling of user components.
 
 ### Scaling
 
 The `minSize`, `maxSize`, and `desiredCapacity` define initial properties of the autoscaling groups - the cluster autoscaler is configured to read these. 
-In some cases they can also be set from within the cluster autoscaler, but on AWS one should adjust these settings on the EC2 console (or the `aws` cli)
+In some cases they can also be set from within the cluster autoscaler, but on AWS one *should adjust these settings on the EC2 console* (or the `aws` cli)
 rather than from within-cluster (see first paragraph of Deployment Specification [here](https://github.com/kubernetes/autoscaler/blob/master/cluster-autoscaler/cloudprovider/aws/README.md#deployment-specification)).
 
 The cluster-autoscaler within the `charts` directory is set to use auto-discover (scale-from-zero not enabled), which requires the cluster name
