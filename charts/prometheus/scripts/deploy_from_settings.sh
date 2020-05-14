@@ -47,6 +47,9 @@ pushgateway:
 kubeStateMetrics:
   nodeSelector:
     nodegroup-role: clustertools
+  service:
+    annotations: {}
+  labels: {}
 alertmonitor:
   nodeSelector:
     nodegroup-role: clustertools
