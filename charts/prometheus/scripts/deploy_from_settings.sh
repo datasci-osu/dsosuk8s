@@ -65,11 +65,11 @@ server:
     nodegroup-role: clustertools
   resources: 
     limits:
-      cpu: 500m
-      memory: 1Gi
+      cpu: 1000m
+      memory: 3Gi
     requests:
-      cpu: 200m
-      memory: 512Mi
+      cpu: 500m
+      memory: 2Gi
 
 nodeExporter:
   tolerations:
