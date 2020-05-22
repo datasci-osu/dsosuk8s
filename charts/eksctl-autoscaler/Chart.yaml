@@ -10,7 +10,7 @@ keywords:
 maintainers:
 - email: shawn.oneil@oregonstate.edu
   name: Shawn T O'Neil
-version: 1.0.1-dev
+version: 1.0.1
 changeLog:
   v1.0.1:
     minor: updating autoscaler image to 1.18.1
