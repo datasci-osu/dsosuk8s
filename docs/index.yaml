@@ -2,7 +2,7 @@ apiVersion: v1
 entries:
   ds-jupyterlab:
   - apiVersion: v1
-    created: "2020-04-08T08:25:42.461992-07:00"
+    created: "2020-05-22T16:18:12.970914-07:00"
     description: JupyerLab with Python, Julia, R, RStudio, Shiny
     digest: c4fd27d1cd515cf15bd6a2aad386ebd3399d30e2a7881d9a08f1de929fd01f5f
     icon: file://icon.svg
@@ -22,7 +22,7 @@ entries:
     - ds-jupyterlab-1.3.2.tgz
     version: 1.3.2
   - apiVersion: v1
-    created: "2020-04-08T08:25:42.454628-07:00"
+    created: "2020-05-22T16:18:12.963416-07:00"
     description: JupyerLab with Python, Julia, R, RStudio, Shiny
     digest: d39d0b365573149e2e12b27dfb7b972a4e89f5803b296c1995c26282e41f9619
     icon: file://icon.svg
@@ -42,7 +42,7 @@ entries:
     - ds-jupyterlab-1.3.2-dev.tgz
     version: 1.3.2-dev
   - apiVersion: v1
-    created: "2020-04-08T08:25:42.448127-07:00"
+    created: "2020-05-22T16:18:12.956917-07:00"
     description: JupyerLab with Python, Julia, R, RStudio, Shiny
     digest: 2aa1b656526504b5d7cef81c71b74728bf76bb74a51a44415c78917be892b9b4
     icon: file://icon.svg
@@ -62,7 +62,7 @@ entries:
     - ds-jupyterlab-1.3.1.tgz
     version: 1.3.1
   - apiVersion: v1
-    created: "2020-04-08T08:25:42.440187-07:00"
+    created: "2020-05-22T16:18:12.949952-07:00"
     description: JupyerLab with Python, Julia, R, RStudio, Shiny
     digest: ec89125f5f0cd31d50d3f3cf7edcb3ed0977d043e9ecbb61344f449a8445308b
     icon: file://icon.svg
@@ -82,7 +82,7 @@ entries:
     - ds-jupyterlab-1.2.1-dev.tgz
     version: 1.2.1-dev
   - apiVersion: v1
-    created: "2020-04-08T08:25:42.432756-07:00"
+    created: "2020-05-22T16:18:12.942361-07:00"
     description: JupyerLab with Python, Julia, R, RStudio, Shiny
     digest: 81712dce119c28f82526e08ca8c8a347f1a8824689b0efff3989a40e3fd5bb0d
     icon: file://icon.svg
@@ -103,7 +103,26 @@ entries:
     version: 1.2.0
   eksctl-autoscaler:
   - apiVersion: v1
-    created: "2020-04-08T08:25:42.463139-07:00"
+    created: "2020-05-22T16:18:12.971609-07:00"
+    description: Autoscaler for eksctl-based clusters, based on https://github.com/kubernetes/autoscaler/tree/master/cluster-autoscaler/cloudprovider/aws,
+      specifically auto-discovery but using kubernetes.io/cluster/eksdevd tag instead
+      of adding a special tag as indicated by the docs.
+    digest: dd3eab61e10cc3b2a78a07b82bf8e275913f0ed0bde8b0ba2a0d5633bf8b2f6c
+    icon: file://icon.png
+    keywords:
+    - kubernetes
+    - aws
+    - eks
+    - autoscaler
+    maintainers:
+    - email: shawn.oneil@oregonstate.edu
+      name: Shawn T O'Neil
+    name: eksctl-autoscaler
+    urls:
+    - eksctl-autoscaler-1.0.1-dev.tgz
+    version: 1.0.1-dev
+  - apiVersion: v1
+    created: "2020-05-22T16:18:12.972718-07:00"
     description: Autoscaler for eksctl-based clusters, based on https://github.com/kubernetes/autoscaler/tree/master/cluster-autoscaler/cloudprovider/aws,
       specifically auto-discovery but using kubernetes.io/cluster/eksdevd tag instead
       of adding a special tag as indicated by the docs.
@@ -124,7 +143,7 @@ entries:
   grafana:
   - apiVersion: v1
     appVersion: 6.6.0
-    created: "2020-04-08T08:25:42.465565-07:00"
+    created: "2020-05-22T16:18:12.97522-07:00"
     description: The leading tool for querying and visualizing time series and metrics.
       (Fork for custom deployment by Shawn O'Neil)
     digest: 7fbf67459dad6464863036b0523253f479afe6b0ce4ccfed1c7686dbd0efa64e
@@ -148,7 +167,7 @@ entries:
     version: 4.6.3
   nfs-drive:
   - apiVersion: v1
-    created: "2020-04-08T08:25:42.466791-07:00"
+    created: "2020-05-22T16:18:12.976147-07:00"
     description: Spawns an NFS server for use by applications.
     digest: a3c3f63278497f087ba282ff76a4fb7b5e3ddf4cc21bac8704f6eb73bbef4943
     icon: file://icon.svg
@@ -165,7 +184,7 @@ entries:
     version: 1.1.0
   nginx-ingress:
   - apiVersion: v1
-    created: "2020-04-08T08:25:42.468858-07:00"
+    created: "2020-05-22T16:18:12.978485-07:00"
     description: Nginx ingress controller built on https://github.com/nginxinc/kubernetes-ingress/tree/master/deployments/helm-chart.
     digest: 7c6dd7194481051d1637757c153137fa5aad5c1692d261798701f283d76b1460
     icon: file://icon.svg
@@ -181,8 +200,35 @@ entries:
     version: "1"
   prometheus:
   - apiVersion: v1
+    appVersion: 2.18.1
+    created: "2020-05-22T16:18:12.989883-07:00"
+    dependencies:
+    - condition: kubeStateMetrics.enabled
+      name: kube-state-metrics
+      repository: https://kubernetes-charts.storage.googleapis.com/
+      version: 2.7.*
+    description: Prometheus is a monitoring system and time series database.
+    digest: 80d17ecdbd40ef2a4efaf3f3e620fcce2a7e22b9e44eca6bff21ca584d8a5dfe
+    home: https://prometheus.io/
+    icon: https://raw.githubusercontent.com/prometheus/prometheus.github.io/master/assets/prometheus_logo-cb55bb5c346.png
+    maintainers:
+    - email: gianrubio@gmail.com
+      name: gianrubio
+    - email: zanhsieh@gmail.com
+      name: zanhsieh
+    name: prometheus
+    sources:
+    - https://github.com/prometheus/alertmanager
+    - https://github.com/prometheus/prometheus
+    - https://github.com/prometheus/pushgateway
+    - https://github.com/prometheus/node_exporter
+    - https://github.com/kubernetes/kube-state-metrics
+    urls:
+    - prometheus-11.2.3.tgz
+    version: 11.2.3
+  - apiVersion: v1
     appVersion: 2.15.2
-    created: "2020-04-08T08:25:42.474083-07:00"
+    created: "2020-05-22T16:18:12.98353-07:00"
     description: Prometheus is a monitoring system and time series database. (Fork
       for custom deployment by Shawn O'Neil)
     digest: 3d047c122bbdcad720169c0c63fb356618730dc20dfae48eae5debe207108ea4
@@ -208,7 +254,7 @@ entries:
   velero:
   - apiVersion: v1
     appVersion: 1.2.0
-    created: "2020-04-08T08:25:42.478412-07:00"
+    created: "2020-05-22T16:18:12.994268-07:00"
     description: A Helm chart for velero (Fork for custom deployment by Shawn O'Neil)
     digest: 3f48d2bf574f0eeb7b5c9053c4f46525840c233a35b470a0f7cf4781b6c18fe9
     home: https://github.com/vmware-tanzu/velero
@@ -232,4 +278,4 @@ entries:
     urls:
     - velero-2.8.8.tgz
     version: 2.8.8
-generated: "2020-04-08T08:25:42.424775-07:00"
+generated: "2020-05-22T16:18:12.933522-07:00"
