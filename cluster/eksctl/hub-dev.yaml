@@ -110,14 +110,15 @@ nodeGroups:
       - "modprobe nfsd"
 
   # user pod nodegroup
-  - name: big-jhworkers
+  - name: t3a-2xlarge-jhworkers
     instanceType: t3a.2xlarge
     iam: 
       withAddonPolicies:
         autoScaler: true
     minSize: 0
     maxSize: 5
-    desiredCapacity: 0
+    # spin one up for a bit so the cluster-autoscaler can get the config for the group and scale it back down if not needed: https://github.com/weaveworks/eksctl/issues/1481
+    desiredCapacity: 1
     volumeSize: 30
     ###availabilityZones: ["us-west-2a", "us-west-2b", "us-west-2c"]
     labels: 
