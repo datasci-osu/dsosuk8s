@@ -14,15 +14,7 @@ do_mount $NFS_SVC_HOME /home
 # there's no NB_USER defined for the hub, so we don't worry about things in the home directory or the site-libs
 create-dir-structure <( cat /usr/local/bin/data/structure.txt | grep -v -E 'NB_USER|NB_UID|PYTHONVERSION')
 
-
-echo "relinking /srv/jupyterhub..."
-
-rm -rf /srv/jupyterhub
-ln -s $ADMIN_HOME_DIR/automanaged/hub_user_db /srv/jupyterhub
-
-echo "relinking done;"
-ls -lah /srv
-ls -lah /srv/jupyterhub
+chown $ADMIN_USERNAME /srv/jupyterhub
 
 
 cd /srv/jupyterhub

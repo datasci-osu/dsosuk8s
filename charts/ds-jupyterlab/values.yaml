@@ -86,7 +86,7 @@ jupyterhub:
   hub:
     baseUrl: /
     db:
-      type: ""
+      type: "sqlite-pvc"
       upgrade: false 
     image:
       name: oneilsh/ktesting-k8s-hub

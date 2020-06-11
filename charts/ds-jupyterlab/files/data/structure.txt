@@ -5,7 +5,6 @@ $ADMIN_UID	$ADMIN_GID	2775	mkdir	permsonly	/home/.hub_local/automanaged
 $ADMIN_UID	$ADMIN_GID	0664	data/etc_group_admins	permsonly	/home/.hub_local/automanaged/etc_group_admins
 $ADMIN_UID	$ADMIN_GID	0664	data/etc_group_users	permsonly	/home/.hub_local/automanaged/etc_group_users
 $ADMIN_UID	$ADMIN_GID	0664	data/etc_passwd_additions	permsonly	/home/.hub_local/automanaged/etc_group_users
-$ADMIN_UID	$ADMIN_GID	2770	mkdir	permsonly	/home/.hub_local/automanaged/hub_user_db
 $ADMIN_UID	$ADMIN_GID	0664	data/autoexec_by_python_notebooks.py	permsonly	/home/.hub_local/autoexec_by_python_notebooks.py
 $ADMIN_UID	$ADMIN_GID	0664	data/autosourced_by_rprofiles.R	permsonly	/home/.hub_local/autosourced_by_rprofiles.R
 $ADMIN_UID	$ADMIN_GID	0664	data/hubrc	permsonly	/home/.hub_local/hubrc

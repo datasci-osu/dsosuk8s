@@ -13,8 +13,11 @@ maintainers:
 - email: shawn.oneil@oregonstate.edu
   name: Shawn T O'Neil
 name: ds-jupyterlab
-version: 1.3.2
+version: 1.3.3
 changeLog:
+  v1.3.3:
+    minor:
+    - taking hub_db dir off of nfs for stability
   v1.3.2:
     minor:
     - fixing shiny server
