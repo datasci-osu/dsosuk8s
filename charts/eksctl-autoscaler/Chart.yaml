@@ -10,8 +10,10 @@ keywords:
 maintainers:
 - email: shawn.oneil@oregonstate.edu
   name: Shawn T O'Neil
-version: 1.0.1
+version: 1.16.5
 changeLog:
+  v1.16.5:
+    minor: downgrading autoscaler image to 1.16.5 to match k8s version
   v1.0.1:
     minor: updating autoscaler image to 1.18.1
   v1.0:
