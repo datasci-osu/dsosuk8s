@@ -13,8 +13,12 @@ maintainers:
 - email: shawn.oneil@oregonstate.edu
   name: Shawn T O'Neil
 name: ds-jupyterlab
-version: 1.3.3
+version: 1.3.4
 changeLog:
+  v1.3.4:
+    minor:
+    - cost-based autoscaling group preferences
+    - increased timeout for user pod spawn, increase simultaneous spawn limit
   v1.3.3:
     minor:
     - taking hub_db dir off of nfs for stability

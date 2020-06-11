@@ -37,7 +37,81 @@ jupyterhub:
       enabled: true
       type: offload
   singleuser:
-    # looks like these should be set null to delete the key (including those defaulted in the jupyterhub chart) for the c.Spawner limits below to be used
+    # if nodes are labeled with their cost in cents-per-hour, this should help
+    # schedule pods on the cheapest node they can fit on (notwithstanding influences by the custom scheduler and various requirements)
+    extraNodeAffinity:
+      preferred:
+      - weight: 100
+        preference: 
+          matchExpressions:
+          - key: cents-per-hour
+            operator: Lt
+            values:
+            - "10"
+      - weight: 100
+        preference: 
+          matchExpressions:
+          - key: cents-per-hour
+            operator: Lt
+            values:
+            - "20"
+      - weight: 100
+        preference: 
+          matchExpressions:
+          - key: cents-per-hour
+            operator: Lt
+            values:
+            - "30"
+      - weight: 100
+        preference: 
+          matchExpressions:
+          - key: cents-per-hour
+            operator: Lt
+            values:
+            - "40"
+      - weight: 100
+        preference: 
+          matchExpressions:
+          - key: cents-per-hour
+            operator: Lt
+            values:
+            - "50"
+      - weight: 100
+        preference: 
+          matchExpressions:
+          - key: cents-per-hour
+            operator: Lt
+            values:
+            - "60"
+      - weight: 100
+        preference: 
+          matchExpressions:
+          - key: cents-per-hour
+            operator: Lt
+            values:
+            - "70"
+      - weight: 100
+        preference: 
+          matchExpressions:
+          - key: cents-per-hour
+            operator: Lt
+            values:
+            - "80"
+      - weight: 100
+        preference: 
+          matchExpressions:
+          - key: cents-per-hour
+            operator: Lt
+            values:
+            - "90"
+      - weight: 100
+        preference: 
+          matchExpressions:
+          - key: cents-per-hour
+            operator: Lt
+            values:
+            - "100"
+      # looks like these should be set null to delete the key (including those defaulted in the jupyterhub chart) for the c.Spawner limits below to be used
     memory:
       limit: 1.0G
       guarantee: 0.5G
@@ -70,6 +144,7 @@ jupyterhub:
       NFS_SVC_HOME: ""
     uid: 0
     fsgid: 0
+    startTimeout: 1200
 
   ingress:
     enabled: true
@@ -109,6 +184,8 @@ jupyterhub:
         subPath: start-hub.sh
 
     extraConfig:
+      concurrentSpawn:
+        c.JupyterHub.concurrent_spawn_limit = 400
       templatePath:
         c.JupyterHub.template_paths = ['/nfs_home/.hub_local/announcement_templates']
       basedir: |
