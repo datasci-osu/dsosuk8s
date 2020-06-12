@@ -7,8 +7,9 @@ create-dir-structure () {
     echo "This allows for changes in files to be not overwritten if present." 1>&2
     echo "Similarly, permsonly can be used to always reset user:group and mode, but leave contents if present (permsonly does not recurse)." 1>&2
     echo "" 1>&2
-    echo "root  root  0755  mkdir  always  ./home" 1>&2
-    echo "smithj  everyone  0755  mkdir  always  /home/smithj/docs" 1>&2
+    echo "Note that to clear setuid and setgid double-0 is needed: https://serverfault.com/a/238964 " 1>&2
+    echo "root  root  00755  mkdir  always  ./home" 1>&2
+    echo "smithj  everyone  00755  mkdir  always  /home/smithj/docs" 1>&2
     echo "smithj  everyone  0755  templates/README.txt  ifnotpresent  /home/smithj/docs/README.txt" 1>&2
     echo "" 1>&2
     echo "Environment variables can be present for interpolation:" 1>&2
@@ -43,6 +44,7 @@ create-dir-structure () {
 
       echo "Setting owner/permissions to $rUSER:$rGROUP $rMODE on $rDEST"
       chown -R $rUSER:$rGROUP $rDEST
+      echo chmod -R $rMODE $rDEST
       chmod -R $rMODE $rDEST
     fi
  
@@ -71,11 +73,11 @@ create_uids_gids() {
 stage_home_temp_copy() {
   
   local NB_USER=$1
-  # move things to /tmp to work on since we'll be NFS mounting over /home
+  # move things to / to work on since we'll be NFS mounting over /home
   # make a copy of the jovyan home to $NB_USER HOME
-  mv /home/jovyan /tmp/jovyan               
-  mv /tmp/jovyan /tmp/$NB_USER
-  rm -rf /tmp/$NB_USER/work
+  mv /home/jovyan /jovyan               
+  mv /jovyan /$NB_USER
+  rm -rf /$NB_USER/work
 }
 
 
