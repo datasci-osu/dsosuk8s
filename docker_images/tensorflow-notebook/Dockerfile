@@ -1,4 +1,4 @@
-FROM jupyter/tensorflow-notebook:76402a27fd13
+FROM cschranz/gpu-jupyter:v1.0_cuda-10.1_ubuntu-18.04
 
 USER root
 
@@ -156,8 +156,8 @@ RUN apt-get update \
 # # fixup for shiny-server bookmarks (don't want to make adjustment in the jupyter-rsession-proxy where the shiny config is generated from)
 # RUN chmod o+w /var/lib/shiny-server
 # 
-# #TAG v0.1.1-simple
-# #TAG tensorflowsimple
+#TAG v0.1.2-simple
+#TAG tensorflowsimple
 # 
 USER $NB_USER
 

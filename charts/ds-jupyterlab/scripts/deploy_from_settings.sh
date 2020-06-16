@@ -21,6 +21,11 @@ usage () {
   echo "MEM_LIMIT=1G" 1>&2
   echo "CPU_GUARANTEE=0.1" 1>&2
   echo "CPU_LIMIT=1" 1>&2
+  echo "GPU_COUNT=0" 1>&2
+  echo "SINGLEUSER_IMAGE=oneilsh/ktesting-datascience-notebook" 1>&2
+  echo "SINGLEUSER_IMAGE_TAG=v1.1.6" 1>&2
+  echo "HUB_IMAGE=oneilsh/ktesting-k8s-hub" 1>&2
+  echo "HUB_IMAGE_TAG=v1.3.2" 1>&2
   echo "" 1>&2
   echo "${yellow}The following can also be optionally set (defaults shown): ${white}" 1>&2 
   echo "AUTH_TYPE=lti              # (lti|native|dummy)" 1>&2
@@ -61,10 +66,16 @@ validate_set NUM_PLACEHOLDERS "$NUM_PLACEHOLDERS" "^[[:digit:]]+$" 3
 validate_set MEM_GUARANTEE "$MEM_GUARANTEE" "^([[:digit:]]*\.)?([[:digit:]]+)G$" 0.5G
 validate_set MEM_LIMIT "$MEM_LIMIT" "^([[:digit:]]*\.)?([[:digit:]]+)G$" 1.0G
 validate_set CPU_GUARANTEE "$CPU_GUARANTEE" "^([[:digit:]]*\.)?([[:digit:]]+)$" 0.1
+validate_set GPU_COUNT "$GPU_COUNT" "^([[:digit:]]+)$" 0
 validate_set CPU_LIMIT "$CPU_LIMIT" "^([[:digit:]]*\.)?([[:digit:]]+)$" 1.0
 validate_set DRIVE_APPNAME "$DRIVE_APPNAME" "^[[:alnum:]_-]+$" "homedrive-$APPNAME"
 validate_set HUB_APPNAME "$HUB_APPNAME" "^[[:alnum:]_-]+$" "hub-$APPNAME"
 validate_set NAMESPACE "$NAMESPACE" "^[[:alnum:]_-]+$" "$APPNAME"
+
+validate_set SINGLEUSER_IMAGE "$SINGLEUSER_IMAGE" "^.+$" "oneilsh/ktesting-datascience-notebook"
+validate_set HUB_IMAGE "$HUB_IMAGE" "^.+$" "oneilsh/ktesting-k8s-hub"
+validate_set SINGLEUSER_IMAGE_TAG "$SINGLEUSER_IMAGE_TAG" "^[[:alnum:]_\.-]+$" "v1.1.6"
+validate_set HUB_IMAGE_TAG "$HUB_IMAGE_TAG" "^[[:alnum:]_\.-]+$" "v1.3.2"
 # JSON doesn't support single quotes (at least not python's json.loads), so we have to use double-quotes internally
 validate_set LTI_ID_KEYS "$LTI_ID_KEYS" ".+" "[\\\"custom_canvas_user_login_id\\\", \\\"lis_person_contact_email_primary\\\", \\\"custom_canvas_user_login_id\\\"]"
 validate_set LTI_ID_REGEXES "$LTI_ID_REGEXES" ".+" "[\\\"(^[^@]+)@oregonstate.edu$\\\", \\\"(^[^@]+@[^@]+$)\\\", \\\"(^[0-9a-f]{6,6})[0-9a-f]*$\\\"]"
@@ -94,6 +105,9 @@ TEMPFILE=$(mktemp)
 cat <<EOF > $TEMPFILE
 jupyterhub:
   hub:
+    image:
+      name: "$HUB_IMAGE"
+      tag: "$HUB_IMAGE_TAG"
     extraEnv:
       AUTH_TYPE: "$AUTH_TYPE"
       LTI_CLIENT_KEY: "$LTI_CLIENT_KEY"
@@ -127,6 +141,12 @@ jupyterhub:
     cpu:
       limit: $CPU_LIMIT
       guarantee: $CPU_GUARANTEE
+    extraResource:
+      limits:
+        nvidia.com/gpu: "$GPU_COUNT"
+    image:
+      name: "$SINGLEUSER_IMAGE"
+      tag: "$SINGLEUSER_IMAGE_TAG"
 
     extraEnv:
       NFS_SVC_HOME: "$DRIVE_APPNAME"   # same as above

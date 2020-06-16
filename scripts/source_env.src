@@ -13,7 +13,7 @@ export PATH=$ADD_PATH:$PATH
 
 alias k=kubectl
 
-alias knodes='k get nodes "-o=custom-columns=NAME:.metadata.name,GPU:.status.allocatable.nvidia\.com/gpu,TYPE:.metadata.labels.beta\\\.kubernetes\\\.io/instance-type,NODEGROUP:.metadata.labels.alpha\\\.eksctl\\\.io/nodegroup-name"'
+alias knodes='k get nodes "-o=custom-columns=NAME:.metadata.name,GPU:.status.allocatable.nvidia\.com/gpu,TYPE:.metadata.labels.beta\\.kubernetes\\.io/instance-type,NODEGROUP:.metadata.labels.alpha\\.eksctl\\.io/nodegroup-name"'
 
 alias kauto='k logs deployment/cluster-autoscaler -n kube-system --tail 50'
 
