@@ -146,7 +146,7 @@ nodeGroups:
 
  
   # user pod nodegroup
-  - name: jhworkers-g4dn-xlarge-ami-0d190d9117f2bca4a
+  - name: jhworkers-g4dn-xlarge
     instanceType: g4dn.xlarge
     ami: "ami-0d190d9117f2bca4a"   # from https://docs.aws.amazon.com/eks/latest/userguide/gpu-ami.html for k8s 1.16; shot in the dark...
     iam: 
@@ -162,6 +162,7 @@ nodeGroups:
       cents-per-hour: "53"
       nodegroup-role: jhusers
       hub.jupyter.org/node-purpose: user
+      nvidia-gpu: "true"
     taints:
       hub.jupyter.org/dedicated: user:NoSchedule
     tags:
