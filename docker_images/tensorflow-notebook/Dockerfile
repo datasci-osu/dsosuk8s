@@ -1,164 +1,572 @@
-FROM cschranz/gpu-jupyter:v1.0_cuda-10.1_ubuntu-18.04
+# Use NVIDIA CUDA as base image and run the same installation as in the other packages.
+# The version of cudatoolkit must match those of the base image, see Dockerfile.pytorch
+FROM nvidia/cuda:10.1-base-ubuntu18.04
+
+# based on https://github.com/iot-salzburg/gpu-jupyter/ with customizations from generated Dockerfile
+# LABEL maintainer="Christoph Schranz <christoph.schranz@salzburgresearch.at>"
+# The maintainers of subsequent sections may vary
+
+############################################################################
+#################### Dependency: jupyter/base-image ########################
+############################################################################
+
+# Copyright (c) Jupyter Development Team.
+# Distributed under the terms of the Modified BSD License.
+
+# Ubuntu 18.04 (bionic)
+# https://hub.docker.com/_/ubuntu/?tab=tags&name=bionic
+ARG ROOT_CONTAINER=ubuntu:bionic-20200112@sha256:bc025862c3e8ec4a8754ea4756e33da6c41cba38330d7e324abd25c8e0b93300
+
+LABEL maintainer="Jupyter Project <jupyter@googlegroups.com>"
+ARG NB_USER="jovyan"
+ARG NB_UID="1000"
+ARG NB_GID="100"
 
 USER root
 
+# Install all OS dependencies for notebook server that starts but lacks all
+# features (e.g., download as all possible file formats)
+ENV DEBIAN_FRONTEND noninteractive
+RUN apt-get update \
+ && apt-get install -yq --no-install-recommends \
+    wget \
+    bzip2 \
+    ca-certificates \
+    sudo \
+    locales \
+    fonts-liberation \
+    run-one \
+ && apt-get clean && rm -rf /var/lib/apt/lists/*
 
-# RUN jupyter labextension install jupyterlab-topbar-extension \
-#                              jupyterlab-system-monitor \
-#                              jupyterlab-logout \
-#                              jupyterlab-theme-toggle
-# 
+########################
+## Manpages install - install early to prevent bloat (RE https://jupyter-docker-stacks.readthedocs.io/en/latest/using/recipes.html#manpage-installation)
+########################
 
-RUN rm -rf /home/jovyan/.cache/yarn
+ENV DEBIAN_FRONTEND noninteractive
+# Remove the manpage blacklist, install man, install docs
+RUN rm /etc/dpkg/dpkg.cfg.d/excludes \
+    && apt-get update \
+    && dpkg -l | grep ^ii | cut -d' ' -f3 | xargs apt-get install -yq --no-install-recommends --reinstall man \
+    && apt-get clean \
+    && rm -rf /var/lib/apt/lists/*
 
+# Workaround for a mandb bug, should be fixed in mandb > 2.8.5
+# https://git.savannah.gnu.org/cgit/man-db.git/commit/?id=8197d7824f814c5d4b992b4c8730b5b0f7ec589a
+RUN echo "MANPATH_MAP /opt/conda/bin /opt/conda/man" >> /etc/manpath.config \
+    && echo "MANPATH_MAP /opt/conda/bin /opt/conda/share/man" >> /etc/manpath.config
+
+#####################
+### End manpages install
+#####################
+
+RUN echo "en_US.UTF-8 UTF-8" > /etc/locale.gen && \
+    locale-gen
+
+# Configure environment
+ENV CONDA_DIR=/opt/conda \
+    SHELL=/bin/bash \
+    NB_USER=$NB_USER \
+    NB_UID=$NB_UID \
+    NB_GID=$NB_GID \
+    LC_ALL=en_US.UTF-8 \
+    LANG=en_US.UTF-8 \
+    LANGUAGE=en_US.UTF-8
+ENV PATH=$CONDA_DIR/bin:$PATH \
+    HOME=/home/$NB_USER
+
+# Copy a script that we will use to correct permissions after running certain commands
+COPY fix-permissions /usr/local/bin/fix-permissions
+RUN chmod a+rx /usr/local/bin/fix-permissions
+
+# Enable prompt color in the skeleton .bashrc before creating the default NB_USER
+RUN sed -i 's/^#force_color_prompt=yes/force_color_prompt=yes/' /etc/skel/.bashrc
+
+# Create NB_USER wtih name jovyan user with UID=1000 and in the 'users' group
+# and make sure these dirs are writable by the `users` group.
+RUN echo "auth requisite pam_deny.so" >> /etc/pam.d/su && \
+    sed -i.bak -e 's/^%admin/#%admin/' /etc/sudoers && \
+    sed -i.bak -e 's/^%sudo/#%sudo/' /etc/sudoers && \
+    useradd -m -s /bin/bash -N -u $NB_UID $NB_USER && \
+    mkdir -p $CONDA_DIR && \
+    chown $NB_USER:$NB_GID $CONDA_DIR && \
+    chmod g+w /etc/passwd && \
+    fix-permissions $HOME && \
+    fix-permissions "$(dirname $CONDA_DIR)"
+
+USER $NB_UID
+WORKDIR $HOME
+ARG PYTHON_VERSION=default
+
+# Setup work directory for backward-compatibility
+RUN mkdir /home/$NB_USER/work && \
+    fix-permissions /home/$NB_USER
+
+# Install conda as jovyan and check the md5 sum provided on the download site
+ENV MINICONDA_VERSION=4.7.12.1 \
+    MINICONDA_MD5=81c773ff87af5cfac79ab862942ab6b3 \
+    CONDA_VERSION=4.7.12
+
+RUN cd /tmp && \
+    wget --quiet https://repo.continuum.io/miniconda/Miniconda3-${MINICONDA_VERSION}-Linux-x86_64.sh && \
+    echo "${MINICONDA_MD5} *Miniconda3-${MINICONDA_VERSION}-Linux-x86_64.sh" | md5sum -c - && \
+    /bin/bash Miniconda3-${MINICONDA_VERSION}-Linux-x86_64.sh -f -b -p $CONDA_DIR && \
+    rm Miniconda3-${MINICONDA_VERSION}-Linux-x86_64.sh && \
+    echo "conda ${CONDA_VERSION}" >> $CONDA_DIR/conda-meta/pinned && \
+    conda config --system --prepend channels conda-forge && \
+    conda config --system --set auto_update_conda false && \
+    conda config --system --set show_channel_urls true && \
+    if [ ! $PYTHON_VERSION = 'default' ]; then conda install --yes python=$PYTHON_VERSION; fi && \
+    conda list python | grep '^python ' | tr -s ' ' | cut -d '.' -f 1,2 | sed 's/$/.*/' >> $CONDA_DIR/conda-meta/pinned && \
+    conda install --quiet --yes conda && \
+    conda install --quiet --yes pip && \
+    conda update --all --quiet --yes && \
+    conda clean --all -f -y && \
+    rm -rf /home/$NB_USER/.cache/yarn && \
+    fix-permissions $CONDA_DIR && \
+    fix-permissions /home/$NB_USER
+
+# Install Tini
+RUN conda install --quiet --yes 'tini=0.18.0' && \
+    conda list tini | grep tini | tr -s ' ' | cut -d ' ' -f 1,2 >> $CONDA_DIR/conda-meta/pinned && \
+    conda clean --all -f -y && \
+    fix-permissions $CONDA_DIR && \
+    fix-permissions /home/$NB_USER
+
+# Install Jupyter Notebook, Lab, and Hub
+# Generate a notebook server config
+# Cleanup temporary files
+# Correct permissions
+# Do all this in a single RUN command to avoid duplicating all of the
+# files across image layers when the permissions change
+RUN conda install --quiet --yes \
+    'notebook=6.0.3' \
+    'jupyterhub=1.1.0' \
+    'jupyterlab=1.2.5' && \
+    conda clean --all -f -y && \
+    npm cache clean --force && \
+    jupyter notebook --generate-config && \
+    rm -rf $CONDA_DIR/share/jupyter/lab/staging && \
+    rm -rf /home/$NB_USER/.cache/yarn && \
+    fix-permissions $CONDA_DIR && \
+    fix-permissions /home/$NB_USER
+
+EXPOSE 8888
+
+# Configure container startup
+ENTRYPOINT ["tini", "-g", "--"]
+CMD ["start-notebook.sh"]
+
+# Copy local files as late as possible to avoid cache busting
+COPY start.sh /usr/local/bin/
+COPY start-notebook.sh /usr/local/bin/
+COPY start-singleuser.sh /usr/local/bin/
+COPY jupyter_notebook_config.py /etc/jupyter/
+
+# Fix permissions on /etc/jupyter as root
+USER root
+RUN fix-permissions /etc/jupyter/
+
+# Switch back to jovyan to avoid accidental container runs as root
+USER $NB_UID
+
+############################################################################
+################# Dependency: jupyter/minimal-notebook #####################
+############################################################################
+
+# Copyright (c) Jupyter Development Team.
+# Distributed under the terms of the Modified BSD License.
+
+LABEL maintainer="Jupyter Project <jupyter@googlegroups.com>"
+
+USER root
+
+# Install all OS dependencies for fully functional notebook server
+RUN apt-get update && apt-get install -yq --no-install-recommends \
+    build-essential \
+    emacs \
+    git \
+    inkscape \
+    jed \
+    libsm6 \
+    libxext-dev \
+    libxrender1 \
+    lmodern \
+    netcat \
+    python-dev \
+    # ---- nbconvert dependencies ----
+    texlive-xetex \
+    texlive-fonts-recommended \
+    texlive-generic-recommended \
+    # Optional dependency
+    texlive-fonts-extra \
+    # ----
+    tzdata \
+    unzip \
+    nano \
+    && apt-get clean && rm -rf /var/lib/apt/lists/*
+
+# Switch back to jovyan to avoid accidental container runs as root
+USER $NB_UID
+
+############################################################################
+################# Dependency: jupyter/scipy-notebook #######################
+############################################################################
+
+# Copyright (c) Jupyter Development Team.
+# Distributed under the terms of the Modified BSD License.
+
+LABEL maintainer="Jupyter Project <jupyter@googlegroups.com>"
+
+USER root
+
+# ffmpeg for matplotlib anim
+RUN apt-get update && \
+    apt-get install -y --no-install-recommends ffmpeg && \
+    rm -rf /var/lib/apt/lists/*
+
+USER $NB_UID
+
+# Install Python 3 packages
+RUN conda install --quiet --yes \
+    'beautifulsoup4=4.8.*' \
+    'conda-forge::blas=*=openblas' \
+    'bokeh=1.4.*' \
+    'cloudpickle=1.2.*' \
+    'cython=0.29.*' \
+    #'dask=2.9.*' \
+    'dill=0.3.*' \
+    #'h5py=2.10.*' \
+    #'hdf5=1.10.*' \
+    'ipywidgets=7.5.*' \
+    'matplotlib-base=3.1.*' \
+    'numba=0.48.*' \
+    'numexpr=2.7.*' \
+    'pandas=0.25.*' \
+    #'patsy=0.5.*' \
+    'protobuf=3.11.*' \
+    #'scikit-image=0.16.*' \
+    'scikit-learn=0.22.*' \
+    'scipy=1.4.*' \
+    'seaborn=0.9.*' \
+    'sqlalchemy=1.3.*' \
+    'statsmodels=0.11.*' \
+    'sympy=1.5.*' \
+    #'vincent=0.4.*' \
+    #'xlrd' \
+    && \
+    conda clean --all -f -y && \
+    # Activate ipywidgets extension in the environment that runs the notebook server
+    jupyter nbextension enable --py widgetsnbextension --sys-prefix && \
+    # Also activate ipywidgets extension for JupyterLab
+    # Check this URL for most recent compatibilities
+    # https://github.com/jupyter-widgets/ipywidgets/tree/master/packages/jupyterlab-manager
+    jupyter labextension install @jupyter-widgets/jupyterlab-manager@^1.0.1 --no-build && \
+    jupyter labextension install jupyterlab_bokeh@1.0.0 --no-build && \
+    jupyter lab build && \
+    npm cache clean --force && \
+    rm -rf $CONDA_DIR/share/jupyter/lab/staging && \
+    rm -rf /home/$NB_USER/.cache/yarn && \
+    rm -rf /home/$NB_USER/.node-gyp && \
+    fix-permissions $CONDA_DIR && \
+    fix-permissions /home/$NB_USER
+
+# Install facets which does not have a pip or conda package at the moment
+#RUN cd /tmp && \
+#    git clone https://github.com/PAIR-code/facets.git && \
+#    cd facets && \
+#    jupyter nbextension install facets-dist/ --sys-prefix && \
+#    cd && \
+#    rm -rf /tmp/facets && \
+#    fix-permissions $CONDA_DIR && \
+#    fix-permissions /home/$NB_USER
+
+# Import matplotlib the first time to build the font cache.
+ENV XDG_CACHE_HOME /home/$NB_USER/.cache/
+RUN MPLBACKEND=Agg python -c "import matplotlib.pyplot" && \
+    fix-permissions /home/$NB_USER
+
+USER $NB_UID
+
+############################################################################
+################ Dependency: jupyter/datascience-notebook ##################
+############################################################################
+
+# Copyright (c) Jupyter Development Team.
+# Distributed under the terms of the Modified BSD License.
+
+LABEL maintainer="Jupyter Project <jupyter@googlegroups.com>"
+
+# Set when building on Travis so that certain long-running build steps can
+# be skipped to shorten build time.
+ARG TEST_ONLY_BUILD
+
+USER root
+
+# R pre-requisites
+RUN apt-get update && \
+    apt-get install -y --no-install-recommends \
+    fonts-dejavu \
+    gfortran \
+    gcc && \
+    rm -rf /var/lib/apt/lists/*
+
+# Julia dependencies
+# install Julia packages in /opt/julia instead of $HOME
+ENV JULIA_DEPOT_PATH=/opt/julia
+ENV JULIA_PKGDIR=/opt/julia
+ENV JULIA_VERSION=1.3.1
+
+RUN mkdir /opt/julia-${JULIA_VERSION} && \
+    cd /tmp && \
+    wget -q https://julialang-s3.julialang.org/bin/linux/x64/`echo ${JULIA_VERSION} | cut -d. -f 1,2`/julia-${JULIA_VERSION}-linux-x86_64.tar.gz && \
+    echo "faa707c8343780a6fe5eaf13490355e8190acf8e2c189b9e7ecbddb0fa2643ad *julia-${JULIA_VERSION}-linux-x86_64.tar.gz" | sha256sum -c - && \
+    tar xzf julia-${JULIA_VERSION}-linux-x86_64.tar.gz -C /opt/julia-${JULIA_VERSION} --strip-components=1 && \
+    rm /tmp/julia-${JULIA_VERSION}-linux-x86_64.tar.gz
+RUN ln -fs /opt/julia-*/bin/julia /usr/local/bin/julia
+
+# Show Julia where conda libraries are \
+RUN mkdir /etc/julia && \
+    echo "push!(Libdl.DL_LOAD_PATH, \"$CONDA_DIR/lib\")" >> /etc/julia/juliarc.jl && \
+    # Create JULIA_PKGDIR \
+    mkdir $JULIA_PKGDIR && \
+    chown $NB_USER $JULIA_PKGDIR && \
+    fix-permissions $JULIA_PKGDIR
+
+USER $NB_UID
+
+# R packages including IRKernel which gets installed globally.
+RUN conda install --quiet --yes \
+    'r-base=3.6.2' \
+    #'r-caret=6.0*' \
+    #'r-crayon=1.3*' \
+    'r-devtools=2.2*' \
+    #'r-forecast=8.10*' \
+    #'r-hexbin=1.28*' \
+    'r-htmltools=0.4*' \
+    'r-htmlwidgets=1.5*' \
+    'r-irkernel=1.1*' \
+    #'r-nycflights13=1.0*' \
+    'r-plyr=1.8*' \
+    #'r-randomforest=4.6*' \
+    'r-rcurl=1.98*' \
+    'r-reshape2=1.4*' \
+    'r-rmarkdown=2.1*' \
+    'r-rsqlite=2.1*' \
+    'r-shiny=1.3*' \
+    #'r-tidyverse=1.3*' \
+    'rpy2=3.1*' \
+    && \
+    conda clean --all -f -y && \
+    fix-permissions $CONDA_DIR && \
+    fix-permissions /home/$NB_USER
+
+# Add Julia packages. Only add HDF5 if this is not a test-only build since
+# it takes roughly half the entire build time of all of the images on Travis
+# to add this one package and often causes Travis to timeout.
+#
+# Install IJulia as jovyan and then move the kernelspec out
+# to the system share location. Avoids problems with runtime UID change not
+# taking effect properly on the .local folder in the jovyan home dir.
+RUN julia -e 'import Pkg; Pkg.update()' && \
+    (test $TEST_ONLY_BUILD || julia -e 'import Pkg; Pkg.add("HDF5")') && \
+    julia -e "using Pkg; pkg\"add IJulia\"; pkg\"precompile\"" && \
+    # move kernelspec out of home \
+    mv $HOME/.local/share/jupyter/kernels/julia* $CONDA_DIR/share/jupyter/kernels/ && \
+    chmod -R go+rx $CONDA_DIR/share/jupyter && \
+    rm -rf $HOME/.local && \
+    fix-permissions $JULIA_PKGDIR $CONDA_DIR/share/jupyter
+
+############################################################################
+########################## Dependency: gpulibs #############################
+############################################################################
+
+LABEL maintainer="Christoph Schranz <christoph.schranz@salzburgresearch.at>"
+
+# Install Tensorflow, check compatibility here: https://www.tensorflow.org/install/gpu 
+RUN conda install --quiet --yes \
+    'tensorflow-gpu=2.1*' \
+    'keras-gpu' && \
+    fix-permissions $CONDA_DIR && \
+    fix-permissions /home/$NB_USER
+
+# Install PyTorch with dependencies
+RUN conda install --quiet --yes \
+    pyyaml mkl mkl-include setuptools cmake cffi typing
+
+# Check compatibility here: https://pytorch.org/get-started/locally/
+RUN conda install --quiet --yes \
+     pytorch \ 
+     torchvision \
+     cudatoolkit=10.1 -c pytorch
+#    pip install torch_nightly -f https://download.pytorch.org/whl/nightly/cu90/torch_nightly.html && \
+
+# Clean installation
+RUN conda clean --all -f -y && \
+    fix-permissions $CONDA_DIR && \
+    fix-permissions /home/$NB_USER
+
+############################################################################
+############################ Useful packages ###############################
+############################################################################
+
+LABEL maintainer="Christoph Schranz <christoph.schranz@salzburgresearch.at>"
+
+# Update conda
+RUN conda update -n base conda -y
+
+USER root
+
+# Install elasticsearch libs
+#USER root
+#RUN apt-get update \
+# && curl -sL https://repo1.maven.org/maven2/org/elasticsearch/elasticsearch-hadoop/6.8.1/elasticsearch-hadoop-6.8.1.jar
+#RUN pip install --no-cache-dir elasticsearch==7.1.0
+
+# Install rpy2 to share data between Python and R
+RUN conda install rpy2=2.9.4 plotly=4.4.1
+RUN conda install -c conda-forge ipyleaflet
+
+# Install important packages and Graphviz
+RUN set -ex \
+ && buildDeps=' \
+    graphviz==0.11 \
+' \
+ && apt-get update \
+ && apt-get -y install htop apt-utils graphviz libgraphviz-dev \
+ && pip install --no-cache-dir $buildDeps
+
+# Install various extensions
+RUN jupyter labextension install @jupyterlab/github
+#RUN jupyter labextension install jupyterlab-drawio
+#RUN jupyter labextension install jupyter-leaflet
+#RUN jupyter labextension install @jupyterlab/plotly-extension
+RUN jupyter labextension install @jupyter-widgets/jupyterlab-manager
+RUN pip install --no-cache-dir jupyter-tabnine==1.0.2  && \
+  jupyter nbextension install --py jupyter_tabnine && \
+  jupyter nbextension enable --py jupyter_tabnine && \
+  jupyter serverextension enable --py jupyter_tabnine
+RUN fix-permissions $CONDA_DIR
+RUN conda install -c conda-forge jupyter_contrib_nbextensions && \
+  conda install -c conda-forge jupyter_nbextensions_configurator && \
+  conda install -c conda-forge rise && \
+  jupyter nbextension enable codefolding/main
+RUN jupyter labextension install @ijmbarr/jupyterlab_spellchecker
+
+RUN fix-permissions /home/$NB_USER
+
+# Switch back to jovyan to avoid accidental container runs as root
+USER $NB_UID
+
+
+
+
+####################################################
+## More customizations
+####################################################
+
+# more jupyterlab extensions
+USER root
+RUN jupyter labextension install jupyterlab-topbar-extension \
+                                 jupyterlab-system-monitor \
+                                 jupyterlab-logout \
+                                 jupyterlab-theme-toggle
+
+# for tracking memory use with the system-monitor
+RUN pip install nbresuse
+
+# bash kernel
+RUN pip install bash_kernel
+RUN python -m bash_kernel.install
+
+
+# nfs tools
 RUN apt-get update \
  && apt-get install -yq --no-install-recommends \
     htop \
+    less \
+    nano \
+    openssh-client \ 
+    gnuplot \
     nfs-common \
     nfs-kernel-server \
     subversion \
     vim \
  && apt-get clean && rm -rf /var/lib/apt/lists/*
 
-## Rstudio - based on https://github.com/jupyterhub/jupyter-server-proxy/blob/master/contrib/rstudio/Dockerfile
+# Rstudio - based on https://github.com/jupyterhub/jupyter-server-proxy/blob/master/contrib/rstudio/Dockerfile
+RUN apt-get update && \
+ 	apt-get install -y --no-install-recommends \
+ 		libapparmor1 \
+                 libclang-dev \
+ 		libedit2 \
+ 		lsb-release \
+ 		psmisc \
+ 		libssl1.0.0 \
+ 		;
+ 
+# You can use rsession from rstudio's desktop package as well.
+ENV RSTUDIO_PKG=rstudio-server-1.2.5019-amd64.deb
+ENV RSTUDIO_URL=http://download2.rstudio.org/server/bionic/amd64
+RUN wget -q ${RSTUDIO_URL}/${RSTUDIO_PKG}
+RUN dpkg -i ${RSTUDIO_PKG}
+RUN rm ${RSTUDIO_PKG}
 
-# RUN apt-get update && \
-# 	apt-get install -y --no-install-recommends \
-# 		libapparmor1 \
-#                 libclang-dev \
-# 		libedit2 \
-# 		lsb-release \
-# 		psmisc \
-# 		libssl1.0.0 \
-# 		;
+# Shiny
+ENV SHINY_PKG=shiny-server-1.5.12.933-amd64.deb
+ENV SHINY_URL=https://download3.rstudio.org/ubuntu-14.04/x86_64
+RUN wget -q ${SHINY_URL}/${SHINY_PKG}
+RUN dpkg -i ${SHINY_PKG}
+RUN rm ${SHINY_PKG}
+
+RUN apt-get clean && \
+    rm -rf /var/lib/apt/lists/*
+
+# Jupyter proxy
+# rather than RUN pip install git+https://github.com/jupyterhub/jupyter-rsession-proxy
+# use the pypi version to avoid a recent bug RE https://github.com/jupyterhub/jupyter-rsession-proxy/issues/71#issuecomment-523630103
+RUN pip install 'jupyter-rsession-proxy==1.0b6'
+
+# fixup for shiny-server bookmarks (don't want to make adjustment in the jupyter-rsession-proxy where the shiny config is generated from)
+RUN chmod o+w /var/lib/shiny-server
+
+
+
+# Items from R jupyter docker-stack image
+RUN apt-get update && \
+     apt-get install -y --no-install-recommends \
+     fonts-dejavu \
+     unixodbc \
+     unixodbc-dev \
+     r-cran-rodbc \
+     gfortran \
+     gcc && \
+     rm -rf /var/lib/apt/lists/*
+
+# Fix for devtools https://github.com/conda-forge/r-devtools-feedstock/issues/4
+RUN ln -s /bin/tar /bin/gtar
+
+# Not entirely sure if this is needed in addition to jupyter-rsession-proxy?
+RUN jupyter labextension install @jupyterlab/server-proxy
+
+# other utilities
+RUN apt-get update \
+ && apt-get install -yq --no-install-recommends \
+    htop \
+    less \
+    nano \
+    openssh-client \ 
+    gnuplot \
+    subversion \
+    vim \
+ && apt-get clean && rm -rf /var/lib/apt/lists/*
+
+
+# cleanup yarn cache, too much wasted space
+RUN rm -rf /home/jovyan/.cache/yarn
+
 # 
-# # You can use rsession from rstudio's desktop package as well.
-# ENV RSTUDIO_PKG=rstudio-server-1.2.5019-amd64.deb
-# ENV RSTUDIO_URL=http://download2.rstudio.org/server/bionic/amd64
-# RUN wget -q ${RSTUDIO_URL}/${RSTUDIO_PKG}
-# RUN dpkg -i ${RSTUDIO_PKG}
-# RUN rm ${RSTUDIO_PKG}
-# 
-# ENV SHINY_PKG=shiny-server-1.5.12.933-amd64.deb
-# ENV SHINY_URL=https://download3.rstudio.org/ubuntu-14.04/x86_64
-# RUN wget -q ${SHINY_URL}/${SHINY_PKG}
-# RUN dpkg -i ${SHINY_PKG}
-# RUN rm ${SHINY_PKG}
-# 
-# RUN apt-get clean && \
-#     rm -rf /var/lib/apt/lists/*
-# 
-# 
-# #RUN pip install git+https://github.com/jupyterhub/jupyter-rsession-proxy
-# # use the pypi version to avoid a recent bug RE https://github.com/jupyterhub/jupyter-rsession-proxy/issues/71#issuecomment-523630103
-# RUN pip install 'jupyter-rsession-proxy==1.0b6'
-# 
-# 
-# #########################
-# ### Items from R stack notebook
-# #########################
-# 
-# RUN apt-get update && \
-#     apt-get install -y --no-install-recommends \
-#     fonts-dejavu \
-#     unixodbc \
-#     unixodbc-dev \
-#     r-cran-rodbc \
-#     gfortran \
-#     gcc && \
-#     rm -rf /var/lib/apt/lists/*
-# 
-# # Fix for devtools https://github.com/conda-forge/r-devtools-feedstock/issues/4
-# RUN ln -s /bin/tar /bin/gtar
-# 
-# USER $NB_UID
-# 
-# # R packages
-# RUN conda install --quiet --yes \
-#     'r-base=3.6.3' \
-#     'r-caret=6.0*' \
-#     'r-crayon=1.3*' \
-#     'r-devtools=2.3*' \
-#     'r-forecast=8.12*' \
-#     'r-hexbin=1.28*' \
-#     'r-htmltools=0.4*' \
-#     'r-htmlwidgets=1.5*' \
-#     'r-irkernel=1.1*' \
-#     'r-nycflights13=1.0*' \
-#     'r-plyr=1.8*' \
-#     'r-randomforest=4.6*' \
-#     'r-rcurl=1.98*' \
-#     'r-reshape2=1.4*' \
-#     'r-rmarkdown=2.1*' \
-#     'r-rodbc=1.3*' \
-#     'r-rsqlite=2.2*' \
-#     'r-shiny=1.4*' \
-#     'r-tidyverse=1.3*' \
-#     'unixodbc=2.3.*' \
-#     && \
-#     conda clean --all -f -y && \
-#     fix-permissions $CONDA_DIR
-# 
-# # Install e1071 R package (dependency of the caret R package)
-# RUN conda install --quiet --yes r-e1071
-# 
-# #########################
-# ### End items from R stack notebook
-# #########################
-# 
-# USER root
-# 
-# # because of some error RE https://github.com/jupyter/docker-stacks/issues/927 
-# # still needed?
-# #RUN conda config --set unsatisfiable_hints True
-# #RUN conda install -c r r-stringi
-# 
-# # needed for launch icon? Sigh...
-# # https://github.com/jupyterhub/jupyter-server-proxy/issues/139#issuecomment-544763062
-# # a never version of jupyterlab should support jupyterlab-server-proxy, even though it's not the jupyerlab itself
-# # that is version conflicted, but some extension packages...
-# # (jupyter/datascience-notebook:7a0c7325e470 has jupyterlab 1.2.1)
-# ## Conflicting Dependencies:
-# ## JupyterLab              Extension      Package
-# ## >=1.2.0 <1.3.0          >=0.19.1 <0.20.0@jupyterlab/application
-# ## >=1.2.0 <1.3.0          >=0.19.1 <0.20.0@jupyterlab/launcher
-# #RUN jupyter labextension install jupyterlab-server-proxy-saulshanabrook
-# # trying this from an earlier comment....
-# #RUN cd /tmp/ && \
-# #    git clone --depth 1 https://github.com/jupyterhub/jupyter-server-proxy && \
-# #    cd jupyter-server-proxy/jupyterlab-server-proxy && \
-# #    npm install && npm run build && jupyter labextension link . && \
-# #    npm run build && jupyter lab build
-# ## OK, NEITHER OF THOSE WORK. Maybe I can try and install a newer jupyterlab... let's see if this works RE https://www.npmjs.com/package/@jupyterlab/server-proxy
-# RUN jupyter labextension install @jupyterlab/server-proxy
-# # omg it leaves 270M of junk around in .cache - we copy around the /home/jovyan user dir to setup NB_USER home, so it needs to be light
-# RUN rm -rf /home/jovyan/.cache/yarn
-# 
-# # these are listed in the dockerfile example in https://github.com/jupyterhub/jupyter-server-proxy/blob/master/contrib/rstudio/Dockerfile,
-# # we add them to the start_nfs.sh script in startup_scripts (set like PATH, PYTHONPATH, etc.)
-# #ENV PATH="${PATH}:/usr/lib/rstudio-server/bin"
-# #ENV LD_LIBRARY_PATH="/usr/lib/R/lib:/lib:/usr/lib/x86_64-linux-gnu:/usr/lib/jvm/java-7-openjdk-amd64/jre/lib/amd64/server:/opt/conda/lib/R/lib"
-# 
-# RUN mkdir -p /usr/local/bin/various
-# 
-# # extra stuff
-# RUN apt-get update \
-#  && apt-get install -yq --no-install-recommends \
-#     less \
-#     openssh-client \
-#  && apt-get clean && rm -rf /var/lib/apt/lists/*
-# 
-# RUN pip install bash_kernel
-# RUN python -m bash_kernel.install
-# RUN pip install jupyter_contrib_nbextensions && jupyter contrib nbextension install 
-# RUN pip install nbresuse
-# 
-# # fixup for shiny-server bookmarks (don't want to make adjustment in the jupyter-rsession-proxy where the shiny config is generated from)
-# RUN chmod o+w /var/lib/shiny-server
-# 
-#TAG v0.1.2-simple
-#TAG tensorflowsimple
-# 
+#TAG v0.1.3
+#TAG gpubase
+
 USER $NB_USER
-
 
