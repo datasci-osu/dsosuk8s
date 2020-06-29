@@ -16,6 +16,9 @@ create-dir-structure <( cat /usr/local/bin/data/structure.txt | grep -v -E 'NB_U
 
 chown $ADMIN_USERNAME /srv/jupyterhub
 
+git clone https://github.com/oneilsh/jh-profile-quota.git
+cd jh-profile-quota
+pip3 install -e .
 
 cd /srv/jupyterhub
 exec sudo -E -H -u $ADMIN_USERNAME -- sh -c 'umask 0007 && jupyterhub --config /etc/jupyterhub/jupyterhub_config.py'

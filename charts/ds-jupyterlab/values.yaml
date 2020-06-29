@@ -145,6 +145,56 @@ jupyterhub:
     uid: 0
     fsgid: 0
     startTimeout: 1200
+    profileQuota:
+      checkEvery: 10
+      quotaDbFilename: "/srv/jupyterhub/profile_quotas.sqlite"
+    profileList:
+    - display_name: "Standard Profile"
+      slug: "standard"
+      description: "The basics"
+      default: True
+    - display_name: "Fancy"
+      description: "Oh you fancy huh"
+      slug: "fancy"
+      kubespawner_override:
+        cpu_gaurantee: 0.4
+        cpu_limit: 1.2
+        mem_guarantee: "0.3G"
+        mem_limit: "0.7G"
+      quota:
+        costTokensPerHour: 0.1
+        minBalanceToSpawn: 0.05
+        admins:
+          active: true
+          initialBalance: 5
+          newTokensPerHour: 0.4
+          maxBalance: 10
+        users:
+          active: true
+          initialBalance: 5
+          newTokensPerHour: 0.4
+          maxBalance: 10
+    - display_name: "Fancy 2"
+      description: "Oh you fancy huh"
+      slug: "fancy2"
+      kubespawner_override:
+        cpu_gaurantee: 0.2
+        cpu_limit: 1.1
+        mem_guarantee: "0.4G"
+        mem_limit: "0.8G"
+      quota:
+        costTokensPerHour: 360
+        minBalanceToSpawn: 5
+        admins:
+          active: true
+          initialBalance: 60
+          newTokensPerHour: 60
+          maxBalance: 10
+        users:
+          active: true
+          initialBalance: 5
+          newTokensPerHour: 0.4
+          maxBalance: 10
 
   ingress:
     enabled: true
@@ -202,6 +252,48 @@ jupyterhub:
             )
             return pod
         c.KubeSpawner.modify_pod_hook = modify_pod_hook
+
+      profiles: |
+        from jhprofilequota import db
+
+        quota_db_filename = get_config('singleuser.profileQuota.quotaDbFilename', '/srv/jupyterhub/profile_quotas.sqlite')
+        db.create_db(quota_db_filename) 
+       
+        checker_cmd = ['python3','-m', 'jhprofilequota']
+        base_url = c.JupyterHub.get('base_url', '/')
+        checker_cmd.append( '--url=http://127.0.0.1:8081' + url_path_join(base_url, 'hub/api'))
+    
+        checker_cmd.append('--quota_db_filename=%s' % quota_db_filename)
+        
+        check_every = get_config('singleuser.profileQuota.checkEvery', 600)
+        checker_cmd.append('--check_every=%s' % check_every)
+
+        profiles_json = json.dumps(get_config('singleuser.profileList', "[]"))
+        # quote the json - this feels awkward
+        checker_cmd.append("--profiles_json=" + profiles_json)
+    
+        c.JupyterHub.services.append({
+          'name': 'quota_checker',
+          'admin': True,
+          'command': checker_cmd
+        })
+
+        from kubespawner import KubeSpawner
+        class KubeSpawnerWithProfileInfo(KubeSpawner):
+            def get_state(self):
+                state = super().get_state()
+                state['profile_slug'] = self.user_options["slug"]
+                return state
+
+        c.JupyterHub.spawner_class = KubeSpawnerWithProfileInfo
+          
+        def profiles_gen(spawner):
+            profiles_list = get_config("singleuser.profileList", [])
+            db.update_user_tokens(quota_db_filename, profiles_list, spawner.user.name, spawner.user.admin)
+            updated_profiles = db.get_profiles_by_balance(quota_db_filename, profiles_list, spawner.user.name, spawner.user.admin)
+            return updated_profiles 
+
+        c.KubeSpawner.profile_list = profiles_gen
 
       authsetting: |
         import os

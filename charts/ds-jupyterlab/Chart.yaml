@@ -13,8 +13,11 @@ maintainers:
 - email: shawn.oneil@oregonstate.edu
   name: Shawn T O'Neil
 name: ds-jupyterlab
-version: 1.4.1
+version: 1.5.1
 changeLog:
+  v1.5.1:
+    minor:
+    - dynamic profile generation/selection
   v1.4.1:
     minor:
     - allow for GPU requests with GPU_COUNT
