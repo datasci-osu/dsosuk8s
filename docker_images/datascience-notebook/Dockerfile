@@ -99,8 +99,9 @@ RUN pip install nbresuse
 # fixup for shiny-server bookmarks (don't want to make adjustment in the jupyter-rsession-proxy where the shiny config is generated from)
 RUN chmod o+w /var/lib/shiny-server
 
-#TAG v1.1.6
-#TAG shinyfix
+RUN conda install -c conda-forge geos r-rgeos r-rgdal r-sf
+#TAG v1.1.8
+#TAG condaGeoStuff
 
 USER $NB_USER
 
