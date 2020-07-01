@@ -146,8 +146,8 @@ jupyterhub:
     fsgid: 0
     startTimeout: 1200
     profileQuota:
-      checkEvery: 10
-      quotaDbFilename: "/srv/jupyterhub/profile_quotas.sqlite"
+      checkEvery: 10  # default 600
+      quotaDbFilename: "/srv/jupyterhub/profile_quotas.sqlite" # default "/srv/jupyterhub/profile_quotas.sqlite"
     profileList:
     - display_name: "Standard Profile"
       slug: "standard"
@@ -162,17 +162,17 @@ jupyterhub:
         mem_guarantee: "0.3G"
         mem_limit: "0.7G"
       quota:
-        costTokensPerHour: 0.1
-        minBalanceToSpawn: 0.05
+        costTokensPerHour: 0.1  # default 1
+        minBalanceToSpawn: 0.05 # default 0.0
         admins:
-          active: true
-          initialBalance: 5
-          newTokensPerHour: 0.4
-          maxBalance: 10
+          active: true   # default true
+          initialBalance: 5   # default float("inf")
+          newTokensPerDay: 0.4 # default 0.0
+          maxBalance: 10  # default float("Inf")
         users:
           active: true
           initialBalance: 5
-          newTokensPerHour: 0.4
+          newTokensPerDay: 0.4
           maxBalance: 10
     - display_name: "Fancy 2"
       description: "Oh you fancy huh"
@@ -188,12 +188,12 @@ jupyterhub:
         admins:
           active: true
           initialBalance: 60
-          newTokensPerHour: 60
+          newTokensPerDay: 60
           maxBalance: 10
         users:
           active: true
           initialBalance: 5
-          newTokensPerHour: 0.4
+          newTokensPerDay: 0.4
           maxBalance: 10
 
   ingress:
@@ -254,10 +254,10 @@ jupyterhub:
         c.KubeSpawner.modify_pod_hook = modify_pod_hook
 
       profiles: |
-        from jhprofilequota import db
+        from jhprofilequota import profile_db
 
         quota_db_filename = get_config('singleuser.profileQuota.quotaDbFilename', '/srv/jupyterhub/profile_quotas.sqlite')
-        db.create_db(quota_db_filename) 
+        profile_db.create_db(quota_db_filename) 
        
         checker_cmd = ['python3','-m', 'jhprofilequota']
         base_url = c.JupyterHub.get('base_url', '/')
@@ -269,7 +269,7 @@ jupyterhub:
         checker_cmd.append('--check_every=%s' % check_every)
 
         profiles_json = json.dumps(get_config('singleuser.profileList', "[]"))
-        # quote the json - this feels awkward
+        # this feels awkward... but I don't want to make the profiles 'state' for the service if I can help it
         checker_cmd.append("--profiles_json=" + profiles_json)
     
         c.JupyterHub.services.append({
@@ -277,6 +277,40 @@ jupyterhub:
           'admin': True,
           'command': checker_cmd
         })
+
+        c.KubeSpawner.profile_form_template = """ 
+        <script>
+        // JupyterHub 0.8 applied form-control indisciminately to all form elements.
+        // Can be removed once we stop supporting JupyterHub 0.8
+        $(document).ready(function() {
+            $('#kubespawner-profiles-list input[type="radio"]').removeClass('form-control');
+        });
+        </script>
+        <style>
+        /* The profile description should not be bold, even though it is inside the <label> tag */
+        #kubespawner-profiles-list label p {
+            font-weight: normal;
+        }
+        </style>
+        <div class='form-group' id='kubespawner-profiles-list'>
+        {% for profile in profile_list %}
+        <label for='profile-item-{{ profile.slug }}' class='form-control input-group'>
+            <div class='col-md-1'>
+                <input type='radio' name='profile' id='profile-item-{{ profile.slug }}' value='{{ profile.slug }}' {% if profile.default %}checked{% endif %} />
+            </div>
+            <div class='col-md-11'>
+                <strong>{{ profile.display_name }}</strong>
+                {% if profile.description %}
+                <p>{{ profile.description }}</p>
+                {% endif %}
+                {% if profile.hasQuota %}
+                <p>Quota Balance: {{ profile.balanceTokens }}</p>
+                {% endif %}
+            </div>
+        </label>
+        {% endfor %}
+        </div>
+        """
 
         from kubespawner import KubeSpawner
         class KubeSpawnerWithProfileInfo(KubeSpawner):
@@ -286,11 +320,16 @@ jupyterhub:
                 return state
 
         c.JupyterHub.spawner_class = KubeSpawnerWithProfileInfo
-          
+
         def profiles_gen(spawner):
             profiles_list = get_config("singleuser.profileList", [])
-            db.update_user_tokens(quota_db_filename, profiles_list, spawner.user.name, spawner.user.admin)
-            updated_profiles = db.get_profiles_by_balance(quota_db_filename, profiles_list, spawner.user.name, spawner.user.admin)
+
+            conn = profile_db.get_connection(quota_db_filename)
+
+            profile_db.update_user_tokens(conn, profiles_list, spawner.user.name, spawner.user.admin)
+            updated_profiles = profile_db.get_profiles_by_balance(conn, profiles_list, spawner.user.name, spawner.user.admin)
+
+            profile_db.close_connection(conn)
             return updated_profiles 
 
         c.KubeSpawner.profile_list = profiles_gen
