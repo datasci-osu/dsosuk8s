@@ -149,53 +149,58 @@ jupyterhub:
       checkEvery: 10  # default 600
       quotaDbFilename: "/srv/jupyterhub/profile_quotas.sqlite" # default "/srv/jupyterhub/profile_quotas.sqlite"
     profileList:
-    - display_name: "Standard Profile"
+    - display_name: "Standard"
       slug: "standard"
-      description: "The basics"
       default: True
-    - display_name: "Fancy"
-      description: "Oh you fancy huh"
-      slug: "fancy"
+      description: "Standard server type suitable for programming and most analyses: 0.1 CPU gauranteed (1.0 maximum where available) and 0.5G RAM gauranteed (1G max where available). <br /><br />Please note that servers with this profile may take longer than usual to start."
       kubespawner_override:
-        cpu_gaurantee: 0.4
-        cpu_limit: 1.2
-        mem_guarantee: "0.3G"
-        mem_limit: "0.7G"
-      disabled: true # set to true to disable this profile altogether
-      quota:
-        costTokensPerHour: 0.1  # default 1
-        minBalanceToSpawn: 0.05 # default 0.0
-        admins:
-          active: true   # default true
-          initialBalance: 5   # default float("inf")
-          newTokensPerDay: 0.4 # default 0.0
-          maxBalance: 10  # default float("Inf")
-        users:
-          active: true
-          initialBalance: 5
-          newTokensPerDay: 0.4
-          maxBalance: 10
-    - display_name: "Fancy 2"
-      description: "Oh you fancy huh"
-      slug: "fancy2"
+        cpu_gaurantee: 0.1
+        cpu_limit: 1
+        mem_guarantee: "0.5G"
+        mem_limit: "1G"
+    - display_name: "Large"
+      description: "For larger computation needs: 1.0 CPU gauranteed (2.0 maximum where available) and 2G RAM gauranteed (4G max where available). <br /><br />Please note that servers with this profile may take longer than usual to start."
+      slug: "large"
       kubespawner_override:
-        cpu_gaurantee: 0.2
-        cpu_limit: 1.1
-        mem_guarantee: "0.4G"
-        mem_limit: "0.8G"
+        cpu_gaurantee: 1.0
+        cpu_limit: 2.0
+        mem_guarantee: "2.0G"
+        mem_limit: "4.0G"
+      disabled: false # set to true to disable this profile altogether
       quota:
-        costTokensPerHour: 360
-        minBalanceToSpawn: 5
+        #costTokensPerHour: 0.1  # default 1
+        #minBalanceToSpawn: 0.25 # default 0.0
         admins:
-          active: true
-          initialBalance: 60
-          newTokensPerDay: 60
-          maxBalance: 10
+          #active: true     # default true - do quota'ing on this profile for admins?
+          #disabled: false  # default false - show this profile for admins?
+          initialBalance: 10   # default float("inf")
+          newTokensPerDay: 4 # default 0.0
+          maxBalance: 12  # default float("Inf")
         users:
-          active: true
-          initialBalance: 5
-          newTokensPerDay: 0.4
-          maxBalance: 10
+          #active: true     # default true - do quota'ing on this profile for admins?
+          #disabled: false  # default false - show this profile for admins?
+          initialBalance: 4
+          newTokensPerDay: 1
+          maxBalance: 8
+    - display_name: "X-Large"
+      description: "For heavy computation needs: 2.0 CPU gauranteed (4.0 maximum where available) and 4G RAM gauranteed (8G max where available). <br /><br />Please note that servers with this profile may take longer than usual to start."
+      slug: "xlarge"
+      kubespawner_override:
+        cpu_gaurantee: 2
+        cpu_limit: 4
+        mem_guarantee: "4G"
+        mem_limit: "8G"
+      quota:
+        minBalanceToSpawn: 1
+        admins:
+          initialBalance: 4 
+          newTokensPerDay: 1
+          maxBalance: 4
+        users:
+          disabled: true
+          initialBalance: 4
+          newTokensPerDay: 1
+          maxBalance: 4
 
   ingress:
     enabled: true
@@ -292,6 +297,39 @@ jupyterhub:
         #kubespawner-profiles-list label p {
             font-weight: normal;
         }
+
+        .input-group {
+          margin-bottom: 10px;
+          padding: 12px 12px;
+         }
+
+        .tooltip {
+          position: relative;
+          display: inline-block;
+          border-bottom: 1px dotted black;  /* If you want dots under the hoverable text */
+          font-size: 14px;
+          opacity: 1;
+        
+        }
+        
+        .tooltip .tooltiptext {
+          visibility: hidden;
+          border-radius: 6px;
+         
+          position: absolute;
+          z-index: 1;
+        }
+        
+        .tooltip:hover .tooltiptext {
+          visibility: visible;
+        }
+        
+        
+        .tooltip .tooltiptext {
+          top: -5px;
+          right: 105%;
+          width: 400px;
+        }
         </style>
         <div class='form-group' id='kubespawner-profiles-list'>
         {% for profile in profile_list %}
@@ -299,15 +337,23 @@ jupyterhub:
             <div class='col-md-1'>
                 <input type='radio' name='profile' id='profile-item-{{ profile.slug }}' value='{{ profile.index }}' {% if profile.default %}checked{% endif %} {% if profile.quotaDisplayDisabled %}disabled{% endif %}/>
             </div>
-            <div class='col-md-11'>
-                <strong>{{ profile.display_name }}</strong>
+            <div class="col-md-11">
+                <strong>{{ profile.display_name }}</strong> 
                 {% if profile.description %}
-                <p>{{ profile.description }}</p>
+                    <p style="margin-top: 15px">{{ profile.description }}</p>
                 {% endif %}
                 {% if profile.hasQuota %}
-                  <p>Quota Balance: {{ profile.quotaDisplayBalanceTokens }} Hours </p>
-                  <p>(Add Rate: {{ profile.quotaDisplayRateHoursPerDay }} Hours/Day, Max Balance: {{ profile.quotaDisplayMaxBalance }} Hours, Min Required Start: {{ profile.quotaDisplayMinToStart }} Hours) <a href="">What's This?</a></p>
-                {% endif %}
+                <div style="font-weight: normal; position: absolute; top: 0px; right: 10px; ">
+                    <div class="tooltip">(Quota Balance: {{ profile.quotaDisplayBalanceHours }} Hours) 
+                        <div class="alert alert-info tooltiptext" role="alert">
+                          <h4 class="alert-heading">Quota Details</h4>
+                          <p>This profile is associated with a time-based quota. You can only start a server with this profile if your balance is <b>{{ profile.quotaDisplayMinToStartHours }}</b> hours or above, and running a server with this profile will drain your balance. </p>
+                          <p style="margin-top: 10px;">Don't worry: your server won't be stopped if your balance goes negative during use (though inactivity timeouts and maximum runtime limits still apply).</p>
+                          <p style="margin-top: 10px;">Your quota for this profile is replenished at a rate of <b>{{ profile.quotaDisplayRateHoursPerDay }}</b> hours/day, up to a maximum balance of <b>{{ profile.quotaDisplayMaxBalanceHours }}</b> hours.</p>
+                        </div>
+                    </div>
+                </div>
+                {% endif %}    
             </div>
         </label>
         {% endfor %}
