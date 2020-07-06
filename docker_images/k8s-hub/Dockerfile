@@ -1,4 +1,4 @@
-FROM jupyterhub/k8s-hub:0.9-484ce8e 
+FROM jupyterhub/k8s-hub:0.9.0 
 
 USER root
 
@@ -32,8 +32,8 @@ WORKDIR /root
 RUN pip3 install jupyterhub-ltiauthenticator
 RUN pip3 install git+https://github.com/oneilsh/ltiauthenticator.git@multi-key
 
-#TAG v1.3.2
-#TAG nfs-hub-db
+#TAG v1.4.2
+#TAG depupgrade
 
 WORKDIR /srv/jupyterhub
 

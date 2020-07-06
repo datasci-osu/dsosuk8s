@@ -297,7 +297,7 @@ jupyterhub:
         {% for profile in profile_list %}
         <label for='profile-item-{{ profile.slug }}' class='form-control input-group'>
             <div class='col-md-1'>
-                <input type='radio' name='profile' id='profile-item-{{ profile.slug }}' value='{{ profile.index }}' {% if profile.default %}checked{% endif %} {% if profile.quotaDisplayDisabled %}disabled{% endif %}/>
+                <input type='radio' name='profile' id='profile-item-{{ profile.slug }}' value='{{ profile.index }}' {% if profile.default %}checked{% endif %} /> {% if profile["quotaDisplay"]["disabled"] %}disabled{% endif %}/>
             </div>
             <div class='col-md-11'>
                 <strong>{{ profile.display_name }}</strong>
@@ -305,8 +305,7 @@ jupyterhub:
                 <p>{{ profile.description }}</p>
                 {% endif %}
                 {% if profile.hasQuota %}
-                  <p>Quota Balance: {{ profile.quotaDisplayBalanceTokens }} Hours </p>
-                  <p>(Add Rate: {{ profile.quotaDisplayRateHoursPerDay }} Hours/Day, Max Balance: {{ profile.quotaDisplayMaxBalance }} Hours, Min Required Start: {{ profile.quotaDisplayMinToStart }} Hours) <a href="">What's This?</a></p>
+                  <p>Quota Balance: {{ round(profile["quotaDisplay"]["balanceTokens"], 1) }} Hours (Add Rate: {{ profile["quotaDisplay"]["rateHoursPerDay"] }} Hours/Day, Max Balance: {{ profile["quotaDisplay"]["maxBalance"] }} Hours, Min Required Start: {{ profile["quotaDisplay"]["minToStart"] }} Hours) <a href="">What's This?</a></p> 
                 {% endif %}
             </div>
         </label>
