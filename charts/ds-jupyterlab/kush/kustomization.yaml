@@ -1,4 +1,4 @@
 resources:
-  - all.yaml
+  - helm-template-output.yaml
 patchesStrategicMerge:
   - patch-hub-container.yaml

@@ -30,7 +30,7 @@ jupyterhub:
 
   proxy:
     # this should get replaced when deployed with scripts/deploy_from_settings.sh
-    secretToken: "78767972dd3d0db5a98fb56554f4484daa57bc35bd73dc61aafebed8ac9fe3df"
+    secretToken: $(openssl rand -hex 32)       --kush-interpolate
     service: 
       type: ClusterIP
     https:
@@ -141,66 +141,13 @@ jupyterhub:
           mountPath: /usr/local/bin/data
 
     extraEnv:
-      NFS_SVC_HOME: ""
+      NFS_SVC_HOME: $DRIVE_RELEASE_NAME      --kush-interpolate
     uid: 0
     fsgid: 0
     startTimeout: 1200
     profileQuota:
-      checkEvery: 10  # default 600
+      checkEvery: 600  # default 600
       quotaDbFilename: "/srv/jupyterhub/profile_quotas.sqlite" # default "/srv/jupyterhub/profile_quotas.sqlite"
-    profileList:
-    - display_name: "Standard"
-      slug: "standard"
-      default: True
-      description: "Standard server type suitable for programming and most analyses: 0.1 CPU gauranteed (1.0 maximum where available) and 0.5G RAM gauranteed (1G max where available). <br /><br />Please note that servers with this profile may take longer than usual to start."
-      kubespawner_override:
-        cpu_gaurantee: 0.1
-        cpu_limit: 1
-        mem_guarantee: "0.5G"
-        mem_limit: "1G"
-    - display_name: "Large"
-      description: "For larger computation needs: 1.0 CPU gauranteed (2.0 maximum where available) and 2G RAM gauranteed (4G max where available). <br /><br />Please note that servers with this profile may take longer than usual to start."
-      slug: "large"
-      kubespawner_override:
-        cpu_gaurantee: 1.0
-        cpu_limit: 2.0
-        mem_guarantee: "2.0G"
-        mem_limit: "4.0G"
-      disabled: false # set to true to disable this profile altogether
-      quota:
-        #costTokensPerHour: 0.1  # default 1
-        #minBalanceToSpawn: 0.25 # default 0.0
-        admins:
-          #active: true     # default true - do quota'ing on this profile for admins?
-          #disabled: false  # default false - show this profile for admins?
-          initialBalance: 10   # default float("inf")
-          newTokensPerDay: 4 # default 0.0
-          maxBalance: 12  # default float("Inf")
-        users:
-          #active: true     # default true - do quota'ing on this profile for admins?
-          #disabled: false  # default false - show this profile for admins?
-          initialBalance: 4
-          newTokensPerDay: 1
-          maxBalance: 8
-    - display_name: "X-Large"
-      description: "For heavy computation needs: 2.0 CPU gauranteed (4.0 maximum where available) and 4G RAM gauranteed (8G max where available). <br /><br />Please note that servers with this profile may take longer than usual to start."
-      slug: "xlarge"
-      kubespawner_override:
-        cpu_gaurantee: 2
-        cpu_limit: 4
-        mem_guarantee: "4G"
-        mem_limit: "8G"
-      quota:
-        minBalanceToSpawn: 1
-        admins:
-          initialBalance: 4 
-          newTokensPerDay: 1
-          maxBalance: 4
-        users:
-          disabled: true
-          initialBalance: 4
-          newTokensPerDay: 1
-          maxBalance: 4
 
   ingress:
     enabled: true
@@ -209,19 +156,19 @@ jupyterhub:
       nginx.org/mergeable-ingress-type: "minion"
       nginx.org/websocket-services: "proxy-public"
     hosts:
-    - dummy.value.org 
+      - $CLUSTER_HOSTNAME         --kush-interpolate
     tls:
-    - hosts:
-      - dummy.value.org
-
+      - hosts:
+        - $CLUSTER_HOSTNAME       --kush-interpolate
+  
   hub:
-    baseUrl: /
+    baseUrl: /$RELEASE_NAME\/     --kush-interpolate
     db:
       type: "sqlite-pvc"
       upgrade: false 
     image:
       name: oneilsh/ktesting-k8s-hub
-      tag: "v1.3.2" 
+      tag: "v1.4.2" 
     uid: 0
     fsgid: 0
     extraVolumes:
@@ -238,6 +185,18 @@ jupyterhub:
       - name: start-hub-volume
         mountPath: /usr/local/bin/start-hub.sh
         subPath: start-hub.sh
+    extraEnv:
+      AUTH_TYPE: lti
+      LTI_ID_KEYS: '["custom_canvas_user_login_id", "lis_person_contact_email_primary", "custom_canvas_user_login_id"]'
+      LTI_ID_REGEXES: '["(^[^@]+)@oregonstate.edu$", "(^[^@]+@[^@]+$)", "(^[0-9a-f]{6,6})[0-9a-f]*$"]'
+      LIT_ADMIN_ROLES: '["Instructor", "TeachingAssistant", "ContentDeveloper"]'
+      LTI_CLIENT_KEY: $LTI_CLIENT_KEY          --kush-interpolate
+      LTI_CLIENT_SECRET: $LTI_CLIENT_SECRET    --kush-interpolate
+      # TODO:
+      NFS_SVC_HOME: $DRIVE_RELEASE_NAME        --kush-interpolate
+      # e.g. oneils,keistc
+      # but only used if not using lti AUTH_TYPE
+      ADMIN_USERS: 
 
     extraConfig:
       concurrentSpawn:
