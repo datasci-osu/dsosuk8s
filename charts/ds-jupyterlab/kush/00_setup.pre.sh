@@ -88,6 +88,7 @@ else
 fi
 
 export RELEASE_NAME
+export BASE_URL="/$RELEASE_NAME/"
 export CLUSTER_HOSTNAME
 export DRIVE_RELEASE_NAME
 export AUTH_TYPE=${AUTH_TYPE:-lti}
