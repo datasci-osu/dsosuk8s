@@ -162,7 +162,7 @@ jupyterhub:
         - $CLUSTER_HOSTNAME       --kush-interpolate
   
   hub:
-    baseUrl: /$RELEASE_NAME\/     --kush-interpolate
+    baseUrl: $BASE_URL            --kush-interpolate
     db:
       type: "sqlite-pvc"
       upgrade: false 
