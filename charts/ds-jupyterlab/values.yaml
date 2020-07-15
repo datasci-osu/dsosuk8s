@@ -189,7 +189,7 @@ jupyterhub:
       AUTH_TYPE: lti
       LTI_ID_KEYS: '["custom_canvas_user_login_id", "lis_person_contact_email_primary", "custom_canvas_user_login_id"]'
       LTI_ID_REGEXES: '["(^[^@]+)@oregonstate.edu$", "(^[^@]+@[^@]+$)", "(^[0-9a-f]{6,6})[0-9a-f]*$"]'
-      LIT_ADMIN_ROLES: '["Instructor", "TeachingAssistant", "ContentDeveloper"]'
+      LTI_ADMIN_ROLES: '["Instructor", "TeachingAssistant", "ContentDeveloper"]'
       LTI_CLIENT_KEY: $LTI_CLIENT_KEY          --kush-interpolate
       LTI_CLIENT_SECRET: $LTI_CLIENT_SECRET    --kush-interpolate
       # TODO:
