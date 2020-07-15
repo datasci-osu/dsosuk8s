@@ -17,6 +17,7 @@ version: 1.5.1
 changeLog:
   v1.5.1:
     minor:
+    - new deployment strategy via helm plugin
     - dynamic profile generation/selection
   v1.4.1:
     minor:

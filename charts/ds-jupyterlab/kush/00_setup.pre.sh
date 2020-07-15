@@ -55,15 +55,14 @@ if [ "$CREATE_NAMESPACE" == "true" ]; then
   
   if [ "$DRY_RUN" == "false" ]; then
     echo "${yellow}Creating namespace: ${white}" 1>&2
-    echo "  ${yellow}kubectl create namespace $HELM_NAMESPACE --context $KUBE_CONTEXT${white}" 1>&2
     kubectl create namespace $HELM_NAMESPACE --context $KUBE_CONTEXT
   else
     echo "${yellow}Not creating namespace (dry-run): ${white}" 1>&2
-    echo "  ${yellow}kubectl create namespace $HELM_NAMESPACE --context $KUBE_CONTEXT${white}" 1>&2
   fi
+  echo "  ${yellow}kubectl create namespace $HELM_NAMESPACE --context $KUBE_CONTEXT${white}" 1>&2
 fi
 
-HOMEDRIVE_SIZE=$(cat $USER_VALUES_FILES | yq .deployment.createHomeDrive | tr -d '"')
+HOMEDRIVE_SIZE=$(cat $USER_VALUES_FILES | yq .deployment.createHomeDrive.size | tr -d '"')
 if [ "$HOMEDRIVE_SIZE" == "null" ]; then
   HOMEDRIVE_SVC=$(cat $USER_VALUES_FILES | yq .deployment.homeDriveSvc | tr -d '"')
   if [ "$HOMEDRIVE_SVC" == "null" ]; then
@@ -72,15 +71,18 @@ if [ "$HOMEDRIVE_SIZE" == "null" ]; then
     DRIVE_RELEASE_NAME=$HOMEDRIVE_SVC
   fi
 elif echo $HOMEDRIVE_SIZE | grep -Eqs '^[[:digit:]]+(\.[[:digit:]]+){0,1}Gi$'; then
+  HOMEDRIVE_CHART=$(cat $USER_VALUES_FILES | yq .deployment.createHomeDrive.chart | tr -d '"')
+  if [ "$HOMEDRIVE_CHART" == "null" ]; then
+    error "If specifying createHomeDrive in --values, must also specify createHomeDrive: {chart: }."
+  fi
   DRIVE_RELEASE_NAME=homedrive-$RELEASE_NAME
   if [ "$DRY_RUN" == "false" ]; then
     echo "${yellow}Installing homedrive: ${white}" 1>&2
-    echo "   ${yellow}helm upgrade $DRIVE_RELEASE_NAME --namespace $HELM_NAMESPACE --timeout 2m0s --atomic --cleanup-on-fail --install --set size=$HOMEDRIVE_SIZE --kube-context $KUBE_CONTEXT ${white}" 1>&2
-    helm upgrade $DRIVE_RELEASE_NAME --namespace $HELM_NAMESPACE --timeout 2m0s --atomic --cleanup-on-fail --install --set size=$HOMEDRIVE_SIZE --kube-context $KUBE_CONTEXT
+    helm upgrade $DRIVE_RELEASE_NAME $HOMEDRIVE_CHART --namespace $HELM_NAMESPACE --timeout 2m0s --atomic --cleanup-on-fail --install --set size=$HOMEDRIVE_SIZE --kube-context $KUBE_CONTEXT
   else
     echo "${yellow}Not installing homedrive (dry-run): ${white}" 1>&2
-    echo "   ${yellow}helm upgrade $DRIVE_RELEASE_NAME --namespace $HELM_NAMESPACE --timeout 2m0s --atomic --cleanup-on-fail --install --set size=$HOMEDRIVE_SIZE --kube-context $KUBE_CONTEXT ${white}" 1>&2
   fi
+  echo "   ${yellow}helm upgrade $DRIVE_RELEASE_NAME $HOMEDRIVE_CHART --namespace $HELM_NAMESPACE --timeout 2m0s --atomic --cleanup-on-fail --install --set size=$HOMEDRIVE_SIZE --kube-context $KUBE_CONTEXT ${white}" 1>&2
 else
   error "Value specified in deployment: {createHomeDrive: 20Gi} must match ^[[:digit:]]+(\.[[:digit:]]+){0,1}Gi$, got $HOMEDRIVE_SIZE."	
 fi
