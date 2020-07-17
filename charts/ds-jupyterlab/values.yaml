@@ -144,7 +144,7 @@ jupyterhub:
     extraEnv:
       NFS_SVC_HOME: <%= $(echo $DRIVE_RELEASE_NAME) %>
     uid: 0
-    fsgid: 0
+    fsGid: 0
     startTimeout: 1200
     profileQuota:
       checkEvery: 600  # default 600
@@ -171,7 +171,7 @@ jupyterhub:
       name: oneilsh/ktesting-k8s-hub
       tag: "v1.4.2" 
     uid: 0
-    fsgid: 0
+    fsGid: 0
     extraVolumes:
       - name: data-volume
         configMap:
