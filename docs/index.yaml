@@ -2,9 +2,9 @@ apiVersion: v1
 entries:
   ds-jupyterlab:
   - apiVersion: v1
-    created: "2020-07-15T11:49:53.426578-07:00"
+    created: "2020-07-17T08:13:11.757791-07:00"
     description: JupyerLab with Python, Julia, R, RStudio, Shiny
-    digest: d6dd9077488788e3dd6cbc11f5dd74add3d911658925e5493b5bb50c87860b0e
+    digest: 18d2c1b158faaf4228321335aeac1272b29caa051149f6f851c3597e10c94caa
     icon: file://icon.svg
     keywords:
     - jupyter
@@ -22,7 +22,7 @@ entries:
     - ds-jupyterlab-1.5.1.tgz
     version: 1.5.1
   - apiVersion: v1
-    created: "2020-07-15T11:49:53.419687-07:00"
+    created: "2020-07-17T08:13:11.752045-07:00"
     description: JupyerLab with Python, Julia, R, RStudio, Shiny
     digest: 750e47561ba0f7d4f32869fe9762f3f8e191bbe5ad0ad28796f97f0bcb1e580e
     icon: file://icon.svg
@@ -42,7 +42,7 @@ entries:
     - ds-jupyterlab-1.4.1.tgz
     version: 1.4.1
   - apiVersion: v1
-    created: "2020-07-15T11:49:53.410361-07:00"
+    created: "2020-07-17T08:13:11.745772-07:00"
     description: JupyerLab with Python, Julia, R, RStudio, Shiny
     digest: 15c9f549bf52efba65eaeaff733a9cd461021c99e0cd87a8cc734e262725c343
     icon: file://icon.svg
@@ -62,7 +62,7 @@ entries:
     - ds-jupyterlab-1.3.5.tgz
     version: 1.3.5
   - apiVersion: v1
-    created: "2020-07-15T11:49:53.402768-07:00"
+    created: "2020-07-17T08:13:11.739874-07:00"
     description: JupyerLab with Python, Julia, R, RStudio, Shiny
     digest: 0e6bb5df951df35a3df0e8666a12f4debdd895aaad2576cdf8cb44d78fc28b21
     icon: file://icon.svg
@@ -82,7 +82,7 @@ entries:
     - ds-jupyterlab-1.3.4.tgz
     version: 1.3.4
   - apiVersion: v1
-    created: "2020-07-15T11:49:53.394506-07:00"
+    created: "2020-07-17T08:13:11.732487-07:00"
     description: JupyerLab with Python, Julia, R, RStudio, Shiny
     digest: f7ecab40e33e49d2e0b2afe05e72e61d707edb1492e11e4cc1f4d9a7c68d45ec
     icon: file://icon.svg
@@ -102,7 +102,7 @@ entries:
     - ds-jupyterlab-1.3.3.tgz
     version: 1.3.3
   - apiVersion: v1
-    created: "2020-07-15T11:49:53.387307-07:00"
+    created: "2020-07-17T08:13:11.727098-07:00"
     description: JupyerLab with Python, Julia, R, RStudio, Shiny
     digest: c4fd27d1cd515cf15bd6a2aad386ebd3399d30e2a7881d9a08f1de929fd01f5f
     icon: file://icon.svg
@@ -122,7 +122,7 @@ entries:
     - ds-jupyterlab-1.3.2.tgz
     version: 1.3.2
   - apiVersion: v1
-    created: "2020-07-15T11:49:53.378586-07:00"
+    created: "2020-07-17T08:13:11.719688-07:00"
     description: JupyerLab with Python, Julia, R, RStudio, Shiny
     digest: d39d0b365573149e2e12b27dfb7b972a4e89f5803b296c1995c26282e41f9619
     icon: file://icon.svg
@@ -142,7 +142,7 @@ entries:
     - ds-jupyterlab-1.3.2-dev.tgz
     version: 1.3.2-dev
   - apiVersion: v1
-    created: "2020-07-15T11:49:53.371289-07:00"
+    created: "2020-07-17T08:13:11.712266-07:00"
     description: JupyerLab with Python, Julia, R, RStudio, Shiny
     digest: 2aa1b656526504b5d7cef81c71b74728bf76bb74a51a44415c78917be892b9b4
     icon: file://icon.svg
@@ -162,7 +162,7 @@ entries:
     - ds-jupyterlab-1.3.1.tgz
     version: 1.3.1
   - apiVersion: v1
-    created: "2020-07-15T11:49:53.361368-07:00"
+    created: "2020-07-17T08:13:11.706037-07:00"
     description: JupyerLab with Python, Julia, R, RStudio, Shiny
     digest: ec89125f5f0cd31d50d3f3cf7edcb3ed0977d043e9ecbb61344f449a8445308b
     icon: file://icon.svg
@@ -182,7 +182,7 @@ entries:
     - ds-jupyterlab-1.2.1-dev.tgz
     version: 1.2.1-dev
   - apiVersion: v1
-    created: "2020-07-15T11:49:53.352007-07:00"
+    created: "2020-07-17T08:13:11.699447-07:00"
     description: JupyerLab with Python, Julia, R, RStudio, Shiny
     digest: 81712dce119c28f82526e08ca8c8a347f1a8824689b0efff3989a40e3fd5bb0d
     icon: file://icon.svg
@@ -203,7 +203,7 @@ entries:
     version: 1.2.0
   eksctl-autoscaler:
   - apiVersion: v1
-    created: "2020-07-15T11:49:53.429967-07:00"
+    created: "2020-07-17T08:13:11.75956-07:00"
     description: Autoscaler for eksctl-based clusters, based on https://github.com/kubernetes/autoscaler/tree/master/cluster-autoscaler/cloudprovider/aws,
       specifically auto-discovery but using kubernetes.io/cluster/eksdevd tag instead
       of adding a special tag as indicated by the docs.
@@ -222,7 +222,7 @@ entries:
     - eksctl-autoscaler-1.16.5.tgz
     version: 1.16.5
   - apiVersion: v1
-    created: "2020-07-15T11:49:53.429033-07:00"
+    created: "2020-07-17T08:13:11.759019-07:00"
     description: Autoscaler for eksctl-based clusters, based on https://github.com/kubernetes/autoscaler/tree/master/cluster-autoscaler/cloudprovider/aws,
       specifically auto-discovery but using kubernetes.io/cluster/eksdevd tag instead
       of adding a special tag as indicated by the docs.
@@ -241,7 +241,7 @@ entries:
     - eksctl-autoscaler-1.0.1.tgz
     version: 1.0.1
   - apiVersion: v1
-    created: "2020-07-15T11:49:53.4278-07:00"
+    created: "2020-07-17T08:13:11.758457-07:00"
     description: Autoscaler for eksctl-based clusters, based on https://github.com/kubernetes/autoscaler/tree/master/cluster-autoscaler/cloudprovider/aws,
       specifically auto-discovery but using kubernetes.io/cluster/eksdevd tag instead
       of adding a special tag as indicated by the docs.
@@ -260,7 +260,7 @@ entries:
     - eksctl-autoscaler-1.0.1-dev.tgz
     version: 1.0.1-dev
   - apiVersion: v1
-    created: "2020-07-15T11:49:53.431158-07:00"
+    created: "2020-07-17T08:13:11.760846-07:00"
     description: Autoscaler for eksctl-based clusters, based on https://github.com/kubernetes/autoscaler/tree/master/cluster-autoscaler/cloudprovider/aws,
       specifically auto-discovery but using kubernetes.io/cluster/eksdevd tag instead
       of adding a special tag as indicated by the docs.
@@ -281,7 +281,7 @@ entries:
   grafana:
   - apiVersion: v1
     appVersion: 6.6.0
-    created: "2020-07-15T11:49:53.433722-07:00"
+    created: "2020-07-17T08:13:11.762664-07:00"
     description: The leading tool for querying and visualizing time series and metrics.
       (Fork for custom deployment by Shawn O'Neil)
     digest: 7fbf67459dad6464863036b0523253f479afe6b0ce4ccfed1c7686dbd0efa64e
@@ -305,7 +305,7 @@ entries:
     version: 4.6.3
   nfs-drive:
   - apiVersion: v1
-    created: "2020-07-15T11:49:53.434878-07:00"
+    created: "2020-07-17T08:13:11.763334-07:00"
     description: Spawns an NFS server for use by applications.
     digest: a3c3f63278497f087ba282ff76a4fb7b5e3ddf4cc21bac8704f6eb73bbef4943
     icon: file://icon.svg
@@ -322,7 +322,7 @@ entries:
     version: 1.1.0
   nginx-ingress:
   - apiVersion: v1
-    created: "2020-07-15T11:49:53.437121-07:00"
+    created: "2020-07-17T08:13:11.764982-07:00"
     description: Nginx ingress controller built on https://github.com/nginxinc/kubernetes-ingress/tree/master/deployments/helm-chart.
     digest: 7c6dd7194481051d1637757c153137fa5aad5c1692d261798701f283d76b1460
     icon: file://icon.svg
@@ -339,7 +339,7 @@ entries:
   prometheus:
   - apiVersion: v1
     appVersion: 2.18.1
-    created: "2020-07-15T11:49:53.447359-07:00"
+    created: "2020-07-17T08:13:11.774275-07:00"
     dependencies:
     - condition: kubeStateMetrics.enabled
       name: kube-state-metrics
@@ -366,7 +366,7 @@ entries:
     version: 11.2.3
   - apiVersion: v1
     appVersion: 2.15.2
-    created: "2020-07-15T11:49:53.441466-07:00"
+    created: "2020-07-17T08:13:11.768927-07:00"
     description: Prometheus is a monitoring system and time series database. (Fork
       for custom deployment by Shawn O'Neil)
     digest: 3d047c122bbdcad720169c0c63fb356618730dc20dfae48eae5debe207108ea4
@@ -392,7 +392,7 @@ entries:
   velero:
   - apiVersion: v1
     appVersion: 1.2.0
-    created: "2020-07-15T11:49:53.45195-07:00"
+    created: "2020-07-17T08:13:11.777305-07:00"
     description: A Helm chart for velero (Fork for custom deployment by Shawn O'Neil)
     digest: 3f48d2bf574f0eeb7b5c9053c4f46525840c233a35b470a0f7cf4781b6c18fe9
     home: https://github.com/vmware-tanzu/velero
@@ -416,4 +416,4 @@ entries:
     urls:
     - velero-2.8.8.tgz
     version: 2.8.8
-generated: "2020-07-15T11:49:53.343112-07:00"
+generated: "2020-07-17T08:13:11.692822-07:00"

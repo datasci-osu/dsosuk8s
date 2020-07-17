@@ -30,12 +30,13 @@ jupyterhub:
 
   proxy:
     # this should get replaced when deployed with scripts/deploy_from_settings.sh
-    secretToken: $(openssl rand -hex 32)       --kush-interpolate
+    secretToken: <%= $(openssl rand -hex 32) %>
     service: 
       type: ClusterIP
     https:
       enabled: true
       type: offload
+
   singleuser:
     # if nodes are labeled with their cost in cents-per-hour, this should help
     # schedule pods on the cheapest node they can fit on (notwithstanding influences by the custom scheduler and various requirements)
@@ -122,7 +123,7 @@ jupyterhub:
       name: oneilsh/ktesting-datascience-notebook
       tag: "v1.1.6"
     defaultUrl: "/lab/tree/{username}"
-    cmd: ["start-singleuser.sh", "--allow-root"]  # don't think I need to add --allow-root... 
+    cmd: ["start-singleuser.sh", "--allow-root"]  # don't think I need this? 
     storage:
       type: none
       extraVolumes:
@@ -141,7 +142,7 @@ jupyterhub:
           mountPath: /usr/local/bin/data
 
     extraEnv:
-      NFS_SVC_HOME: $DRIVE_RELEASE_NAME      --kush-interpolate
+      NFS_SVC_HOME: <%= $(echo $DRIVE_RELEASE_NAME) %>
     uid: 0
     fsgid: 0
     startTimeout: 1200
@@ -156,13 +157,13 @@ jupyterhub:
       nginx.org/mergeable-ingress-type: "minion"
       nginx.org/websocket-services: "proxy-public"
     hosts:
-      - $CLUSTER_HOSTNAME         --kush-interpolate
+      - <%= $CLUSTER_HOSTNAME %>
     tls:
       - hosts:
-        - $CLUSTER_HOSTNAME       --kush-interpolate
+        - <%= $CLUSTER_HOSTNAME %>
   
   hub:
-    baseUrl: $BASE_URL            --kush-interpolate
+    baseUrl: <%= $BASE_URL %>
     db:
       type: "sqlite-pvc"
       upgrade: false 
@@ -190,10 +191,10 @@ jupyterhub:
       LTI_ID_KEYS: '["custom_canvas_user_login_id", "lis_person_contact_email_primary", "custom_canvas_user_login_id"]'
       LTI_ID_REGEXES: '["(^[^@]+)@oregonstate.edu$", "(^[^@]+@[^@]+$)", "(^[0-9a-f]{6,6})[0-9a-f]*$"]'
       LTI_ADMIN_ROLES: '["Instructor", "TeachingAssistant", "ContentDeveloper"]'
-      LTI_CLIENT_KEY: $LTI_CLIENT_KEY          --kush-interpolate
-      LTI_CLIENT_SECRET: $LTI_CLIENT_SECRET    --kush-interpolate
+      LTI_CLIENT_KEY: <%= $LTI_CLIENT_KEY %>
+      LTI_CLIENT_SECRET: <%= $LTI_CLIENT_SECRET %>
       # TODO:
-      NFS_SVC_HOME: $DRIVE_RELEASE_NAME        --kush-interpolate
+      NFS_SVC_HOME: <%= $DRIVE_RELEASE_NAME %>
       # e.g. oneils,keistc
       # but only used if not using lti AUTH_TYPE
       ADMIN_USERS: 
@@ -219,128 +220,134 @@ jupyterhub:
         c.KubeSpawner.modify_pod_hook = modify_pod_hook
 
       profiles: |
-        from jhprofilequota import profile_db
+        profile_list = get_config("singleuser.profileList", None)
 
-        quota_db_filename = get_config('singleuser.profileQuota.quotaDbFilename', '/srv/jupyterhub/profile_quotas.sqlite')
-        profile_db.create_db(quota_db_filename) 
+        if profile_list:
+            quota_db_filename = get_config('singleuser.profileQuota.quotaDbFilename', '/srv/jupyterhub/profile_quotas.sqlite')
+            profile_db.create_db(quota_db_filename) 
        
-        checker_cmd = ['python3','-m', 'jhprofilequota']
-        base_url = c.JupyterHub.get('base_url', '/')
-        checker_cmd.append( '--url=http://127.0.0.1:8081' + url_path_join(base_url, 'hub/api'))
+            checker_cmd = ['python3','-m', 'jhprofilequota']
+            base_url = c.JupyterHub.get('base_url', '/')
+            checker_cmd.append( '--url=http://127.0.0.1:8081' + url_path_join(base_url, 'hub/api'))
     
-        checker_cmd.append('--quota_db_filename=%s' % quota_db_filename)
+            checker_cmd.append('--quota_db_filename=%s' % quota_db_filename)
         
-        check_every = get_config('singleuser.profileQuota.checkEvery', 600)
-        checker_cmd.append('--check_every=%s' % check_every)
+            check_every = get_config('singleuser.profileQuota.checkEvery', 600)
+            checker_cmd.append('--check_every=%s' % check_every)
 
-        profiles_json = json.dumps(get_config('singleuser.profileList', "[]"))
-        # this feels awkward... but I don't want to make the profiles 'state' for the service if I can help it
-        checker_cmd.append("--profiles_json=" + profiles_json)
+            profiles_json = json.dumps(get_config('singleuser.profileList', "[]"))
+            # this feels awkward... but I don't want to make the profiles 'state' for the service if I can help it
+            checker_cmd.append("--profiles_json=" + profiles_json)
+        
+            c.JupyterHub.services.append({
+              'name': 'quota_checker',
+              'admin': True,
+              'command': checker_cmd
+            })
     
-        c.JupyterHub.services.append({
-          'name': 'quota_checker',
-          'admin': True,
-          'command': checker_cmd
-        })
-
-        c.KubeSpawner.profile_form_template = """ 
-        <script>
-        // JupyterHub 0.8 applied form-control indisciminately to all form elements.
-        // Can be removed once we stop supporting JupyterHub 0.8
-        $(document).ready(function() {
-            $('#kubespawner-profiles-list input[type="radio"]').removeClass('form-control');
-        });
-        </script>
-        <style>
-        /* The profile description should not be bold, even though it is inside the <label> tag */
-        #kubespawner-profiles-list label p {
-            font-weight: normal;
-        }
-
-        .input-group {
-          margin-bottom: 10px;
-          padding: 12px 12px;
-         }
-
-        .tooltip {
-          position: relative;
-          display: inline-block;
-          border-bottom: 1px dotted black;  /* If you want dots under the hoverable text */
-          font-size: 14px;
-          opacity: 1;
-        
-        }
-        
-        .tooltip .tooltiptext {
-          visibility: hidden;
-          border-radius: 6px;
-         
-          position: absolute;
-          z-index: 1;
-        }
-        
-        .tooltip:hover .tooltiptext {
-          visibility: visible;
-        }
-        
-        
-        .tooltip .tooltiptext {
-          top: -5px;
-          right: 105%;
-          width: 400px;
-        }
-        </style>
-        <div class='form-group' id='kubespawner-profiles-list'>
-        {% for profile in profile_list %}
-        <label for='profile-item-{{ profile.slug }}' class='form-control input-group'>
-            <div class='col-md-1'>
-                <input type='radio' name='profile' id='profile-item-{{ profile.slug }}' value='{{ profile.index }}' {% if profile.default %}checked{% endif %} {% if profile.quotaDisplayDisabled %}disabled{% endif %}/>
-            </div>
-            <div class="col-md-11">
-                <strong>{{ profile.display_name }}</strong> 
-                {% if profile.description %}
-                    <p style="margin-top: 15px">{{ profile.description }}</p>
-                {% endif %}
-                {% if profile.hasQuota %}
-                <div style="font-weight: normal; position: absolute; top: 0px; right: 10px; ">
-                    <div class="tooltip">(Quota Balance: {{ profile.quotaDisplayBalanceHours }} Hours) 
-                        <div class="alert alert-info tooltiptext" role="alert">
-                          <h4 class="alert-heading">Quota Details</h4>
-                          <p>This profile is associated with a time-based quota. You can only start a server with this profile if your balance is <b>{{ profile.quotaDisplayMinToStartHours }}</b> hours or above, and running a server with this profile will drain your balance. </p>
-                          <p style="margin-top: 10px;">Don't worry: your server won't be stopped if your balance goes negative during use (though inactivity timeouts and maximum runtime limits still apply).</p>
-                          <p style="margin-top: 10px;">Your quota for this profile is replenished at a rate of <b>{{ profile.quotaDisplayRateHoursPerDay }}</b> hours/day, up to a maximum balance of <b>{{ profile.quotaDisplayMaxBalanceHours }}</b> hours.</p>
+    
+    
+            from jhprofilequota import profile_db
+    
+    
+            c.KubeSpawner.profile_form_template = """ 
+            <script>
+            // JupyterHub 0.8 applied form-control indisciminately to all form elements.
+            // Can be removed once we stop supporting JupyterHub 0.8
+            $(document).ready(function() {
+                $('#kubespawner-profiles-list input[type="radio"]').removeClass('form-control');
+            });
+            </script>
+            <style>
+            /* The profile description should not be bold, even though it is inside the <label> tag */
+            #kubespawner-profiles-list label p {
+                font-weight: normal;
+            }
+    
+            .input-group {
+              margin-bottom: 10px;
+              padding: 12px 12px;
+             }
+    
+            .tooltip {
+              position: relative;
+              display: inline-block;
+              border-bottom: 1px dotted black;  /* If you want dots under the hoverable text */
+              font-size: 14px;
+              opacity: 1;
+            
+            }
+            
+            .tooltip .tooltiptext {
+              visibility: hidden;
+              border-radius: 6px;
+             
+              position: absolute;
+              z-index: 1;
+            }
+            
+            .tooltip:hover .tooltiptext {
+              visibility: visible;
+            }
+            
+            
+            .tooltip .tooltiptext {
+              top: -5px;
+              right: 105%;
+              width: 400px;
+            }
+            </style>
+            <div class='form-group' id='kubespawner-profiles-list'>
+            {% for profile in profile_list %}
+            <label for='profile-item-{{ profile.slug }}' class='form-control input-group'>
+                <div class='col-md-1'>
+                    <input type='radio' name='profile' id='profile-item-{{ profile.slug }}' value='{{ profile.index }}' {% if profile.default %}checked{% endif %} {% if profile.quotaDisplayDisabled %}disabled{% endif %}/>
+                </div>
+                <div class="col-md-11">
+                    <strong>{{ profile.display_name }}</strong> 
+                    {% if profile.description %}
+                        <p style="margin-top: 15px">{{ profile.description }}</p>
+                    {% endif %}
+                    {% if profile.hasQuota %}
+                    <div style="font-weight: normal; position: absolute; top: 0px; right: 10px; ">
+                        <div class="tooltip">(Quota Balance: {{ profile.quotaDisplayBalanceHours }} Hours) 
+                            <div class="alert alert-info tooltiptext" role="alert">
+                              <h4 class="alert-heading">Quota Details</h4>
+                              <p>This profile is associated with a time-based quota. You can only start a server with this profile if your balance is <b>{{ profile.quotaDisplayMinToStartHours }}</b> hours or above, and running a server with this profile will drain your balance. </p>
+                              <p style="margin-top: 10px;">Don't worry: your server won't be stopped if your balance goes negative during use (though inactivity timeouts and maximum runtime limits still apply).</p>
+                              <p style="margin-top: 10px;">Your quota for this profile is replenished at a rate of <b>{{ profile.quotaDisplayRateHoursPerDay }}</b> hours/day, up to a maximum balance of <b>{{ profile.quotaDisplayMaxBalanceHours }}</b> hours.</p>
+                            </div>
                         </div>
                     </div>
+                    {% endif %}    
                 </div>
-                {% endif %}    
+            </label>
+            {% endfor %}
             </div>
-        </label>
-        {% endfor %}
-        </div>
-        """
-
-        from kubespawner import KubeSpawner
-        class KubeSpawnerWithProfileInfo(KubeSpawner):
-            def get_state(self):
-                state = super().get_state()
-                state['profile_slug'] = self.user_options["slug"]
-                return state
-
-        c.JupyterHub.spawner_class = KubeSpawnerWithProfileInfo
-
-        def profiles_gen(spawner):
-            profiles_list = get_config("singleuser.profileList", [])
-
-            conn = profile_db.get_connection(quota_db_filename)
-
-            profile_db.update_user_tokens(conn, profiles_list, spawner.user.name, spawner.user.admin)
-            updated_profiles = profile_db.get_profiles_by_balance(conn, profiles_list, spawner.user.name, spawner.user.admin)
-
-            profile_db.close_connection(conn)
-            return updated_profiles 
-
-        c.KubeSpawner.profile_list = profiles_gen
-
+            """
+    
+            from kubespawner import KubeSpawner
+            class KubeSpawnerWithProfileInfo(KubeSpawner):
+                def get_state(self):
+                    state = super().get_state()
+                    state['profile_slug'] = self.user_options["slug"]
+                    return state
+    
+            c.JupyterHub.spawner_class = KubeSpawnerWithProfileInfo
+    
+            def profiles_gen(spawner):
+                profiles_list = get_config("singleuser.profileList", [])
+    
+                conn = profile_db.get_connection(quota_db_filename)
+    
+                profile_db.update_user_tokens(conn, profiles_list, spawner.user.name, spawner.user.admin)
+                updated_profiles = profile_db.get_profiles_by_balance(conn, profiles_list, spawner.user.name, spawner.user.admin)
+    
+                profile_db.close_connection(conn)
+                return updated_profiles 
+    
+            c.KubeSpawner.profile_list = profiles_gen
+    
       authsetting: |
         import os
         import json
