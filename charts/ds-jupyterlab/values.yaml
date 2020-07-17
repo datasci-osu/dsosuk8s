@@ -223,6 +223,8 @@ jupyterhub:
         profile_list = get_config("singleuser.profileList", None)
 
         if profile_list:
+            from jhprofilequota import profile_db
+            
             quota_db_filename = get_config('singleuser.profileQuota.quotaDbFilename', '/srv/jupyterhub/profile_quotas.sqlite')
             profile_db.create_db(quota_db_filename) 
        
@@ -247,7 +249,6 @@ jupyterhub:
     
     
     
-            from jhprofilequota import profile_db
     
     
             c.KubeSpawner.profile_form_template = """ 
