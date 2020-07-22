@@ -560,6 +560,8 @@ RUN apt-get update \
     vim \
  && apt-get clean && rm -rf /var/lib/apt/lists/*
 
+# run a jupyter lab build for extensions...
+RUN jupyter lab build
 
 # cleanup yarn cache, too much wasted space
 RUN rm -rf /home/jovyan/.cache/yarn
