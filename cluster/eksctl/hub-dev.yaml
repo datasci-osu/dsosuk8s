@@ -156,7 +156,7 @@ nodeGroups:
     maxSize: 10
     # spin one up for a bit so the cluster-autoscaler can get the config for the group and scale it back down if not needed: https://github.com/weaveworks/eksctl/issues/1481
     desiredCapacity: 1
-    volumeSize: 30
+    volumeSize: 60
     ###availabilityZones: ["us-west-2a", "us-west-2b", "us-west-2c"]
     labels: 
       cents-per-hour: "53"
