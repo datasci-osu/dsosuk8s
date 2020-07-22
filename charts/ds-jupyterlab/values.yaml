@@ -1,4 +1,6 @@
 jupyterhub:
+  #debug: 
+  #  enabled: true
   auth:
     type: dummy
     dummy:

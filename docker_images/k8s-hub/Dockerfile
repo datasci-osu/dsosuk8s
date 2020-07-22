@@ -1,4 +1,6 @@
-FROM jupyterhub/k8s-hub:0.9.0 
+FROM jupyterhub/k8s-hub:0.9-484ce8e
+# y doesn't v0.9.0 and later work with uid=0 for the singleuser containers???
+#FROM jupyterhub/k8s-hub:0.9.1 
 
 USER root
 
@@ -32,8 +34,8 @@ WORKDIR /root
 RUN pip3 install jupyterhub-ltiauthenticator
 RUN pip3 install git+https://github.com/oneilsh/ltiauthenticator.git@multi-key
 
-#TAG v1.4.2
-#TAG depupgrade
+#TAG v1.4.3
+#TAG baseimage0.9.1
 
 WORKDIR /srv/jupyterhub
 

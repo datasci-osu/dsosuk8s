@@ -80,6 +80,7 @@ c.JupyterHub.port = int(os.environ['PROXY_PUBLIC_SERVICE_PORT'])
 # the hub should listen on all interfaces, so the proxy can access it
 c.JupyterHub.hub_ip = '0.0.0.0'
 
+
 # implement common labels
 # this duplicates the jupyterhub.commonLabels helper
 common_labels = c.KubeSpawner.common_labels = {}
@@ -99,6 +100,8 @@ if release:
     common_labels['release'] = release
 
 c.KubeSpawner.namespace = os.environ.get('POD_NAMESPACE', 'default')
+
+
 
 # Max number of consecutive failures before the Hub restarts itself
 # requires jupyterhub 0.9.2
