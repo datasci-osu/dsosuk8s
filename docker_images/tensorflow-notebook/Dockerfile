@@ -384,7 +384,7 @@ LABEL maintainer="Christoph Schranz <christoph.schranz@salzburgresearch.at>"
 
 # Install Tensorflow, check compatibility here: https://www.tensorflow.org/install/gpu 
 RUN conda install --quiet --yes \
-    'tensorflow-gpu=2.1*' \
+    'tensorflow-gpu=2.2*' \
     'keras-gpu' && \
     fix-permissions $CONDA_DIR && \
     fix-permissions /home/$NB_USER
@@ -567,8 +567,8 @@ RUN jupyter lab build
 RUN rm -rf /home/jovyan/.cache/yarn
 
 # 
-#TAG v0.1.3
-#TAG gpubase
+#TAG v0.1.4
+#TAG tensorflow2.2
 
 USER $NB_USER
 
