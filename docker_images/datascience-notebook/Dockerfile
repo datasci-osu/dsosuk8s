@@ -89,6 +89,7 @@ RUN apt-get update \
  && apt-get install -yq --no-install-recommends \
     less \
     openssh-client \
+    file \
  && apt-get clean && rm -rf /var/lib/apt/lists/*
 
 RUN pip install bash_kernel
@@ -99,9 +100,10 @@ RUN pip install nbresuse
 # fixup for shiny-server bookmarks (don't want to make adjustment in the jupyter-rsession-proxy where the shiny config is generated from)
 RUN chmod o+w /var/lib/shiny-server
 
+# R geospatial libs, need system install
 RUN conda install -c conda-forge geos r-rgeos r-rgdal r-sf
-#TAG v1.1.8
-#TAG condaGeoStuff
+#TAG v1.1.9
+#TAG fileutil
 
 USER $NB_USER
 
