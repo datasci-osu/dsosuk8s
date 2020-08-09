@@ -8,6 +8,6 @@ metadata:
 spec:
   tls:
   - hosts:
-    - {{ .Values.masterHost }}
+    - {{ index .Values "nginx-ingress" "masterHost" }} # how to handle dashes in subchart names: https://github.com/helm/helm/issues/2192#issuecomment-306033149
   rules:
-  - host: {{ .Values.masterHost }}
+  - host: {{ index .Values "nginx-ingress" "masterHost" }}

@@ -1,17 +1,14 @@
-masterHost: ""
 nginx-ingress:
+  masterHost: ""
   controller:
     wildcardTLS:
-      cert: ""
-      key: ""
-    nodeSelector: 
-      nodegroup-role: clustertools
+      cert:  ""
+      key:  ""
     config:
       entries:
-        client-max-body-size: "1000m"
+        client-max-body-size: ""
         ssl-redirect: "True"
         proxy-buffering: "False"
         #error-log-level: "debug"
     #nginxDebug: true
     logLevel: 2
-

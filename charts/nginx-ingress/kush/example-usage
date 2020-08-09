@@ -1,0 +1,11 @@
+echo "${cyan}Example usage:${white}"
+echo helm kush install ReleaseName $CHART --kush-interpolate --values custom-values.yaml
+echo ""
+echo "${cyan}Example custom-values.yaml:${white}"
+cat $CHART_DIR/example-custom-values.yaml
+echo ""
+echo "${yellow}The kubeContext and createNamespace can be used to specify the "
+echo "installation context/namespace; settings made via --namespace and "
+echo "--kube-context override (and namespace won't be created), if not specified "
+echo "helm defaults are used.${white}"
+
