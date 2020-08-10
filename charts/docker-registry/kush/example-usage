@@ -2,7 +2,42 @@ echo "${cyan}Example usage:${white}"
 echo helm kush template ReleaseName $CHART --kush-interpolate --values custom-values.yaml
 echo ""
 echo "${cyan}Example custom-values.yaml:${white}"
-cat $CHART_DIR/example-custom-values.yaml
+
+cat << EOF
+kubeContext: cluster-dev
+createNamespace: dev-group
+
+ingress:
+  hosts:
+    - registry-dev.domain.tld
+  tls:
+    - hosts:
+      - registry-dev.domain.tld
+
+persistence:
+  enabled: true
+  size: 60Gi
+  # storageClass: '-'
+
+# set the type of filesystem to use: filesystem, s3
+storage: filesystem
+
+# Set this to name of secret for tls certs
+# tlsSecretName: registry.docker.example.com
+secrets:
+  haSharedSecret: ""
+  htpasswd: <%= $(htpasswd -Bbn admin adminpass) %>
+
+configData:
+  # this configures the registry as a pass-through proxy for dockerhub
+  # specify images as this-registry.domain.tlc/owner/image:tag
+  proxy:
+    remoteurl: https://registry-1.docker.io
+
+nodeSelector: 
+  nodegroup-role: clustertools
+EOF
+
 echo ""
 echo "${yellow}The kubeContext and createNamespace can be used to specify the "
 echo "installation context/namespace; settings made via --namespace and "

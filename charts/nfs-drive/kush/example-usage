@@ -2,7 +2,15 @@ echo "${cyan}Example usage:${white}"
 echo helm kush template ReleaseName $CHART --kush-interpolate --values custom-values.yaml
 echo ""
 echo "${cyan}Example custom-values.yaml:${white}"
-cat $CHART_DIR/example-custom-values.yaml
+
+cat << EOF
+kubeContext: cluster-dev
+createNamespace: dev-group
+
+nfs-drive:
+  size: 10G 
+EOF
+
 echo ""
 echo "${yellow}The kubeContext and createNamespace can be used to specify the "
 echo "installation context/namespace; settings made via --namespace and "
