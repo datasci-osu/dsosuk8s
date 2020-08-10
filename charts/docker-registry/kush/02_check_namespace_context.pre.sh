@@ -1,7 +1,7 @@
 # if default namespace, check and see if they've asked for one in the values, 
 # if not leave it as default
 if [ "$HELM_NAMESPACE" == "default" ]; then
-  HELM_NAMESPACE=$(index .createNamespace "default")
+  HELM_NAMESPACE=$(index createNamespace "default")
 
   # if the namespace is still not default, they had .createNamespace set and thus want it actually created
   if [ "$HELM_NAMESPACE" != "default" ]; then
@@ -12,7 +12,7 @@ fi
 # if no --kube-context specified, see if they've asked for one
 # if not use the current context
 if [ "$HELM_KUBECONTEXT" == "" ]; then
-  HELM_KUBECONTEXT=$(index .kubeContext $(kubectl config current-context))
+  HELM_KUBECONTEXT=$(index kubeContext $(kubectl config current-context))
 fi
 
 echo "${yellow}Using namespace:${white} $HELM_NAMESPACE " 2>&1
