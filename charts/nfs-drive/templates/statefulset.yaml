@@ -50,4 +50,4 @@ spec:
       accessModes: [ "ReadWriteOnce" ]
       resources:
         requests:
-          storage: {{ .Values.size }} 
+          storage: {{ index .Values "nfs-drive" "size" }} 

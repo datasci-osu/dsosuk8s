@@ -53,11 +53,11 @@ resources:
   # resources, such as Minikube. If you do want to specify resources, uncomment the following
   # lines, adjust them as necessary, and remove the curly braces after 'resources:'.
   limits:
-    cpu: 100m
-    memory: 256Mi
+    cpu: 200m
+    memory: 512Mi
   requests:
-    cpu: 100m
-    memory: 256Mi
+    cpu: 200m
+    memory: 512Mi
 persistence:
   accessMode: 'ReadWriteOnce'
   enabled: true
@@ -118,8 +118,6 @@ configData:
       enabled: true
       interval: 10s
       threshold: 3
-  proxy:
-    remoteurl: https://registry-1.docker.io
 
 securityContext:
   enabled: true

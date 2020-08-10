@@ -9,3 +9,4 @@ echo "installation context/namespace; settings made via --namespace and "
 echo "--kube-context override (and namespace won't be created), if not specified "
 echo "helm defaults are used.${white}"
 
+
