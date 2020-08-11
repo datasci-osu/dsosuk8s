@@ -26,7 +26,7 @@ if [ "$HELM_NAMESPACE" != "default" ] && [ "$CREATING" == "True" ]; then
     echo "${yellow}Not creating namespace (dry run), but would with: ${white} kubectl create namespace $HELM_NAMESPACE " 2>&1
   else
     echo "${yellow}Creating namespace with: ${cyan} kubectl create namespace $HELM_NAMESPACE ${white}" 2>&1
-    kubectl create namespace $HELM_NAMESPACE
+    kubectl create namespace $HELM_NAMESPACE || true
   fi
 fi
 
