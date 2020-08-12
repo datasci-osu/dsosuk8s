@@ -26,7 +26,7 @@ storage: filesystem
 # tlsSecretName: registry.docker.example.com
 secrets:
   haSharedSecret: ""
-  htpasswd: <%= $(htpasswd -Bbn admin adminpass) %>
+  htpasswd: <%= \$(htpasswd -Bbn admin adminpass) %>
 
 configData:
   # this configures the registry as a pass-through proxy for dockerhub

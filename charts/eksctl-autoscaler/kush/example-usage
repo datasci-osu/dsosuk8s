@@ -1,0 +1,23 @@
+echo "${cyan}Example usage:${white}"
+echo helm kush template ReleaseName $CHART --kush-interpolate --values custom-values.yaml
+echo ""
+echo "${cyan}Example custom-values.yaml:${white}"
+
+cat << EOF
+kubeContext: cluster-dev
+
+# clusterName should be the name of the cluster as created by eksctl
+clusterName: myCluster
+nodeSelector: 
+  nodegroup-role: clustertools
+
+EOF
+
+echo ""
+echo "${yellow}The kubeContext can be used to specify the "
+echo "installation context; settings made via "
+echo "--kube-context override, if not specified "
+echo "helm defaults are used.
+echo ""
+echo "Note that this chart will be installed in the kube-system namespace (a requirement of the chart).${white}"
+
