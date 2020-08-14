@@ -1,0 +1,5 @@
+resources:
+  - helm-template-output.yaml
+patchesStrategicMerge:
+  - patch-deploy.yaml
+   

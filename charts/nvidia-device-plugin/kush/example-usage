@@ -1,0 +1,28 @@
+echo "${cyan}Example usage:${white}"
+echo helm kush template ReleaseName $CHART --kush-interpolate --values custom-values.yaml
+echo ""
+echo "${cyan}Example custom-values.yaml:${white}"
+
+cat << EOF
+kubeContext: cluster-dev
+createNamespace: cluster-ingress
+
+tolerations:
+  # This toleration is deprecated. Kept here for backward compatibility
+  # See https://kubernetes.io/docs/tasks/administer-cluster/guaranteed-scheduling-critical-addon-pods/
+  - key: CriticalAddonsOnly
+    operator: Exists
+  - key: nvidia.com/gpu
+    operator: Exists
+    effect: NoSchedule
+  - key: hub.jupyter.org/dedicated
+    operator: Exists
+    effect: NoSchedule
+EOF
+
+echo ""
+echo "${yellow}The kubeContext and createNamespace can be used to specify the "
+echo "installation context/namespace; settings made via --namespace and "
+echo "--kube-context override (and namespace won't be created), if not specified "
+echo "helm defaults are used.${white}"
+
