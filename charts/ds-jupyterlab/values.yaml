@@ -159,7 +159,7 @@ jupyterhub:
       nginx.org/mergeable-ingress-type: "minion"
       nginx.org/websocket-services: "proxy-public"
     hosts:
-      - <%= $(index clusterHostname) "" %>
+      - <%= $(index clusterHostname "") %>
     tls:
       - hosts:
         - <%= $(index clusterHostname "") %>

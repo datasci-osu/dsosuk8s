@@ -23,10 +23,10 @@ echo "${yellow}Using kube-context:${white} $HELM_KUBECONTEXT " 2>&1
 if [ "$HELM_NAMESPACE" != "default" ] && [ "$CREATING" == "True" ]; then
   # if create the namespace, if we're not in a dry-run situation
   if [ "$DRY_RUN" == "True" ]; then
-    echo "${yellow}Not creating namespace (dry run), but would with: ${white} kubectl create namespace $HELM_NAMESPACE " 2>&1
+    echo "${yellow}Not creating namespace (dry run), but would with: ${white} kubectl create namespace $HELM_NAMESPACE --context $HELM_KUBECONTEXT " 2>&1
   else
-    echo "${yellow}Creating namespace with: ${cyan} kubectl create namespace $HELM_NAMESPACE ${white}" 2>&1
-    kubectl create namespace $HELM_NAMESPACE || true
+    echo "${yellow}Creating namespace with: ${cyan} kubectl create namespace $HELM_NAMESPACE --context $HELM_KUBECONTEXT ${white}" 2>&1
+    kubectl create namespace $HELM_NAMESPACE --context $HELM_KUBECONTEXT || true
   fi
 fi
 
