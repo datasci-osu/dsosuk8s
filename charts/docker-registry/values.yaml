@@ -21,7 +21,7 @@ image:
 service:
   name: registry
   type: ClusterIP
-  # clusterIP:
+  #clusterIP:
   port: 5000
   # nodePort:
   # loadBalancerIP:
