@@ -3,7 +3,7 @@ SECURITY_SALT=$(index securitySalt "")
 HOMEDRIVE_SIZE=$(index createHomeDrive.size "")
 
 if [ "$HOMEDRIVE_SIZE" != "" ]; then
-  DRIVE_RELEASE_NAME="${RELEASE_NAME}Homedrive"
+  DRIVE_RELEASE_NAME="${RELEASE_NAME}homedrive"
   HOMEDRIVE_CHART=$(index createHomeDrive.chart "")
   if [ "$HOMEDRIVE_CHART" == "" ]; then
     echo "${red}You must have a createHomeDrive.chart specified in --values. ${white}" 1>&2
