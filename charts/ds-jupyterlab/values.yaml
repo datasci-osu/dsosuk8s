@@ -144,7 +144,7 @@ jupyterhub:
           mountPath: /usr/local/bin/data
 
     extraEnv:
-      NFS_SVC_HOME: <%= $(echo $DRIVE_RELEASE_NAME) %>
+      NFS_SVC_HOME: <%= $DRIVE_RELEASE_NAME %>
     uid: 0
     fsGid: 0
     startTimeout: 1200
@@ -159,13 +159,13 @@ jupyterhub:
       nginx.org/mergeable-ingress-type: "minion"
       nginx.org/websocket-services: "proxy-public"
     hosts:
-      - <%= $CLUSTER_HOSTNAME %>
+      - <%= $(index clusterHostname) "" %>
     tls:
       - hosts:
-        - <%= $CLUSTER_HOSTNAME %>
+        - <%= $(index clusterHostname "") %>
   
   hub:
-    baseUrl: <%= $BASE_URL %>
+    baseUrl: <%= "/$RELEASE_NAME/" %>
     db:
       type: "sqlite-pvc"
       upgrade: false 
@@ -189,7 +189,7 @@ jupyterhub:
         mountPath: /usr/local/bin/start-hub.sh
         subPath: start-hub.sh
     extraEnv:
-      AUTH_TYPE: lti
+      AUTH_TYPE: <%= $(index authType "lti") %>
       LTI_ID_KEYS: '["custom_canvas_user_login_id", "lis_person_contact_email_primary", "custom_canvas_user_login_id"]'
       LTI_ID_REGEXES: '["(^[^@]+)@oregonstate.edu$", "(^[^@]+@[^@]+$)", "(^[0-9a-f]{6,6})[0-9a-f]*$"]'
       LTI_ADMIN_ROLES: '["Instructor", "TeachingAssistant", "ContentDeveloper"]'
@@ -199,7 +199,7 @@ jupyterhub:
       NFS_SVC_HOME: <%= $DRIVE_RELEASE_NAME %>
       # e.g. oneils,keistc
       # but only used if not using lti AUTH_TYPE
-      ADMIN_USERS: 
+      ADMIN_USERS: <%= $(index adminUsers "") %> 
 
     extraConfig:
       concurrentSpawn:
