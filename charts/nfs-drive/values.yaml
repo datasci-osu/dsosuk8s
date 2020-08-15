@@ -1,3 +1,2 @@
 # Source: templates/deploy.yaml
-nfs-drive:
-  size: 4Gi
+size: 4Gi

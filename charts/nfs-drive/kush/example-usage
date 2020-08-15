@@ -7,8 +7,7 @@ cat << EOF
 kubeContext: cluster-dev
 createNamespace: dev-group
 
-nfs-drive:
-  size: 10G 
+size: 10G 
 EOF
 
 echo ""
