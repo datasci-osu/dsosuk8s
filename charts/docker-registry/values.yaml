@@ -71,7 +71,7 @@ storage: filesystem
 # tlsSecretName: registry.docker.example.com
 secrets:
   haSharedSecret: ""
-  htpasswd: ""
+  htpasswd: <%= $(htpasswd -Bbn $ADMIN_USERNAME $ADMIN_PASSWORD) %>
 # Secrets for Azure
 #   azure:
 #     accountName: ""

@@ -561,14 +561,13 @@ RUN apt-get update \
  && apt-get clean && rm -rf /var/lib/apt/lists/*
 
 # run a jupyter lab build for extensions...
-RUN jupyter lab build
+RUN jupyter lab build --dev-build=False --minimize=False
 
 # cleanup yarn cache, too much wasted space
 RUN rm -rf /home/jovyan/.cache/yarn
 
 # 
-#TAG v0.1.4
-#TAG tensorflow2.2
+#TAG v0.1.5
 
 USER $NB_USER
 

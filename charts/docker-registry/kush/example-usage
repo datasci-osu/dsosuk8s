@@ -7,6 +7,18 @@ cat << EOF
 kubeContext: cluster-dev
 createNamespace: dev-group
 
+basicAuth:
+  username: admin
+  password: adminpass
+
+createGlobalSecret:
+  secretName: <%= $RELEASE_NAME %>
+  matchNamespace:
+    - '.*'
+  avoidNamespaces:
+    - default
+    - kube-system
+
 ingress:
   hosts:
     - registry-dev.domain.tld
@@ -22,11 +34,6 @@ persistence:
 # set the type of filesystem to use: filesystem, s3
 storage: filesystem
 
-# Set this to name of secret for tls certs
-# tlsSecretName: registry.docker.example.com
-secrets:
-  haSharedSecret: ""
-  htpasswd: <%= \$(htpasswd -Bbn admin adminpass) %>
 
 configData:
   # this configures the registry as a pass-through proxy for dockerhub

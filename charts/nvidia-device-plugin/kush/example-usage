@@ -7,6 +7,10 @@ cat << EOF
 kubeContext: cluster-dev
 createNamespace: cluster-ingress
 
+# optional
+# image: private-registry/nvidia/k8s-device-plugin:v0.6.0
+# imagePullSecret: regcred
+
 tolerations:
   # This toleration is deprecated. Kept here for backward compatibility
   # See https://kubernetes.io/docs/tasks/administer-cluster/guaranteed-scheduling-critical-addon-pods/
