@@ -170,8 +170,8 @@ jupyterhub:
       type: "sqlite-pvc"
       upgrade: false 
     image:
-      name: oneilsh/ktesting-k8s-hub
-      tag: "v1.3.2" 
+      name: oneilsh/jupyterlab-k8s-hub
+      tag: "v1.4.3" 
     uid: 0
     fsGid: 0
     extraVolumes:

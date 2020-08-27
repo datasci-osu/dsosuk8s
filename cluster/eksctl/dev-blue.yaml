@@ -9,8 +9,7 @@ metadata:
   version: "1.16"
 
 # default availabilityzones unless otherwise specified?
-availabilityZones: ["us-west-2a", "us-west-2b", "us-west-2c"]
-
+availabilityZones: ["us-west-2a", "us-west-2b", "us-west-2c"] 
 # eks now has managedNodeGroups, but they don't support taints, which are required for jupyterhub to put user pods in the right nodegroup. 
 # one could use 'kubectl taint' to add taints after creation, but new nodes created by an autoscaler won't have it
 # a potential workaround: https://github.com/jupyterhub/zero-to-jupyterhub-k8s/issues/299#issuecomment-413924333

@@ -32,7 +32,7 @@ spec:
           limits:
             cpu: 0.5
             memory: "2G"
-        image: oneilsh/ktesting-nfsserver3:acb20051
+        image: oneilsh/nfsserver3:v1.0.1
         securityContext:
           capabilities:
             add: ["SYS_ADMIN", "SETPCAP"]
