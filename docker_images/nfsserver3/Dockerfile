@@ -13,3 +13,6 @@ COPY nfs-kernel-server /etc/default/nfs-kernel-server
 
 ADD run.sh /usr/local/bin/run.sh
 ENTRYPOINT ["run.sh"]
+
+#IMAGE oneilsh/nfsserver3
+#TAG v1.0.1 

@@ -1,5 +1,6 @@
 FROM jupyterhub/k8s-hub:0.9-484ce8e
 # y doesn't v0.9.0 and later work with uid=0 for the singleuser containers???
+# (possibly a hub/singleuser version mismatch)
 #FROM jupyterhub/k8s-hub:0.9.1 
 
 USER root
@@ -34,12 +35,9 @@ WORKDIR /root
 RUN pip3 install jupyterhub-ltiauthenticator
 RUN pip3 install git+https://github.com/oneilsh/ltiauthenticator.git@multi-key
 
+#IMAGE oneilsh/jupyterlab-k8s-hub
 #TAG v1.4.3
 #TAG baseimage0.9.1
 
 WORKDIR /srv/jupyterhub
 
-
-# TODO: These can prolly be removed since I'm now specifying the command with kustomize (helm post install)
-ENTRYPOINT ["/bin/sh", "-c"]
-CMD ["/usr/local/bin/start-hub.sh"]
