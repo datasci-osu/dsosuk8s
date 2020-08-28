@@ -10,6 +10,7 @@ USER root
 
 # Install Tensorflow, check compatibility here: https://www.tensorflow.org/install/gpu 
 RUN conda install --quiet --yes \
+    'tensorflow-estimator=2.1*' \
     'tensorflow-gpu=2.1*' \
     'keras-gpu' && \
     fix-permissions $CONDA_DIR && \
@@ -34,6 +35,9 @@ RUN conda clean --all -f -y && \
 
 USER $NB_USER
 
+# let's check to make sure this works...
+RUN python3 -c 'import tensorflow as tf'
+
 
 #IMAGE oneilsh/jupyterlab-ubuntu-nvidia-scipy-rjulia-gpu
-#TAG v1.0.2
+#TAG v1.0.3
