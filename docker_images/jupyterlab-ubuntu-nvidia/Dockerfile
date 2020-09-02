@@ -140,6 +140,7 @@ RUN conda install --quiet --yes 'tini=0.18.0' && \
 # files across image layers when the permissions change
 RUN conda install --quiet --yes \
     'notebook=6.0.3' \
+    'nodejs=14.9.0' \
     'jupyterhub=1.1.0' \
     'jupyterlab=1.2.5' && \
     conda clean --all -f -y && \
@@ -185,20 +186,20 @@ RUN apt-get update && apt-get install -yq --no-install-recommends \
     build-essential \
     emacs \
     git \
-    inkscape \
-    jed \
-    libsm6 \
-    libxext-dev \
-    libxrender1 \
-    lmodern \
+#    inkscape \
+#    jed \
+#    libsm6 \
+#    libxext-dev \
+#    libxrender1 \
+#    lmodern \
     netcat \
     python-dev \
     # ---- nbconvert dependencies ----
-    texlive-xetex \
-    texlive-fonts-recommended \
-    texlive-generic-recommended \
+#    texlive-xetex \
+#    texlive-fonts-recommended \
+#    texlive-generic-recommended \
     # Optional dependency
-    texlive-fonts-extra \
+#    texlive-fonts-extra \
     # ----
     tzdata \
     unzip \
@@ -207,13 +208,13 @@ RUN apt-get update && apt-get install -yq --no-install-recommends \
 
 
 # Install important packages and Graphviz
-RUN set -ex \
- && buildDeps=' \
-    graphviz==0.11 \
-' \
- && apt-get update \
- && apt-get -y install htop apt-utils graphviz libgraphviz-dev \
- && pip install --no-cache-dir $buildDeps
+#RUN set -ex \
+# && buildDeps=' \
+#    graphviz==0.11 \
+#' \
+# && apt-get update \
+# && apt-get -y install htop apt-utils graphviz libgraphviz-dev \
+# && pip install --no-cache-dir $buildDeps
 
 # Install various extensions
 RUN jupyter labextension install @jupyterlab/github
@@ -261,7 +262,7 @@ RUN apt-get update \
     less \
     nano \
     openssh-client \ 
-    gnuplot \
+#    gnuplot \
     nfs-common \
     nfs-kernel-server \
     subversion \
@@ -280,5 +281,5 @@ RUN rm -rf /home/jovyan/.cache/yarn
 USER $NB_UID
 
 #IMAGE oneilsh/jupyterlab-ubuntu-nvidia
-#TAG v1.0.2
+#TAG v1.0.3slim
 
