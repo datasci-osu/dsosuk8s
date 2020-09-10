@@ -31,6 +31,10 @@ service:
 #    - default
 #    - kube-system
 
+#secrets:
+#  # remove # below to uncomment for esh
+#  htpasswd: <%= $(htpasswd -Bbn $ADMIN_USERNAME $ADMIN_PASSWORD) %>
+
 #ingress:
 #  hosts:
 #    - registry-dev.domain.tld
