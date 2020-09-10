@@ -71,7 +71,9 @@ storage: filesystem
 # tlsSecretName: registry.docker.example.com
 secrets:
   haSharedSecret: ""
+  <% if [ "$ADMIN_USERNAME" != "" ]; then %>
   htpasswd: <%= $(htpasswd -Bbn $ADMIN_USERNAME $ADMIN_PASSWORD) %>
+  <% fi %>
 # Secrets for Azure
 #   azure:
 #     accountName: ""
@@ -129,9 +131,6 @@ priorityClassName: ""
 podDisruptionBudget: {}
   # maxUnavailable: 1
   # minAvailable: 2
-
-nodeSelector: 
-  nodegroup-role: clustertools
 
 affinity: {}
 

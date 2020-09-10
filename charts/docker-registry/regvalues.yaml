@@ -1,0 +1,29 @@
+# this can go with the default docker-registry chart to setup a cluster-local dockerhub pull-through cache, accessible at localhost:30050
+# (e.g. image would be localhost:30050/username/imagename:tag)
+
+#nodeSelector:
+#  nodegroup-role: clustertools
+
+configData:
+  proxy:
+    remoteurl: https://registry-1.docker.io
+
+service:
+  name: registry
+  type: NodePort
+  port: 5000
+  nodePort: 30050
+
+resources:
+  limits:
+    cpu: 200m
+    memory: 512Mi
+  requests:
+    cpu: 200m
+    memory: 512Mi
+
+persistence:
+  accessMode: 'ReadWriteOnce'
+  enabled: true
+  size: 60Gi
+
