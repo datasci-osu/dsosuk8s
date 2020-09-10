@@ -89,17 +89,18 @@ RUN echo "auth requisite pam_deny.so" >> /etc/pam.d/su && \
     useradd -m -s /bin/bash -N -u $NB_UID $NB_USER && \
     mkdir -p $CONDA_DIR && \
     chown $NB_USER:$NB_GID $CONDA_DIR && \
-    chmod g+w /etc/passwd && \
-    fix-permissions $HOME && \
-    fix-permissions "$(dirname $CONDA_DIR)"
+    chmod g+w /etc/passwd
+    #fix-permissions $HOME && \
+    #fix-permissions "$(dirname $CONDA_DIR)"
 
 USER $NB_UID
 WORKDIR $HOME
 ARG PYTHON_VERSION=default
 
 # Setup work directory for backward-compatibility
-RUN mkdir /home/$NB_USER/work && \
-    fix-permissions /home/$NB_USER
+RUN mkdir /home/$NB_USER/work 
+    #&& \
+    #fix-permissions /home/$NB_USER
 
 # Install conda as jovyan and check the md5 sum provided on the download site
 ENV MINICONDA_VERSION=4.7.12.1 \
@@ -121,16 +122,16 @@ RUN cd /tmp && \
     conda install --quiet --yes pip && \
     conda update --all --quiet --yes && \
     conda clean --all -f -y && \
-    rm -rf /home/$NB_USER/.cache/yarn && \
-    fix-permissions $CONDA_DIR && \
-    fix-permissions /home/$NB_USER
+    rm -rf /home/$NB_USER/.cache/yarn
+    #fix-permissions $CONDA_DIR && \
+    #fix-permissions /home/$NB_USER
 
 # Install Tini
 RUN conda install --quiet --yes 'tini=0.18.0' && \
     conda list tini | grep tini | tr -s ' ' | cut -d ' ' -f 1,2 >> $CONDA_DIR/conda-meta/pinned && \
-    conda clean --all -f -y && \
-    fix-permissions $CONDA_DIR && \
-    fix-permissions /home/$NB_USER
+    conda clean --all -f -y
+    #fix-permissions $CONDA_DIR && \
+    #fix-permissions /home/$NB_USER
 
 # Install Jupyter Notebook, Lab, and Hub
 # Generate a notebook server config
@@ -139,17 +140,18 @@ RUN conda install --quiet --yes 'tini=0.18.0' && \
 # Do all this in a single RUN command to avoid duplicating all of the
 # files across image layers when the permissions change
 RUN conda install --quiet --yes \
-    'notebook=6.0.3' \
+    'notebook=6.1.3' \
     'nodejs=14.9.0' \
     'jupyterhub=1.1.0' \
-    'jupyterlab=1.2.5' && \
+    'ipywidgets=7.5.*' \
+    'jupyterlab=2.2.6' && \
     conda clean --all -f -y && \
     npm cache clean --force && \
     jupyter notebook --generate-config && \
     rm -rf $CONDA_DIR/share/jupyter/lab/staging && \
-    rm -rf /home/$NB_USER/.cache/yarn && \
-    fix-permissions $CONDA_DIR && \
-    fix-permissions /home/$NB_USER
+    rm -rf /home/$NB_USER/.cache/yarn 
+    #fix-permissions $CONDA_DIR && \
+    #fix-permissions /home/$NB_USER
 
 EXPOSE 8888
 
@@ -165,7 +167,7 @@ COPY jupyter_notebook_config.py /etc/jupyter/
 
 # Fix permissions on /etc/jupyter as root
 USER root
-RUN fix-permissions /etc/jupyter/
+#RUN fix-permissions /etc/jupyter/
 
 # Switch back to jovyan to avoid accidental container runs as root
 USER $NB_UID
@@ -184,7 +186,7 @@ USER root
 # Install all OS dependencies for fully functional notebook server
 RUN apt-get update && apt-get install -yq --no-install-recommends \
     build-essential \
-    emacs \
+#    emacs \
     git \
 #    inkscape \
 #    jed \
@@ -192,7 +194,7 @@ RUN apt-get update && apt-get install -yq --no-install-recommends \
 #    libxext-dev \
 #    libxrender1 \
 #    lmodern \
-    netcat \
+#    netcat \
     python-dev \
     # ---- nbconvert dependencies ----
 #    texlive-xetex \
@@ -217,23 +219,24 @@ RUN apt-get update && apt-get install -yq --no-install-recommends \
 # && pip install --no-cache-dir $buildDeps
 
 # Install various extensions
-RUN jupyter labextension install @jupyterlab/github
+RUN jupyter nbextension enable --py widgetsnbextension --sys-prefix
+#RUN jupyter labextension install @jupyterlab/github
 #RUN jupyter labextension install jupyterlab-drawio
 #RUN jupyter labextension install jupyter-leaflet
 #RUN jupyter labextension install @jupyterlab/plotly-extension
 RUN jupyter labextension install @jupyter-widgets/jupyterlab-manager
-RUN pip install --no-cache-dir jupyter-tabnine==1.0.2  && \
-  jupyter nbextension install --py jupyter_tabnine && \
-  jupyter nbextension enable --py jupyter_tabnine && \
-  jupyter serverextension enable --py jupyter_tabnine
-RUN fix-permissions $CONDA_DIR
-RUN conda install -c conda-forge jupyter_contrib_nbextensions && \
-  conda install -c conda-forge jupyter_nbextensions_configurator && \
-  conda install -c conda-forge rise && \
-  jupyter nbextension enable codefolding/main
-RUN jupyter labextension install @ijmbarr/jupyterlab_spellchecker
+#RUN pip install --no-cache-dir jupyter-tabnine==1.0.2  && \
+#  jupyter nbextension install --py jupyter_tabnine && \
+#  jupyter nbextension enable --py jupyter_tabnine && \
+#  jupyter serverextension enable --py jupyter_tabnine
+#RUN fix-permissions $CONDA_DIR
+#RUN conda install -c conda-forge jupyter_contrib_nbextensions && \
+#  conda install -c conda-forge jupyter_nbextensions_configurator && \
+#  conda install -c conda-forge rise && \
+#  jupyter nbextension enable codefolding/main
+#RUN jupyter labextension install @ijmbarr/jupyterlab_spellchecker
 
-RUN fix-permissions /home/$NB_USER
+# RUN fix-permissions /home/$NB_USER
 
 
 ####################################################
@@ -269,17 +272,20 @@ RUN apt-get update \
     vim \
  && apt-get clean && rm -rf /var/lib/apt/lists/*
 
-# run a jupyter lab build for extensions...
-RUN jupyter lab build --dev-build=False --minimize=False
+# run a jupyter lab build for extensions and do some cleanup
+RUN conda clean --all -f -y && \
+    jupyter lab build --dev-build=False --minimize=False && \
+    npm cache clean --force && \
+    rm -rf $CONDA_DIR/share/jupyter/lab/staging && \
+    rm -rf /home/$NB_USER/.cache/yarn && \
+    rm -rf /home/$NB_USER/.node-gyp
+    #fix-permissions $CONDA_DIR && \
+    #fix-permissions /home/$NB_USER
 
-# cleanup yarn cache, too much wasted space
-RUN rm -rf /home/jovyan/.cache/yarn
 
-
-
-# Switch back to jovyan to avoid accidental container runs as root
-USER $NB_UID
+# don't switch bach to jovyan, we want to run as root for nfs mount (not respecting uid setting in chart?)
+# USER $NB_UID
 
 #IMAGE oneilsh/jupyterlab-ubuntu-nvidia
-#TAG v1.0.3slim
+#TAG v1.1.0-dev
 

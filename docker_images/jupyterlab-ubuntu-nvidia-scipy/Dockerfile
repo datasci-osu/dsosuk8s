@@ -1,4 +1,4 @@
-FROM oneilsh/jupyterlab-ubuntu-nvidia:v1.0.2
+FROM oneilsh/jupyterlab-ubuntu-nvidia:v1.1.0-dev
 
 ############################################################################
 ################# Dependency: jupyter/scipy-notebook #######################
@@ -12,55 +12,37 @@ LABEL maintainer="Jupyter Project <jupyter@googlegroups.com>"
 USER root
 
 # ffmpeg for matplotlib anim
-RUN apt-get update && \
-    apt-get install -y --no-install-recommends ffmpeg && \
-    rm -rf /var/lib/apt/lists/*
+#RUN apt-get update && \
+#    apt-get install -y --no-install-recommends ffmpeg && \
+#    rm -rf /var/lib/apt/lists/*
 
 #USER $NB_UID
 
 # Install Python 3 packages
-RUN conda install --quiet --yes \
-    'beautifulsoup4=4.8.*' \
-    'conda-forge::blas=*=openblas' \
-    'bokeh=1.4.*' \
-    'cloudpickle=1.2.*' \
-    'cython=0.29.*' \
+RUN conda install --quiet --yes 'conda-forge::blas=*=openblas'
+#    'beautifulsoup4=4.8.*' \
+#    'bokeh=1.4.*' \
+#    'cloudpickle=1.2.*' \
+#    'cython=0.29.*' \
     #'dask=2.9.*' \
-    'dill=0.3.*' \
+#    'dill=0.3.*' \
     #'h5py=2.10.*' \
     #'hdf5=1.10.*' \
-    'ipywidgets=7.5.*' \
-    'matplotlib-base=3.1.*' \
-    'numba=0.48.*' \
-    'numexpr=2.7.*' \
-    'pandas=0.25.*' \
+RUN conda install --quiet --yes 'matplotlib-base=3.3.*' 
+#    'numba=0.48.*' \
+#    'numexpr=2.7.*' \
+RUN conda install --quiet --yes 'pandas=1.1.*'
     #'patsy=0.5.*' \
-    'protobuf=3.11.*' \
+#    'protobuf=3.11.*' \
     #'scikit-image=0.16.*' \
-    'scikit-learn=0.22.*' \
-    'scipy=1.4.*' \
-    'seaborn=0.9.*' \
-    'sqlalchemy=1.3.*' \
-    'statsmodels=0.11.*' \
-    'sympy=1.5.*' \
+RUN conda install --quiet --yes 'scikit-learn=0.23.*'
+RUN conda install --quiet --yes 'scipy=1.5.*'
+RUN conda install --quiet --yes 'seaborn=0.10.*'
+#    'sqlalchemy=1.3.*' \
+RUN conda install --quiet --yes 'statsmodels=0.12.*'
+#    'sympy=1.5.*' \
     #'vincent=0.4.*' \
     #'xlrd' \
-    && \
-    conda clean --all -f -y && \
-    # Activate ipywidgets extension in the environment that runs the notebook server
-    jupyter nbextension enable --py widgetsnbextension --sys-prefix && \
-    # Also activate ipywidgets extension for JupyterLab
-    # Check this URL for most recent compatibilities
-    # https://github.com/jupyter-widgets/ipywidgets/tree/master/packages/jupyterlab-manager
-    jupyter labextension install @jupyter-widgets/jupyterlab-manager@^1.0.1 --no-build && \
-    jupyter labextension install jupyterlab_bokeh@1.0.0 --no-build && \
-    jupyter lab build && \
-    npm cache clean --force && \
-    rm -rf $CONDA_DIR/share/jupyter/lab/staging && \
-    rm -rf /home/$NB_USER/.cache/yarn && \
-    rm -rf /home/$NB_USER/.node-gyp && \
-    fix-permissions $CONDA_DIR && \
-    fix-permissions /home/$NB_USER
 
 # Install facets which does not have a pip or conda package at the moment
 #RUN cd /tmp && \
@@ -74,10 +56,11 @@ RUN conda install --quiet --yes \
 
 # Import matplotlib the first time to build the font cache.
 ENV XDG_CACHE_HOME /home/$NB_USER/.cache/
-RUN MPLBACKEND=Agg python -c "import matplotlib.pyplot" && \
-    fix-permissions /home/$NB_USER
+RUN MPLBACKEND=Agg python -c "import matplotlib.pyplot"
+    #fix-permissions /home/$NB_USER
 
-USER $NB_UID
+USER root
+#USER $NB_UID
 
 #IMAGE oneilsh/jupyterlab-ubuntu-nvidia-scipy
-#TAG v1.0.2
+#TAG v1.1.0-dev
