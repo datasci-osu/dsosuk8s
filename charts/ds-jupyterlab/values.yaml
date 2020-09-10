@@ -304,7 +304,7 @@ jupyterhub:
             {% for profile in profile_list %}
             <label for='profile-item-{{ profile.slug }}' class='form-control input-group'>
                 <div class='col-md-1'>
-                    <input type='radio' name='profile' id='profile-item-{{ profile.slug }}' value='{{ profile.index }}' {% if profile.default %}checked{% endif %} {% if profile.quotaDisplayDisabled %}disabled{% endif %}/>
+                    <input type='radio' name='profile' id='profile-item-{{ profile.slug }}' value='{{ profile.slug }}' {% if profile.default %}checked{% endif %} {% if profile.quotaDisplayDisabled %}disabled{% endif %}/>
                 </div>
                 <div class="col-md-11">
                     <strong>{{ profile.display_name }}</strong> 
@@ -333,7 +333,7 @@ jupyterhub:
             class KubeSpawnerWithProfileInfo(KubeSpawner):
                 def get_state(self):
                     state = super().get_state()
-                    state['profile_slug'] = self.user_options["slug"]
+                    state['profile_slug'] = self.user_options["profile"]  # from the form element name? apparently not, changing the ratio name="profile-slug" and here "profile-slug" doesn't work
                     return state
     
             c.JupyterHub.spawner_class = KubeSpawnerWithProfileInfo

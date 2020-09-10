@@ -18,7 +18,7 @@ chown $ADMIN_USERNAME /srv/jupyterhub
 
 git clone https://github.com/oneilsh/jh-profile-quota.git
 cd jh-profile-quota
-pip3 install -e .
+pip3 install .
 
 cd /srv/jupyterhub
 exec sudo -E -H -u $ADMIN_USERNAME -- sh -c 'umask 0007 && jupyterhub --config /etc/jupyterhub/jupyterhub_config.py'
