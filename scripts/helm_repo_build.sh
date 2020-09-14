@@ -7,7 +7,7 @@ source $GIT_ROOT/scripts/utils.src
 
 cd $GIT_ROOT/docs/build
 
-for chart in $(ls -1 $GIT_ROOT/charts); do
+for chart in $(ls -1 $GIT_ROOT/charts | grep -v -E '^common$'); do
   helm lint $GIT_ROOT/charts/$chart
   created=$(basename $(helm package $GIT_ROOT/charts/$chart | grep Successfully | awk '{print $NF}'))
   # we don't md5sum the package itself due to https://github.com/helm/helm/issues/3612

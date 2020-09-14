@@ -1,10 +1,11 @@
-# if no --kube-context specified, see if they've asked for one
-# if not use the current context
-if [ "$HELM_KUBECONTEXT" == "" ]; then
-  HELM_KUBECONTEXT=$(index kubeContext $(kubectl config current-context))
+# use values-supplied context if there is one
+VALUES_CONTEXT=$(index kubeContext "")
+if [ "$VALUES_CONTEXT" != "" ]; then
+  echo "${yellow}WARNING: using kube-context ${cyan}$VALUES_CONTEXT${yellow} from specified values.${white}" 2>&1
+  HELM_KUBECONTEXT=$VALUES_CONTEXT
 fi
 
-
+# force namespace to be the same as the release name
 HELM_NAMESPACE=$RELEASE_NAME
 
 if [ "$DRY_RUN" == "True" ]; then
