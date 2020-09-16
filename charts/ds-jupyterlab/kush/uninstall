@@ -1,0 +1,114 @@
+
+if [ "$#" != "2" ] && [ "$#" != "3" ]; then
+  echo "${red}Usage: helm kush run uninstall $CHART <release-name> [--dry-run]${white}" 1>&2
+  echo "${yellow}(Note that \`helm kush uninstall $CHART\` assumes the release exists in a namespace with the same name, as installed by \`helm kush install [RELEASE-NAME] $CHART\`)${white}" 1>&2
+  return 1
+fi
+RELEASE_NAME=$2
+
+if ! kubectl get namespace $RELEASE_NAME > /dev/null 2> /dev/null; then
+  echo "${red}Error: no corresponding namespace: $RELEASE_NAME${white}" 1>&2
+  return 1
+fi
+
+# use values-supplied context if there is one
+VALUES_CONTEXT=$(index kubeContext "")
+if [ "$VALUES_CONTEXT" != "" ]; then
+  echo "${yellow}WARNING: using kube-context ${cyan}$VALUES_CONTEXT${yellow} from specified values.${white}" 2>&1
+  HELM_KUBECONTEXT=$VALUES_CONTEXT
+else
+  HELM_KUBECONTEXT=$(kubectl config current-context) 
+fi
+
+# force namespace to be the same as the release name
+HELM_NAMESPACE=$RELEASE_NAME
+
+if [ "$DRY_RUN" == "True" ]; then
+  echo "${green}DRY_RUN is set (template or --dry-run), not uninstalling.${white}" 1>&2
+fi
+
+# check and see if any user pods are running, if so list them
+if kubectl get pods --selector=component=singleuser-server --namespace $HELM_NAMESPACE --context $HELM_KUBECONTEXT 2> /dev/null | grep -q jupyter; then
+  echo "${red}Warning: This will kill the following user containers and delete all data for $RELEASE_NAME: ${white}"
+  kubectl get pods --selector=component=singleuser-server --namespace $HELM_NAMESPACE --context $HELM_KUBECONTEXT
+else
+  echo "${red}Warning: This will delete all data for $RELEASE_NAME. ${white}"
+fi
+echo ""
+
+# countdown timer for a last second ctrl-c opportunity ;) 
+echo -n "Removing in ";
+for i in $(seq 5 1); do
+  echo -n "$i... "
+  sleep 1
+done
+echo ""
+echo ""
+
+# If there are any, delete them
+if kubectl get pods --selector=component=singleuser-server --namespace $HELM_NAMESPACE --context $HELM_KUBECONTEXT 2> /dev/null | grep -q jupyter; then
+  echo "${yellow}Deleting user containers, waiting for termination... $white"
+  echo "${magenta}kubectl delete pods --selector=component=singleuser-server --namespace $HELM_NAMESPACE --context $HELM_KUBECONTEXT ${white}"
+  kubectl delete pods --selector=component=singleuser-server --namespace $HELM_NAMESPACE --context $HELM_KUBECONTEXT --wait
+  echo ""
+fi
+
+# delete the main hub release
+echo "${yellow}Deleting hub resources... ${white}"
+echo "${magenta}helm delete $RELEASE_NAME --namespace $HELM_NAMESPACE --kube-context $HELM_KUBECONTEXT ${white}"
+helm delete $RELEASE_NAME --namespace $HELM_NAMESPACE --kube-context $HELM_KUBECONTEXT
+echo ""
+
+while kubectl get pods --namespace $HELM_NAMESPACE --context $HELM_KUBECONTEXT | grep -Eqs 'hub-'; do
+  echo "${yellow}  ...waiting for hub termination... ${white}"
+  sleep 1
+done
+
+# delete the homedrive
+echo "${yellow}Deleting homedrive nfs server... ${white}"
+echo "${magenta}helm delete ${RELEASE_NAME}homedrive --namespace $HELM_NAMESPACE --kube-context $HELM_KUBECONTEXT ${white}"
+helm delete ${RELEASE_NAME}homedrive --namespace $HELM_NAMESPACE --kube-context $HELM_KUBECONTEXT
+echo ""
+
+while kubectl get pods --namespace $HELM_NAMESPACE --context $HELM_KUBECONTEXT | grep -Eqs 'homedrive'; do
+  echo "${yellow}  waiting for nfs server termination... ${white}"
+  sleep 1
+done
+
+# delete the pvc
+echo "${yellow}Deleting homedrive persistent volume claim (pvc)... ${white}"
+PVC_NAME=storagevol-nfs-${RELEASE_NAME}homedrive-dep-0
+PV_NAME=$(kubectl get pv --context $HELM_KUBECONTEXT | grep ${RELEASE_NAME}homedrive | awk '{print $1}')
+echo "${magenta}kubectl delete pvc $PVC_NAME --namespace $HELM_NAMESPACE --context $HELM_KUBECONTEXT ${white}"
+kubectl delete pvc $PVC_NAME --namespace $HELM_NAMESPACE --context $HELM_KUBECONTEXT
+echo ""
+
+# just for good measure
+sleep 2
+
+# delete the pv
+echo "${yellow}Deleting homedrive persistent volume (pv)... ${white}"
+echo "${magenta}kubectl delete pv $PV_NAME --context $HELM_KUBECONTEXT ${white}"
+kubectl delete pv $PV_NAME --context $HELM_KUBECONTEXT
+echo ""
+
+# check for empty namespace
+ALL_CHECK=$(kubectl get all --namespace $HELM_NAMESPACE --context $HELM_KUBECONTEXT | wc -l | awk '{print $1}')   # should be 0
+PVC_CHECK=$(kubectl get pvc --namespace $HELM_NAMESPACE --context $HELM_KUBECONTEXT | wc -l | awk '{print $1}')   # should be 0     
+PV_CHECK=$(kubectl get pv --context $HELM_KUBECONTEXT | grep -Eqs ${RELEASE_NAME}homedrive | grep "$RELEASE_NAME\/" | wc -l | awk '{print $1}') # should be 0
+
+if [ "$ALL_CHECK" != "0" ] || [ "$PVC_CHECK" != "0" ] || [ "$PV_CHECK" != "0" ]; then
+  echo "${red}Error: namespace not cleared or PVC/PVs exist, check \`kubectl get all --namespace $HELM_NAMESPACE --context $HELM_CONTEXT\`, \`kubectl get pvc --namespace $HELM_NAMESPACE --context $HELM_CONTEXT\`, and \`kubectl get pv --context $HELM_CONTEXT\` ${white}"
+  echo "${red}ALL_CHECK: $ALL_CHECK ${white}"
+  echo "${red}PVC_CHECK: $PVC_CHECK ${white}"
+  echo "${red}PV_CHECK: $PV_CHECK ${white}"
+  return 1
+fi
+
+# delete the namespace
+echo "${yellow}Deleting namespace... ${white}"
+echo "${magenta}kubectl delete namespace $HELM_NAMESPACE --context $HELM_KUBECONTEXT --wait ${white}"
+kubectl delete namespace $HELM_NAMESPACE --context $HELM_KUBECONTEXT --wait
+echo ""
+
+echo "${green}Success! $RELEASE_NAME uninstalled. ${white}"
