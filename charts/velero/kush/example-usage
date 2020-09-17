@@ -1,0 +1,61 @@
+echo "${cyan}Example usage:${white}"
+echo helm kush template ReleaseName $CHART --kush-interpolate --values custom-values.yaml
+echo ""
+echo "${cyan}Example custom-values.yaml (for ds@osu jupyterhub):${white}"
+
+cat << EOF
+kubeContext: dev-green
+createNamespace: cluster-tools
+
+veleroS3Bucket: mahbucket
+veleroBackupRegion: us-west-2
+eksClusterName: dev-green
+
+credentials:
+  secretContents:
+    cloud: |
+      <%= $(cat /path/to/your/creds.txt) %>
+
+initContainers:
+  - name: velero-plugin-for-aws
+    image: velero/velero-plugin-for-aws:v1.0.0
+    imagePullPolicy: IfNotPresent
+    volumeMounts:
+      - mountPath: /target
+        name: plugins
+
+resources: 
+  requests:
+    memory: "128Mi"
+    cpu: "250m"
+  limits:
+    memory: "256Mi"
+    cpu: "500m"
+
+nodeSelector:
+  nodegroup-role: clustertools  
+
+configuration:
+  provider: aws
+  backupStorageLocation:
+    name: aws
+    bucket: VELERO_S3_BUCKET
+    prefix: EKS_CLUSTER_NAME
+    config:
+      region: VELERO_BACKUP_REGION
+  volumeSnapshotLocation: 
+    name: aws
+    config:
+      region: VELERO_BACKUP_REGION
+  extraEnvVars:
+    AWS_CLUSTER_NAME: EKS_CLUSTER_NAME      
+  logLevel: warning
+
+EOF
+
+echo ""
+echo "${yellow}The kubeContext and createNamespace can be used to specify the "
+echo "installation context/namespace; settings made via --namespace and "
+echo "--kube-context override (and namespace won't be created), if not specified "
+echo "helm defaults are used.${white}"
+
