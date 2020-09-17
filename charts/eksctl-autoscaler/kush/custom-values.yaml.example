@@ -1,0 +1,9 @@
+#!/usr/bin/env -S helm kush upgrade autoscaler ../../charts/eksctl-autoscaler --kush-interpolate --install --values
+
+kubeContext: dev-green
+
+# clusterName should be the name of the cluster as created by eksctl
+clusterName: dev-green
+nodeSelector:
+  nodegroup-role: clustertools
+

@@ -1,13 +1,14 @@
-echo "${cyan}Example usage:${white}"
-echo helm kush template ReleaseName $CHART --kush-interpolate --values custom-values.yaml
-echo ""
-echo "${cyan}Example custom-values.yaml (for ds@osu jupyterhub):${white}"
+#!/usr/bin/env -S helm kush upgrade grafana ../../charts/grafana --kush-interpolate --install --values
+#!/usr/bin/env -S helm kush template grafana ../../charts/grafana --kush-interpolate --values
 
-cat << EOF
-kubeContext: cluster-dev
-createNamespace: dev-group
+# uninstall: helm delete grafana -n cluster-tools 
 
-adminPassword: <%= $ADMIN_INIT_PASSWORD %>
+clusterHostname: dev-green.datasci.oregonstate.edu
+kubeContext: dev-green
+createNamespace: cluster-tools
+
+adminPassword: admin
+
 ingress:
   enabled: true
   annotations:
@@ -15,20 +16,20 @@ ingress:
     nginx.org/mergeable-ingress-type: "minion"
     nginx.org/websocket-services: "grafana"
     #nginx.ingress.kubernetes.io/rewrite-target: /\$1
-  path: /<%= $GRAFANA_PATH %>/
+  path: /<%= $RELEASE_NAME %>/
   hosts:
-    - <%= $CLUSTER_HOSTNAME %>
+    - <%= $(index clusterHostname "") %>
   tls:
   - hosts:
-    - <%= $CLUSTER_HOSTNAME %>
+    - <%= $(index clusterHostname "") %>
 
 persistence:
   enabled: true
 
 grafana.ini:
   server:
-    domain: <%= $CLUSTER_HOSTNAME %>
-    root_url: https://<%= $CLUSTER_HOSTNAME %>/<%= $GRAFANA_PATH %>
+    domain: <%= $(index clusterHostname "") %>
+    root_url: https://<%= $(index clusterHostname "") %>/<%= $RELEASE_NAME %>
     serve_from_sub_path: true
 
 nodeSelector:
@@ -55,11 +56,3 @@ plugins:
 - mxswat-separator-panel
 - grafana-kubernetes-app
 - devopsprodigy-kubegraf-app
-EOF
-
-echo ""
-echo "${yellow}The kubeContext and createNamespace can be used to specify the "
-echo "installation context/namespace; settings made via --namespace and "
-echo "--kube-context override (and namespace won't be created), if not specified "
-echo "helm defaults are used.${white}"
-

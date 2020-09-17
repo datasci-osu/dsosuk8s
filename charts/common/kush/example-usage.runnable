@@ -1,0 +1,8 @@
+echo "${cyan}Example usage:${white}"
+echo helm kush template ReleaseName $CHART --kush-interpolate --values custom-values.yaml
+echo ""
+echo "${cyan}Example custom-values.yaml:${white}"
+
+cat custom-values.yaml.example
+
+

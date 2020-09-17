@@ -1,0 +1,20 @@
+#!/usr/bin/env -S helm kush upgrade master-ingress ../../charts/nginx-ingress --install --kush-interpolate --values
+#!/usr/bin/env -S helm kush template master-ingress ../../charts/nginx-ingress --kush-interpolate --values
+
+kubeContext: dev-green
+createNamespace: cluster-tools
+
+nginx-ingress:
+  masterHost: dev-green.datasci.oregonstate.edu
+  controller:
+    defaultTLS:
+      cert:  <%= $( /usr/bin/base64 -b 0 -i /users/soneil/box/datascience/ssl/dsosu-cert-with-chain-maintop.cer) %>
+      key:  <%= $( /usr/bin/base64 -b 0 -i /users/soneil/box/datascience/ssl/star_datasci_oregonstate_edu.key) %>
+    wildcardTLS:
+      cert:  <%= $( /usr/bin/base64 -b 0 -i /users/soneil/box/datascience/ssl/dsosu-cert-with-chain-maintop.cer) %>
+      key:  <%= $( /usr/bin/base64 -b 0 -i /users/soneil/box/datascience/ssl/star_datasci_oregonstate_edu.key) %>
+    nodeSelector:
+      nodegroup-role: clustertools
+    config:
+      entries:
+        client-max-body-size: 2G
