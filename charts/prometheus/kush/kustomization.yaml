@@ -1,0 +1,2 @@
+resources:
+  - helm-template-output.yaml

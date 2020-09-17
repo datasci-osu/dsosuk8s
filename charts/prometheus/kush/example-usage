@@ -1,0 +1,53 @@
+echo "${cyan}Example usage:${white}"
+echo helm kush template ReleaseName $CHART --kush-interpolate --values custom-values.yaml
+echo ""
+echo "${cyan}Example custom-values.yaml (for ds@osu jupyterhub):${white}"
+
+cat << EOF
+kubeContext: cluster-dev
+createNamespace: dev-group
+
+pushgateway:
+  nodeSelector:
+    nodegroup-role: clustertools
+kubeStateMetrics:
+  nodeSelector:
+    nodegroup-role: clustertools
+  service:
+    annotations: {}
+  labels: {}
+alertmonitor:
+  nodeSelector:
+    nodegroup-role: clustertools
+alertmanager:
+  nodeSelector:
+    nodegroup-role: clustertools
+server:
+  nodeSelector:
+    nodegroup-role: clustertools
+  resources: 
+    limits:
+      cpu: 1000m
+      memory: 3Gi
+    requests:
+      cpu: 500m
+      memory: 2Gi
+
+nodeExporter:
+  tolerations:
+  - effect: NoSchedule
+    key: hub.jupyter.org/dedicated
+    operator: Equal
+    value: user
+  - effect: NoSchedule
+    key: hub.jupyter.org_dedicated
+    operator: Equal
+    value: user
+EOF
+
+echo ""
+echo "${yellow}The kubeContext and createNamespace can be used to specify the "
+echo "installation context/namespace; settings made via --namespace and "
+echo "--kube-context override (and namespace won't be created), if not specified "
+echo "helm defaults are used.${white}"
+
