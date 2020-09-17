@@ -1,0 +1,65 @@
+echo "${cyan}Example usage:${white}"
+echo helm kush template ReleaseName $CHART --kush-interpolate --values custom-values.yaml
+echo ""
+echo "${cyan}Example custom-values.yaml (for ds@osu jupyterhub):${white}"
+
+cat << EOF
+kubeContext: cluster-dev
+createNamespace: dev-group
+
+adminPassword: <%= $ADMIN_INIT_PASSWORD %>
+ingress:
+  enabled: true
+  annotations:
+    kubernetes.io/ingress.class: nginx
+    nginx.org/mergeable-ingress-type: "minion"
+    nginx.org/websocket-services: "grafana"
+    #nginx.ingress.kubernetes.io/rewrite-target: /\$1
+  path: /<%= $GRAFANA_PATH %>/
+  hosts:
+    - <%= $CLUSTER_HOSTNAME %>
+  tls:
+  - hosts:
+    - <%= $CLUSTER_HOSTNAME %>
+
+persistence:
+  enabled: true
+
+grafana.ini:
+  server:
+    domain: <%= $CLUSTER_HOSTNAME %>
+    root_url: https://<%= $CLUSTER_HOSTNAME %>/<%= $GRAFANA_PATH %>
+    serve_from_sub_path: true
+
+nodeSelector:
+  nodegroup-role: clustertools 
+
+datasources:
+  datasources.yaml:
+    apiVersion: 1
+    datasources:
+    - name: Prometheus
+      type: prometheus
+      url: http://prometheus-server.<%= $HELM_NAMESPACE %>.svc.cluster.local
+      access: proxy
+      isDefault: true  
+
+plugins:
+- digrich-bubblechart-panel
+- grafana-clock-panel
+- neocat-cal-heatmap-panel
+- petrslavotinek-carpetplot-panel
+- mtanda-histogram-panel
+- michaeldmoore-multistat-panel
+- natel-plotly-panel
+- mxswat-separator-panel
+- grafana-kubernetes-app
+- devopsprodigy-kubegraf-app
+EOF
+
+echo ""
+echo "${yellow}The kubeContext and createNamespace can be used to specify the "
+echo "installation context/namespace; settings made via --namespace and "
+echo "--kube-context override (and namespace won't be created), if not specified "
+echo "helm defaults are used.${white}"
+

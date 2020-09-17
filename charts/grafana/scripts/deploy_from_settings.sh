@@ -73,17 +73,6 @@ grafana.ini:
     domain: $CLUSTER_HOSTNAME
     root_url: https://$CLUSTER_HOSTNAME/$GRAFANA_PATH
     serve_from_sub_path: true
-  paths:
-    data: /var/lib/grafana/data
-    logs: /var/log/grafana
-    plugins: /var/lib/grafana/plugins
-    provisioning: /etc/grafana/provisioning
-  analytics:
-    check_for_updates: true
-  log:
-    mode: console
-  grafana_net:
-    url: https://grafana.net
 
 nodeSelector:
   nodegroup-role: clustertools 
