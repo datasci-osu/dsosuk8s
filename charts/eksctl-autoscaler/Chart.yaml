@@ -10,8 +10,11 @@ keywords:
 maintainers:
 - email: shawn.oneil@oregonstate.edu
   name: Shawn T O'Neil
-version: 1.16.5
+version: 1.16.6
 changeLog:
+  v1.16.6:
+    minor: change to use priority expander
+    path: update image to 1.16.6
   v1.16.5:
     minor: downgrading autoscaler image to 1.16.5 to match k8s version
   v1.0.1:

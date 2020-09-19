@@ -1,2 +1,8 @@
 clusterName: ""
 nodeSelector: {}
+
+priorities: |-
+  10:
+    - '*.t3a-2xlarge.*'
+  20:
+    - '*.t3a-large.*'

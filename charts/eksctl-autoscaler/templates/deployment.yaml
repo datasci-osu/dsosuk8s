@@ -24,7 +24,7 @@ spec:
 {{- end }}
       serviceAccountName: cluster-autoscaler
       containers:
-        - image: us.gcr.io/k8s-artifacts-prod/autoscaling/cluster-autoscaler:v1.16.5
+        - image: us.gcr.io/k8s-artifacts-prod/autoscaling/cluster-autoscaler:v1.16.6
           name: cluster-autoscaler
           resources:
             limits:
@@ -40,7 +40,7 @@ spec:
             - --cloud-provider=aws
             - --skip-nodes-with-local-storage=0
             - --skip-nodes-with-system-pods=0
-            - --expander=least-waste
+            - --expander=priority
             - --node-group-auto-discovery=asg:tag=k8s.io/cluster-autoscaler/enabled,k8s.io/cluster-autoscaler/{{ .Values.clusterName }}
           volumeMounts:
             - name: ssl-certs
