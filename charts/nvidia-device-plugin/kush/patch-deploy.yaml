@@ -7,9 +7,9 @@ spec:
     spec:
       containers:
       - name: nvidia-device-plugin-ctr
-        image: <%= $IMAGE %>
+        image: <%= $(index image "nvidia/k8s-device-plugin:v0.6.0") %>
         imagePullPolicy: Always 
-<% if [ "$IMAGE_PULL_SECRET" != "" ]; then -%>
+<% if [ $(index imagePullSecret "") != "" ]; then -%>
       imagePullSecrets:
-      - name: <%= $IMAGE_PULL_SECRET %>
+      - name: <%= $(index imagePullSecret "registry-global-regcred") %>
 <% fi -%>
