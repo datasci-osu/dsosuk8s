@@ -3,6 +3,8 @@ echo helm kush template ReleaseName $CHART --kush-interpolate --values custom-va
 echo ""
 echo "${cyan}Example custom-values.yaml:${white}"
 
-cat custom-values.yaml.example
+SCRIPT_DIR=$(realpath $(dirname ${BASH_SOURCE:-$_}))
+
+cat $SCRIPT_DIR/custom-values.yaml.example
 
 
