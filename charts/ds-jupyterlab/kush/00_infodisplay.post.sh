@@ -10,6 +10,6 @@ else
   echo "${green}Admin users: ${cyan}$ADMIN_USERS${white}" 1>&2
 fi
 
-if [ "$DRY_RUN" != "True" ]; then
+if [ "$DRY_RUN" == "True" ]; then
   echo "${yellow}This is a *dry run* (using helm template or --dry-run), no install performed.${white}" 1>&2
 fi

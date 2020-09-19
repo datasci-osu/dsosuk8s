@@ -1,0 +1,79 @@
+#!/usr/bin/env -S helm kush upgrade greenhub ../../charts/ds-jupyterlab --install --kush-interpolate --timeout 8m0s --values
+#!/usr/bin/env -S helm kush run uninstall ../../charts/ds-jupyterlab greenhub
+#!/usr/bin/env -S helm kush template greenhub ../../charts/ds-jupyterlab --kush-interpolate --values
+
+---
+
+kubeContext: dev-green
+clusterHostname: dev-green.datasci.oregonstate.edu
+
+
+securitySalt: sshsecret
+createHomeDrive:
+  size: 20Gi
+  chart: http://localhost:8080/nfs-drive-1.1.0.tgz
+
+## lti is default, other options: dummy (no passwords), native (self-contained passwords, admin-managed)
+#authType: dummy
+## only used if authType is not lti
+#adminUsers: oneils, keistc
+
+
+jupyterhub:
+  scheduling: {userPlaceholder: {replicas: 0}}
+
+  singleuser:
+    memory: {guarantee: 0.5G, limit: 1.0G}
+    cpu:    {guarantee: 0.1,  limit: 1.0}
+    image:  {name: localhost:30050/oneilsh/jupyterlab-ubuntu-nvidia-scipy-rjulia, tag: v1.1.0-dev, pullPolicy: Always} 
+    
+    profileList:
+    - display_name: "Standard"
+      slug: "standard"
+      default: True
+      description: "Standard server type suitable for programming and most analyses: 0.1 CPU gauranteed (1.0 maximum where available) and 0.5G RAM gauranteed (1G max where available)."
+    - display_name: "Large"
+      description: "For larger computation needs: 1.0 CPU gauranteed (2.0 maximum where available) and 2G RAM gauranteed (4G max where available). <br /><br />Please note that servers with this profile may take longer than usual to start."
+      slug: "large"
+      kubespawner_override: {mem_guarantee: 2.0G, mem_limit: 4.0G, cpu_gaurantee: 1.0, cpu_limit: 2.0}
+      quota:
+        admins: {initialBalance: 10, newTokensPerDay: 4, maxBalance: 12}
+        users:  {initialBalance: 4,  newTokensPerDay: 1, maxBalance: 8, disabled: true}
+#     - display_name: "X-Large"
+#       description: "For heavy computation needs: 2.0 CPU gauranteed (4.0 maximum where available) and 4G RAM gauranteed (8G max where available). <br /><br />Please note that servers with this profile may take longer than usual to start."
+#       slug: "xlarge"
+#       kubespawner_override: {mem_guarantee: 4.0G, mem_limit: 8.0G, cpu_gaurantee: 2.0, cpu_limit: 4.0}
+#       quota:
+#         minBalanceToSpawn: 1
+#         admins: {initialBalance: 4, newTokensPerDay:  1, maxBalance: 4}
+#         users:  {initialBalance: 4,  newTokensPerDay: 1, maxBalance: 4, disabled: true}
+    - display_name: "X-Large w/ GPU"
+      description: "GPU-Based Compute: 4.0 CPU, 16G RAM, and one NVIDIA T4 GPU gauranteed. Tensorflow installed. <br /><br />Please note that servers with this profile *will* take longer than usual to start."
+      slug: "gpu"
+      kubespawner_override:
+        mem_guarantee: 10.0G
+        mem_limit: 14.0G
+        cpu_gaurantee: 3.5
+        cpu_limit: 4.0
+        extra_resource_limits: {"nvidia.com/gpu": "1"}
+        image: "localhost:30050/oneilsh/jupyterlab-ubuntu-nvidia-scipy-rjulia-gpu:v1.1.0-dev"
+      quota:
+        minBalanceToSpawn: 1
+        admins: {initialBalance: 4, newTokensPerDay:  1, maxBalance: 4}
+        users:  {initialBalance: 4, newTokensPerDay:  1, maxBalance: 4}
+     
+    networkTools:
+      image: {name: 'localhost:30050/jupyterhub/k8s-network-tools', tag: '0.9.0-alpha.1.000.f995427'} 
+
+  hub:
+    image: {name: 'localhost:30050/oneilsh/jupyterlab-k8s-hub', tag: v1.5.3-dev}
+
+  proxy: 
+    chp:
+      image: {name: 'localhost:30050/jupyterhub/configurable-http-proxy', tag: 4.2.0}
+
+  prePuller:
+    hook:
+      image: {name: 'localhost:30050/jupyterhub/k8s-image-awaiter', tag: '0.9.0-alpha.1.000.f995427'}
+    
+
