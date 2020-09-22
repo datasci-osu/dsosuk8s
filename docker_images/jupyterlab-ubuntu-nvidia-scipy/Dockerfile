@@ -1,4 +1,4 @@
-FROM oneilsh/jupyterlab-ubuntu-nvidia:v1.1.0-dev
+FROM oneilsh/jupyterlab-ubuntu-nvidia:v1.1.0
 
 ############################################################################
 ################# Dependency: jupyter/scipy-notebook #######################
@@ -63,4 +63,4 @@ USER root
 #USER $NB_UID
 
 #IMAGE oneilsh/jupyterlab-ubuntu-nvidia-scipy
-#TAG v1.1.0-dev
+#TAG v1.1.0

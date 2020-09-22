@@ -1,3 +1,4 @@
+
 # use values-supplied context if there is one
 VALUES_CONTEXT=$(index kubeContext "")
 if [ "$VALUES_CONTEXT" != "" ]; then

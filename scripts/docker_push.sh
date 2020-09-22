@@ -34,6 +34,12 @@ echo -e "\e[33mChecking push $TARGETDIR, looking for $IMAGENAME:$TAG.\e[0m"
 # check for image:tag on dockerhub with docker manifest inspect
 if ! docker manifest inspect $IMAGENAME:$TAG > /dev/null 2> /dev/null; then
   docker push $IMAGENAME | cat       # be quiet about it, sheesh; edit, why doesn't this work per https://github.com/moby/moby/issues/37417#issuecomment-403833610 
+  # TODO: I feel like this shouldn't be necessary to get specific tags up?
+  for CUSTOMTAG in $(grep '^#TAG' $TARGETDIR/Dockerfile | awk '{print $2}'); do
+    echo "Tagging: tag $IMAGENAME:$TAG $IMAGENAME:$CUSTOMTAG"
+    docker push $IMAGENAME:$CUSTOMTAG
+    echo -e "\e[32mPushed $IMAGENAME:$CUSTOMTAG. \e[0m"
+  done
   echo -e "\e[32mPushed $IMAGENAME. \e[0m"
   exit 0
 else

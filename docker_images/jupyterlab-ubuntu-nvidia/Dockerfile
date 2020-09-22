@@ -287,5 +287,5 @@ RUN conda clean --all -f -y && \
 # USER $NB_UID
 
 #IMAGE oneilsh/jupyterlab-ubuntu-nvidia
-#TAG v1.1.0-dev
+#TAG v1.1.0
 

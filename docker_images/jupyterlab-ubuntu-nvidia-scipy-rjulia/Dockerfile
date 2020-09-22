@@ -1,4 +1,4 @@
-FROM  oneilsh/jupyterlab-ubuntu-nvidia-scipy:v1.1.0-dev
+FROM  oneilsh/jupyterlab-ubuntu-nvidia-scipy:v1.1.0
 ############################################################################
 ################ Dependency: jupyter/datascience-notebook ##################
 ############################################################################
@@ -109,6 +109,10 @@ RUN apt-get update && \
  		lsb-release \
  		psmisc \
  		libssl1.0.0 \
+# and texlive for Rstudio PDF explorts
+                texlive-xetex \
+                lmodern \
+                texlive-fonts-recommended \
  		;
  
 # You can use rsession from rstudio's desktop package as well.
@@ -176,5 +180,6 @@ RUN conda clean --all -f -y && \
 
 RUN echo "un-dropping server-proxy"
 
+
 #IMAGE oneilsh/jupyterlab-ubuntu-nvidia-scipy-rjulia
-#TAG v1.1.0-dev
+#TAG v1.1.0

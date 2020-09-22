@@ -1,4 +1,4 @@
-FROM oneilsh/jupyterlab-ubuntu-nvidia-scipy-rjulia:v1.1.0-dev
+FROM oneilsh/jupyterlab-ubuntu-nvidia-scipy-rjulia:v1.1.0
 
 ############################################################################
 ########################## Dependency: gpulibs #############################
@@ -39,6 +39,5 @@ RUN conda clean --all -f -y
 # let's check to make sure this works...
 RUN python3 -c 'import tensorflow as tf'
 
-
 #IMAGE oneilsh/jupyterlab-ubuntu-nvidia-scipy-rjulia-gpu
-#TAG v1.1.0-dev
+#TAG v1.1.0

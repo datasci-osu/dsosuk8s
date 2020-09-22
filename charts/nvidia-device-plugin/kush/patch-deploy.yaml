@@ -9,7 +9,7 @@ spec:
       - name: nvidia-device-plugin-ctr
         image: <%= $(index image "nvidia/k8s-device-plugin:v0.6.0") %>
         imagePullPolicy: Always 
-<% if [ $(index imagePullSecret "") != "" ]; then -%>
+<% if [ "$(index imagePullSecret '')" != "" ]; then -%>
       imagePullSecrets:
       - name: <%= $(index imagePullSecret "registry-global-regcred") %>
 <% fi -%>
