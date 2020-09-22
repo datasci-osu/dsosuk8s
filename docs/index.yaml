@@ -3,7 +3,7 @@ entries:
   docker-registry:
   - apiVersion: v1
     appVersion: 2.7.1
-    created: "2020-09-18T22:22:43.220046-07:00"
+    created: "2020-09-21T21:48:41.143789-07:00"
     description: A Helm chart for Docker Registry
     digest: 82694af72b2a22eb6d21e5f800b078c82014784bb1745452895be463392e70a0
     home: https://hub.docker.com/_/registry/
@@ -21,7 +21,7 @@ entries:
     version: 1.9.5
   - apiVersion: v1
     appVersion: 2.7.1
-    created: "2020-09-18T22:22:43.218656-07:00"
+    created: "2020-09-21T21:48:41.142252-07:00"
     description: A Helm chart for Docker Registry
     digest: df8576ef555ea5c65fc9abd9dc012cee05dc23d901548b78b953d41afce48f62
     home: https://hub.docker.com/_/registry/
@@ -39,9 +39,9 @@ entries:
     version: 1.9.4
   ds-jupyterlab:
   - apiVersion: v1
-    created: "2020-09-18T22:22:43.293325-07:00"
+    created: "2020-09-21T21:48:41.26438-07:00"
     description: JupyerLab with Python, Julia, R, RStudio, Shiny
-    digest: 34cb1f256bd0aa0c71f011e6e3f98bf60c2565a22fd108c5c95d18a33022f5e0
+    digest: 803ba0cf799fcba8b19cf150f5979d0eb54e39083f0ce5dea91d96839d566537
     icon: file://icon.svg
     keywords:
     - jupyter
@@ -59,7 +59,7 @@ entries:
     - ds-jupyterlab-1.5.1.tgz
     version: 1.5.1
   - apiVersion: v1
-    created: "2020-09-18T22:22:43.285471-07:00"
+    created: "2020-09-21T21:48:41.209284-07:00"
     description: JupyerLab with Python, Julia, R, RStudio, Shiny
     digest: 750e47561ba0f7d4f32869fe9762f3f8e191bbe5ad0ad28796f97f0bcb1e580e
     icon: file://icon.svg
@@ -79,7 +79,7 @@ entries:
     - ds-jupyterlab-1.4.1.tgz
     version: 1.4.1
   - apiVersion: v1
-    created: "2020-09-18T22:22:43.278843-07:00"
+    created: "2020-09-21T21:48:41.201787-07:00"
     description: JupyerLab with Python, Julia, R, RStudio, Shiny
     digest: 15c9f549bf52efba65eaeaff733a9cd461021c99e0cd87a8cc734e262725c343
     icon: file://icon.svg
@@ -99,7 +99,7 @@ entries:
     - ds-jupyterlab-1.3.5.tgz
     version: 1.3.5
   - apiVersion: v1
-    created: "2020-09-18T22:22:43.271703-07:00"
+    created: "2020-09-21T21:48:41.195105-07:00"
     description: JupyerLab with Python, Julia, R, RStudio, Shiny
     digest: 0e6bb5df951df35a3df0e8666a12f4debdd895aaad2576cdf8cb44d78fc28b21
     icon: file://icon.svg
@@ -119,7 +119,7 @@ entries:
     - ds-jupyterlab-1.3.4.tgz
     version: 1.3.4
   - apiVersion: v1
-    created: "2020-09-18T22:22:43.264468-07:00"
+    created: "2020-09-21T21:48:41.187632-07:00"
     description: JupyerLab with Python, Julia, R, RStudio, Shiny
     digest: f7ecab40e33e49d2e0b2afe05e72e61d707edb1492e11e4cc1f4d9a7c68d45ec
     icon: file://icon.svg
@@ -139,7 +139,7 @@ entries:
     - ds-jupyterlab-1.3.3.tgz
     version: 1.3.3
   - apiVersion: v1
-    created: "2020-09-18T22:22:43.257366-07:00"
+    created: "2020-09-21T21:48:41.18104-07:00"
     description: JupyerLab with Python, Julia, R, RStudio, Shiny
     digest: c4fd27d1cd515cf15bd6a2aad386ebd3399d30e2a7881d9a08f1de929fd01f5f
     icon: file://icon.svg
@@ -159,7 +159,7 @@ entries:
     - ds-jupyterlab-1.3.2.tgz
     version: 1.3.2
   - apiVersion: v1
-    created: "2020-09-18T22:22:43.249596-07:00"
+    created: "2020-09-21T21:48:41.174325-07:00"
     description: JupyerLab with Python, Julia, R, RStudio, Shiny
     digest: d39d0b365573149e2e12b27dfb7b972a4e89f5803b296c1995c26282e41f9619
     icon: file://icon.svg
@@ -179,7 +179,7 @@ entries:
     - ds-jupyterlab-1.3.2-dev.tgz
     version: 1.3.2-dev
   - apiVersion: v1
-    created: "2020-09-18T22:22:43.242868-07:00"
+    created: "2020-09-21T21:48:41.167338-07:00"
     description: JupyerLab with Python, Julia, R, RStudio, Shiny
     digest: 2aa1b656526504b5d7cef81c71b74728bf76bb74a51a44415c78917be892b9b4
     icon: file://icon.svg
@@ -199,7 +199,7 @@ entries:
     - ds-jupyterlab-1.3.1.tgz
     version: 1.3.1
   - apiVersion: v1
-    created: "2020-09-18T22:22:43.235645-07:00"
+    created: "2020-09-21T21:48:41.159457-07:00"
     description: JupyerLab with Python, Julia, R, RStudio, Shiny
     digest: ec89125f5f0cd31d50d3f3cf7edcb3ed0977d043e9ecbb61344f449a8445308b
     icon: file://icon.svg
@@ -219,7 +219,7 @@ entries:
     - ds-jupyterlab-1.2.1-dev.tgz
     version: 1.2.1-dev
   - apiVersion: v1
-    created: "2020-09-18T22:22:43.226644-07:00"
+    created: "2020-09-21T21:48:41.153064-07:00"
     description: JupyerLab with Python, Julia, R, RStudio, Shiny
     digest: 81712dce119c28f82526e08ca8c8a347f1a8824689b0efff3989a40e3fd5bb0d
     icon: file://icon.svg
@@ -240,11 +240,11 @@ entries:
     version: 1.2.0
   eksctl-autoscaler:
   - apiVersion: v1
-    created: "2020-09-18T22:22:43.298099-07:00"
+    created: "2020-09-21T21:48:41.271224-07:00"
     description: Autoscaler for eksctl-based clusters, based on https://github.com/kubernetes/autoscaler/tree/master/cluster-autoscaler/cloudprovider/aws,
       specifically auto-discovery but using kubernetes.io/cluster/eksdevd tag instead
       of adding a special tag as indicated by the docs.
-    digest: 5b377d39ad225e088c620740fd42f23e03d6cea43ec3b1dc5e61dd25ee765a2a
+    digest: 2706487e85ec8beb083084f36175f094d03997e89917f57a9e0c15efbb49578e
     icon: file://icon.png
     keywords:
     - kubernetes
@@ -259,7 +259,7 @@ entries:
     - eksctl-autoscaler-1.16.6.tgz
     version: 1.16.6
   - apiVersion: v1
-    created: "2020-09-18T22:22:43.297482-07:00"
+    created: "2020-09-21T21:48:41.270282-07:00"
     description: Autoscaler for eksctl-based clusters, based on https://github.com/kubernetes/autoscaler/tree/master/cluster-autoscaler/cloudprovider/aws,
       specifically auto-discovery but using kubernetes.io/cluster/eksdevd tag instead
       of adding a special tag as indicated by the docs.
@@ -278,7 +278,7 @@ entries:
     - eksctl-autoscaler-1.16.5.tgz
     version: 1.16.5
   - apiVersion: v1
-    created: "2020-09-18T22:22:43.295866-07:00"
+    created: "2020-09-21T21:48:41.268408-07:00"
     description: Autoscaler for eksctl-based clusters, based on https://github.com/kubernetes/autoscaler/tree/master/cluster-autoscaler/cloudprovider/aws,
       specifically auto-discovery but using kubernetes.io/cluster/eksdevd tag instead
       of adding a special tag as indicated by the docs.
@@ -297,7 +297,7 @@ entries:
     - eksctl-autoscaler-1.0.1.tgz
     version: 1.0.1
   - apiVersion: v1
-    created: "2020-09-18T22:22:43.294668-07:00"
+    created: "2020-09-21T21:48:41.266953-07:00"
     description: Autoscaler for eksctl-based clusters, based on https://github.com/kubernetes/autoscaler/tree/master/cluster-autoscaler/cloudprovider/aws,
       specifically auto-discovery but using kubernetes.io/cluster/eksdevd tag instead
       of adding a special tag as indicated by the docs.
@@ -316,7 +316,7 @@ entries:
     - eksctl-autoscaler-1.0.1-dev.tgz
     version: 1.0.1-dev
   - apiVersion: v1
-    created: "2020-09-18T22:22:43.299407-07:00"
+    created: "2020-09-21T21:48:41.272755-07:00"
     description: Autoscaler for eksctl-based clusters, based on https://github.com/kubernetes/autoscaler/tree/master/cluster-autoscaler/cloudprovider/aws,
       specifically auto-discovery but using kubernetes.io/cluster/eksdevd tag instead
       of adding a special tag as indicated by the docs.
@@ -337,7 +337,7 @@ entries:
   grafana:
   - apiVersion: v1
     appVersion: 6.6.0
-    created: "2020-09-18T22:22:43.301898-07:00"
+    created: "2020-09-21T21:48:41.27598-07:00"
     description: The leading tool for querying and visualizing time series and metrics.
       (Fork for custom deployment by Shawn O'Neil)
     digest: 3f1cf3b7706cfaa97deaf2308eb8b6dd3baa244256f8837cdfc193ff73db921e
@@ -361,7 +361,7 @@ entries:
     version: 4.6.3
   nfs-drive:
   - apiVersion: v1
-    created: "2020-09-18T22:22:43.303126-07:00"
+    created: "2020-09-21T21:48:41.27762-07:00"
     description: Spawns an NFS server for use by applications.
     digest: fa4801bd43eedaa70288ece150bfe039c12e6c11131eebc1959e2113e4f08960
     icon: file://icon.svg
@@ -378,7 +378,7 @@ entries:
     version: 1.1.0
   nginx-ingress:
   - apiVersion: v1
-    created: "2020-09-18T22:22:43.306291-07:00"
+    created: "2020-09-21T21:48:41.282012-07:00"
     description: Nginx ingress controller built on https://github.com/nginxinc/kubernetes-ingress/tree/master/deployments/helm-chart.
     digest: d8a99a2c2269dfaa1f9cd80f9b1017deaeefc46c5873030a2a45b8db9389ea25
     icon: file://icon.svg
@@ -395,10 +395,10 @@ entries:
   nvidia-device-plugin:
   - apiVersion: v2
     appVersion: 0.6.0
-    created: "2020-09-18T22:22:43.307733-07:00"
+    created: "2020-09-21T21:48:41.283113-07:00"
     description: A Helm chart for the nvidia-device-plugin on Kubernetes with extra
       sauce
-    digest: 56b42bafe8bc236a7090af8b3000454a9a1ac81c2c31a931fa283e4d1ba3d2b2
+    digest: acdc86177e21bd7e1b2fdab5ce69968e75beb735b3acd6c809716cbcf95fb194
     home: https://github.com/NVIDIA/k8s-device-plugin
     kubeVersion: '>= 1.10.0-0'
     name: nvidia-device-plugin
@@ -409,7 +409,7 @@ entries:
   prometheus:
   - apiVersion: v1
     appVersion: 2.18.1
-    created: "2020-09-18T22:22:43.318903-07:00"
+    created: "2020-09-21T21:48:41.294934-07:00"
     dependencies:
     - condition: kubeStateMetrics.enabled
       name: kube-state-metrics
@@ -436,7 +436,7 @@ entries:
     version: 11.2.3
   - apiVersion: v1
     appVersion: 2.15.2
-    created: "2020-09-18T22:22:43.313265-07:00"
+    created: "2020-09-21T21:48:41.288696-07:00"
     description: Prometheus is a monitoring system and time series database. (Fork
       for custom deployment by Shawn O'Neil)
     digest: 3d047c122bbdcad720169c0c63fb356618730dc20dfae48eae5debe207108ea4
@@ -462,7 +462,7 @@ entries:
   velero:
   - apiVersion: v1
     appVersion: 1.2.0
-    created: "2020-09-18T22:22:43.323409-07:00"
+    created: "2020-09-21T21:48:41.299123-07:00"
     description: A Helm chart for velero (Fork for custom deployment by Shawn O'Neil)
     digest: 7d968af291ec25e5baea1d85d9b4263e2d21ec14d026f091a88e5d578e2f0d73
     home: https://github.com/vmware-tanzu/velero
@@ -486,4 +486,4 @@ entries:
     urls:
     - velero-2.8.8.tgz
     version: 2.8.8
-generated: "2020-09-18T22:22:43.215834-07:00"
+generated: "2020-09-21T21:48:41.140388-07:00"
