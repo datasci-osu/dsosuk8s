@@ -13,8 +13,10 @@ maintainers:
 - email: shawn.oneil@oregonstate.edu
   name: Shawn T O'Neil
 name: ds-jupyterlab
-version: 1.4.1
+version: 1.4.1-patch
 changeLog:
+  v1.4.1-patch:
+    minor: using hub image oneilsh/jupyterlab-k8s-hub:1.5.3-dev to use later version, attempting to address https://github.com/jupyterhub/kubespawner/issues/354
   v1.4.1:
     minor:
     - allow for GPU requests with GPU_COUNT
