@@ -143,7 +143,7 @@ jupyterhub:
     extraEnv:
       NFS_SVC_HOME: ""
     uid: 0
-    fsgid: 0
+    fsGid: 0
     startTimeout: 1200
 
   ingress:
@@ -167,7 +167,7 @@ jupyterhub:
       name: oneilsh/jupyterlab-k8s-hub
       tag: "v1.5.3-dev" 
     uid: 0
-    fsgid: 0
+    fsGid: 0
     extraVolumes:
       - name: data-volume
         configMap:
