@@ -102,9 +102,9 @@ RUN chmod o+w /var/lib/shiny-server
 
 # R geospatial libs, need system install
 RUN conda install -c conda-forge geos r-rgeos r-rgdal r-sf
-#TAG v1.1.9
+#TAG v1.1.10
 #TAG fileutil
 
-USER $NB_USER
-
+#USER $NB_USER
+USER root
 
