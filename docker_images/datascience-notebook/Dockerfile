@@ -101,9 +101,11 @@ RUN pip install nbresuse
 RUN chmod o+w /var/lib/shiny-server
 
 # R geospatial libs, need system install
-RUN conda install -c conda-forge geos r-rgeos r-rgdal r-sf
-#TAG v1.1.10
-#TAG fileutil
+RUN conda install -c conda-forge geos r-rgeos r-rgdal r-sf 
+# gganimate and r-rmarkdown update for pandoc compatibility
+RUN conda install -c conda-forge r-gganimate r-rmarkdown r-gifski
+#TAG v1.1.12
+#TAG dansfix12-6-2020
 
 #USER $NB_USER
 USER root
