@@ -88,7 +88,6 @@ development where helm charts aren't a good fit.
 The `dev_singleuser_home_nfs` subdirectory in particular provides a workflow for fast development of JupyterHub
 singleuser servers, avoiding the need to redeploy JupyterHub and use the spawner for testing. 
 
-
 ### scripts
 
 Scripts for working with docker images (building and pushing to dockerhub), helm repos, and application/cluster deployment and
