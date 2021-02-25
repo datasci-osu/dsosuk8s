@@ -24,7 +24,7 @@ nodeGroups:
     availabilityZones: ["us-west-2b"]
     ssh:
       allow: true
-      publicKeyPath: ~/Box/DataScience/sshkeys/eksctl_id_rsa.pub
+      publicKeyPath: /datascience/keys/sshkeys/eksctl_id_rsa.pub
     iam: 
       withAddonPolicies:
         autoScaler: true
@@ -57,7 +57,7 @@ nodeGroups:
     availabilityZones: ["us-west-2b"]
     ssh:
       allow: true
-      publicKeyPath: ~/Box/DataScience/sshkeys/eksctl_id_rsa.pub
+      publicKeyPath: /datascience/keys/sshkeys/eksctl_id_rsa.pub
     iam: 
       withAddonPolicies:
         autoScaler: true
@@ -91,7 +91,7 @@ nodeGroups:
     instanceType: t3a.large
     ssh:
       allow: true
-      publicKeyPath: ~/Box/DataScience/sshkeys/eksctl_id_rsa.pub
+      publicKeyPath: /datascience/keys/sshkeys/eksctl_id_rsa.pub
     iam: 
       withAddonPolicies:
         autoScaler: true
@@ -124,7 +124,7 @@ nodeGroups:
     instanceType: t3a.2xlarge
     ssh:
       allow: true
-      publicKeyPath: ~/Box/DataScience/sshkeys/eksctl_id_rsa.pub
+      publicKeyPath: /datascience/keys/sshkeys/eksctl_id_rsa.pub
     iam: 
       withAddonPolicies:
         autoScaler: true
@@ -163,7 +163,7 @@ nodeGroups:
     ami: "ami-0d190d9117f2bca4a"   # from https://docs.aws.amazon.com/eks/latest/userguide/gpu-ami.html for k8s 1.16; shot in the dark...
     ssh:
       allow: true
-      publicKeyPath: ~/Box/DataScience/sshkeys/eksctl_id_rsa.pub
+      publicKeyPath: /datascience/keys/sshkeys/eksctl_id_rsa.pub
     iam: 
       withAddonPolicies:
         autoScaler: true
