@@ -206,6 +206,7 @@ RUN apt-get update && apt-get install -yq --no-install-recommends \
     tzdata \
     unzip \
     nano \
+    sudo \
     && apt-get clean && rm -rf /var/lib/apt/lists/*
 
 
@@ -282,10 +283,12 @@ RUN conda clean --all -f -y && \
     #fix-permissions $CONDA_DIR && \
     #fix-permissions /home/$NB_USER
 
-
 # don't switch bach to jovyan, we want to run as root for nfs mount (not respecting uid setting in chart?)
 # USER $NB_UID
 
 #IMAGE oneilsh/jupyterlab-ubuntu-nvidia
-#TAG v1.1.0
+#TAG v1.1.1
+
+# changelog:
+# 1.1.1: upgrade sudo to address root exploit https://ubuntu.com/security/notices/USN-4705-1
 

@@ -1,4 +1,4 @@
-FROM oneilsh/jupyterlab-ubuntu-nvidia-scipy-rjulia:v1.1.0
+FROM oneilsh/jupyterlab-ubuntu-nvidia-scipy-rjulia:v1.1.1
 
 ############################################################################
 ########################## Dependency: gpulibs #############################
@@ -40,4 +40,7 @@ RUN conda clean --all -f -y
 RUN python3 -c 'import tensorflow as tf'
 
 #IMAGE oneilsh/jupyterlab-ubuntu-nvidia-scipy-rjulia-gpu
-#TAG v1.1.0
+#TAG v1.1.1
+# changelog:
+# 1.1.1: upgrade sudo to address root exploit https://ubuntu.com/security/notices/USN-4705-1
+

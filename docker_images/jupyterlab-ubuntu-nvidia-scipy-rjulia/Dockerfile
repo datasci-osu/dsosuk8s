@@ -1,4 +1,4 @@
-FROM  oneilsh/jupyterlab-ubuntu-nvidia-scipy:v1.1.0
+FROM  oneilsh/jupyterlab-ubuntu-nvidia-scipy:v1.1.1
 ############################################################################
 ################ Dependency: jupyter/datascience-notebook ##################
 ############################################################################
@@ -169,6 +169,14 @@ RUN apt-get update \
 #    gnuplot \
     subversion \
     vim \
+    zlib1g-dev \
+    zlib1g \
+    libncurses5-dev \
+    libncursesw5-dev \ 
+    libbz2-dev \
+    liblzma-dev \
+    libcurl4-openssl-dev \
+    libssl-dev \
  && apt-get clean && rm -rf /var/lib/apt/lists/*
 
 RUN conda clean --all -f -y && \
@@ -182,4 +190,9 @@ RUN echo "un-dropping server-proxy"
 
 
 #IMAGE oneilsh/jupyterlab-ubuntu-nvidia-scipy-rjulia
-#TAG v1.1.0
+#TAG v1.1.3
+# changelog:
+# 1.1.3: more libs; libbz2-dev, liblzma, libcurl4, libssl
+# 1.1.2: added zlib1g-dev and ncurses dev libraries
+# 1.1.1: upgrade sudo to address root exploit https://ubuntu.com/security/notices/USN-4705-1
+

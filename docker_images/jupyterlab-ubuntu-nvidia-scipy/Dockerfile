@@ -1,4 +1,4 @@
-FROM oneilsh/jupyterlab-ubuntu-nvidia:v1.1.0
+FROM oneilsh/jupyterlab-ubuntu-nvidia:v1.1.1
 
 ############################################################################
 ################# Dependency: jupyter/scipy-notebook #######################
@@ -63,4 +63,7 @@ USER root
 #USER $NB_UID
 
 #IMAGE oneilsh/jupyterlab-ubuntu-nvidia-scipy
-#TAG v1.1.0
+#TAG v1.1.1
+# changelog:
+# 1.1.1: upgrade sudo to address root exploit https://ubuntu.com/security/notices/USN-4705-1
+
