@@ -21,7 +21,8 @@ RUN apt-get update && \
       dnsutils \
       # libc-bin explicitly added and pinned 2020-06-10 for a CVE found with trivy
       # ref: https://github.com/jupyterhub/zero-to-jupyterhub-k8s/issues/1712#issuecomment-656425028
-      libc-bin=2.27-3ubuntu1.2 \
+      ### libc-bin=2.27-3ubuntu1.2 \
+      libc-bin \
       $(bash -c 'if [[ $JUPYTERHUB_VERSION == "git"* ]]; then \
         # workaround for https://bugs.launchpad.net/ubuntu/+source/nodejs/+bug/1794589
         echo nodejs=8.10.0~dfsg-2ubuntu0.2 nodejs-dev=8.10.0~dfsg-2ubuntu0.2 npm; \
@@ -92,10 +93,11 @@ RUN apt-get update \
 # to use the fancy template (https://github.com/jupyterhub/nativeauthenticator/pull/79)
 # add c.JupyterHub.template_paths = ["/usr/local/lib/nativeauthenticator/nativeauthenticator/templates/"] to config
 # (/home/jovyan is the container user, so that's where we have write/install privs other than /tmp)
-# WORKDIR /home/jovyan
+WORKDIR /usr/local/bin
 # RUN git clone https://github.com/oneilsh/nativeauthenticator.git
-# WORKDIR /home/jovyan/nativeauthenticator
-# RUN pip3 install -e .
+RUN git clone https://github.com/jupyterhub/nativeauthenticator.git
+WORKDIR /usr/local/bin/nativeauthenticator
+RUN pip3 install .
 
 # gotta to go /root for pip install to be global and overwrite the existing ltiauthenticator
 WORKDIR /root
@@ -103,8 +105,10 @@ RUN pip3 install jupyterhub-ltiauthenticator
 RUN pip3 install git+https://github.com/oneilsh/ltiauthenticator.git@multi-key
 
 #IMAGE oneilsh/jupyterlab-k8s-hub
-#TAG v1.5.3-dev
-#TAG baseimage0.9.1
+#TAG v1.5.4
+
+# changelog
+# 1.5.4; 2/26/21 - added back nativeauthentictor, udpate to latest jupyterhub 1.3
 
 WORKDIR /srv/jupyterhub
 

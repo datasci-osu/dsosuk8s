@@ -301,7 +301,9 @@ jupyterhub:
        
           c.JupyterHub.authenticator_class = NativeExtraAuthenticator
           # location in docker image
-          c.JupyterHub.template_paths = ["/home/jovyan/nativeauthenticator/nativeauthenticator/templates/"]       
+          c.JupyterHub.template_paths = ["/usr/local/bin/nativeauthenticator/nativeauthenticator/templates/"]
+          #import sys
+          #sys.stderr.write(",".join(c.JupyterHub.template_paths))
 
         elif env_auth_type == "lti":
           from ltiauthenticator import LTIAuthenticator
