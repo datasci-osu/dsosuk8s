@@ -8,7 +8,7 @@ jupyterhub:
   
   scheduling:
     userScheduler:
-      enabled: true
+      enabled: false
     userPods:
       nodeAffinity:
         matchNodePurpose: require
@@ -128,6 +128,8 @@ jupyterhub:
       ADMIN_USERS: <%= $(index adminUsers "") %> 
 
     extraConfig:
+      globalScheduler:
+        c.KubeSpawner.scheduler_name = "placeholders-user-scheduler"
       concurrentSpawn:
         c.JupyterHub.concurrent_spawn_limit = 400
       templatePath:
