@@ -21,8 +21,8 @@ jupyterhub:
       nodeAffinity:
         matchNodePurpose: require
     userPlaceholder:
-      enabled: true
-      replicas: 1
+      enabled: false
+      replicas: 0
 
   cull:
     enabled: true
