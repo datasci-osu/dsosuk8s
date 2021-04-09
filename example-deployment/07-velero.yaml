@@ -1,0 +1,57 @@
+#!/usr/bin/env -S helm kush upgrade velero /datascience/dsosuk8s/charts/velero --kush-interpolate --install --values
+#!/usr/bin/env -S helm kush template velero /datascience/dsosuk8s/charts/velero --kush-interpolate --values
+
+# uninstall: helm delete velero -n cluster-tools
+
+kubeContext: hub-green
+# velero wants to be installed in the velero namespace, unless you want to add --namespace to all the velero commands...
+createNamespace: velero 
+
+veleroS3Bucket: velero-backups-dsosu
+veleroBackupRegion: us-west-2
+eksClusterName: hub-green
+veleroCredentialsFile: /datascience/keys/awsconfigs/velero-backups-dsosu.credentials
+
+
+
+credentials:
+  secretContents:
+    cloud: |
+      <% cat $(index veleroCredentialsFile "no_veleroCredentialsFile") | awk '{if(NR == 1) {print $0} else {print "      "$0}}' %>
+
+initContainers:
+  - name: velero-plugin-for-aws
+    image: velero/velero-plugin-for-aws:v1.0.0
+    imagePullPolicy: IfNotPresent
+    volumeMounts:
+      - mountPath: /target
+        name: plugins
+
+resources: 
+  requests:
+    memory: "128Mi"
+    cpu: "250m"
+  limits:
+    memory: "256Mi"
+    cpu: "500m"
+
+nodeSelector:
+  nodegroup-role: clustertools  
+
+configuration:
+  provider: aws
+  backupStorageLocation:
+    name: aws
+    bucket: <%= $(index veleroS3Bucket "no veleroS3Bucket") %>
+    prefix: <%= $(index eksClusterName "no eksClusterName") %>
+    config:
+      region: <%= $(index veleroBackupRegion "no veleroBackupRegion") %>
+  volumeSnapshotLocation: 
+    name: aws
+    config:
+      region: <%= $(index veleroBackupRegion "no veleroBackupRegion") %>
+  extraEnvVars:
+    AWS_CLUSTER_NAME: <%= $(index eksClusterName "no eksClusterName") %> 
+  logLevel: warning
+
+

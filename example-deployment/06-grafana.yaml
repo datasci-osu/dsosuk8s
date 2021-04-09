@@ -1,0 +1,58 @@
+#!/usr/bin/env -S helm kush upgrade grafana /datascience/dsosuk8s/charts/grafana --kush-interpolate --install --values
+#!/usr/bin/env -S helm kush template grafana /datascience/dsosuk8s/charts/grafana --kush-interpolate --values
+
+# uninstall: helm delete grafana -n cluster-tools 
+
+clusterHostname: hub-green.datasci.oregonstate.edu
+kubeContext: hub-green
+createNamespace: cluster-tools
+
+adminPassword: admin
+
+ingress:
+  enabled: true
+  annotations:
+    kubernetes.io/ingress.class: nginx
+    nginx.org/mergeable-ingress-type: "minion"
+    nginx.org/websocket-services: "grafana"
+    #nginx.ingress.kubernetes.io/rewrite-target: /\$1
+  path: /<%= $RELEASE_NAME %>/
+  hosts:
+    - <%= $(index clusterHostname "") %>
+  tls:
+  - hosts:
+    - <%= $(index clusterHostname "") %>
+
+persistence:
+  enabled: true
+
+grafana.ini:
+  server:
+    domain: <%= $(index clusterHostname "") %>
+    root_url: https://<%= $(index clusterHostname "") %>/<%= $RELEASE_NAME %>
+    serve_from_sub_path: true
+
+nodeSelector:
+  nodegroup-role: clustertools 
+
+datasources:
+  datasources.yaml:
+    apiVersion: 1
+    datasources:
+    - name: Prometheus
+      type: prometheus
+      url: http://prometheus-server.<%= $HELM_NAMESPACE %>.svc.cluster.local
+      access: proxy
+      isDefault: true  
+
+plugins:
+- digrich-bubblechart-panel
+- grafana-clock-panel
+- neocat-cal-heatmap-panel
+- petrslavotinek-carpetplot-panel
+- mtanda-histogram-panel
+- michaeldmoore-multistat-panel
+- natel-plotly-panel
+- mxswat-separator-panel
+- grafana-kubernetes-app
+- devopsprodigy-kubegraf-app

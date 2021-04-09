@@ -1,0 +1,22 @@
+#!/usr/bin/env -S helm kush upgrade gpudriver /datascience/dsosuk8s/charts/nvidia-device-plugin --kush-interpolate --install --values
+#!/usr/bin/env -S helm kush template gpudriver /datascience/dsosuk8s/charts/nvidia-device-plugin --kush-interpolate --values
+
+kubeContext: hub-green
+createNamespace: kube-system
+
+image: localhost:30050/nvidia/k8s-device-plugin:v0.6.0
+#imagePullSecret: registry-global-regcred 
+#image: nvidia/k8s-device-plugin:v0.6.0
+
+tolerations:
+  # This toleration is deprecated. Kept here for backward compatibility
+  # See https://kubernetes.io/docs/tasks/administer-cluster/guaranteed-scheduling-critical-addon-pods/
+  - key: CriticalAddonsOnly
+    operator: Exists
+  - key: nvidia.com/gpu
+    operator: Exists
+    effect: NoSchedule
+  - key: hub.jupyter.org/dedicated
+    operator: Exists
+    effect: NoSchedule
+

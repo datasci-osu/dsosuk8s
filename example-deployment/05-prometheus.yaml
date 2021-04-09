@@ -1,0 +1,60 @@
+#!/usr/bin/env -S helm kush upgrade prometheus /datascience/dsosuk8s/charts/prometheus --kush-interpolate --install --values
+#!/usr/bin/env -S helm kush template prometheus /datascience/dsosuk8s/charts/prometheus --kush-interpolate --values
+
+# uninstall: helm delete prometheus -n cluster-tools 
+
+kubeContext: hub-green
+createNamespace: cluster-tools
+
+configmapReload:
+  prometheus:
+    image: 
+      repository: localhost:30050/jimmidyson/configmap-reload
+  alertmanager:
+    image: 
+      repository: localhost:30050/jimmidyson/configmap-reload
+
+pushgateway:
+  image:
+    repository: localhost:30050/prom/pushgateway
+  nodeSelector:
+    nodegroup-role: clustertools
+
+kubeStateMetrics:
+  nodeSelector:
+    nodegroup-role: clustertools
+  service:
+    annotations: {}
+  labels: {}
+
+alertmanager:
+  image: 
+    repository: localhost:30050/prom/alertmanager
+  nodeSelector:
+    nodegroup-role: clustertools
+
+server:
+  image:
+    repository: localhost:30050/prom/prometheus
+  nodeSelector:
+    nodegroup-role: clustertools
+  resources:
+    limits:
+      cpu: 1000m
+      memory: 3Gi
+    requests:
+      cpu: 500m
+      memory: 2Gi
+
+nodeExporter:
+  image:
+    repository: localhost:30050/prom/node-exporter
+  tolerations:
+  - effect: NoSchedule
+    key: hub.jupyter.org/dedicated
+    operator: Equal
+    value: user
+  - effect: NoSchedule
+    key: hub.jupyter.org_dedicated
+    operator: Equal
+    value: user

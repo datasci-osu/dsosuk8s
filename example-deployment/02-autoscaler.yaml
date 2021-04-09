@@ -1,0 +1,18 @@
+#!/usr/bin/env -S helm kush upgrade autoscaler /datascience/dsosuk8s/charts/eksctl-autoscaler --kush-interpolate --install --values
+#!/usr/bin/env -S helm kush template autoscaler /datascience/dsosuk8s/charts/eksctl-autoscaler --kush-interpolate --debug --values
+
+kubeContext: hub-green
+
+# clusterName should be the name of the cluster as created by eksctl
+clusterName: hub-green
+nodeSelector:
+  nodegroup-role: clustertools
+
+
+priorities: |- 
+  10:
+    - '.*g4dn-xlarge.*'
+  20:
+    - '.*t3a-2xlarge.*'
+  30:
+    - '.*t3a-large.*'

@@ -1,0 +1,61 @@
+#!/usr/bin/env -S helm kush upgrade registry /datascience/dsosuk8s/charts/docker-registry --install --kush-interpolate --values
+#!/usr/bin/env -S helm kush template registry /datascience/dsosuk8s/charts/docker-registry --kush-interpolate --values
+
+kubeContext: hub-green
+createNamespace: cluster-tools
+
+persistence:
+  enabled: true
+  size: 100Gi
+  # storageClass: '-'
+
+configData:
+  # this configures the registry as a pass-through proxy for dockerhub
+  # specify images as this-registry.domain.tlc/owner/image:tag
+  proxy:
+    remoteurl: https://registry-1.docker.io
+
+nodeSelector:
+  nodegroup-role: clustertools
+
+
+### Option 1: local access, no auth
+service:
+  name: registry
+  type: NodePort
+  port: 5000
+  nodePort: 30050
+
+### Option 2: create a clusterIP service and route ingress to it, setup with auth - also install a global cluster secret to use 
+###
+
+#service:
+#  name: registry
+#  type: ClusterIP
+#  port: 5000
+
+#secrets:
+# remove # below to uncomment for esh
+#  htpasswd: <%#= $(htpasswd -Bbn $ADMIN_USERNAME $ADMIN_PASSWORD) %>
+
+#basicAuth:
+#  username: admin
+#  password: submarine
+
+#createGlobalSecret:
+#  secretName: <%= $RELEASE_NAME %>
+#  matchNamespace:
+#    - '.*'
+#  avoidNamespaces:
+#    - 'default'
+
+#ingress:
+#  enabled: true
+#  hosts:
+#    - hub-green-registry.datasci.oregonstate.edu
+#  tls:
+#    - hosts:
+#      - hub-green-registry.datasci.oregonstate.edu
+
+
+
