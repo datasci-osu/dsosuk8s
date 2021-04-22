@@ -16,6 +16,9 @@ if ! grep -q -E '"experimental"[[:blank:]]*:[[:blank:]]*"enabled"' ~/.docker/con
   exit 1
 fi
 
+read DOCKERUSER "DockerHub Username:"
+read DOCKERPASS "DockerHub Password:"
+
 TARGETDIR=$1
 # determine tag as md5sum of files in directory (not git hash, which updates more frequently than images)
 TAG=`find $TARGETDIR -type f -exec md5sum {} \; | grep -v -E '\.swp$' | sort -k 2 | md5sum | head -c 8`
