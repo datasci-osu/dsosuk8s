@@ -144,7 +144,7 @@ RUN conda install --quiet --yes \
     'nodejs=14.9.0' \
     'jupyterhub=1.3.0' \
     'ipywidgets=7.5.*' \
-    'jupyterlab=2.2.6' && \
+    'jupyterlab=3.0.14' && \
     conda clean --all -f -y && \
     npm cache clean --force && \
     jupyter notebook --generate-config && \
@@ -246,13 +246,17 @@ RUN jupyter labextension install @jupyter-widgets/jupyterlab-manager
 
 # more jupyterlab extensions
 USER root
-RUN jupyter labextension install jupyterlab-topbar-extension \
-                                 jupyterlab-system-monitor \
-                                 jupyterlab-logout \
-                                 jupyterlab-theme-toggle
+#RUN jupyter labextension install jupyterlab-topbar-extension \
+#                                 jupyterlab-system-monitor \
+#                                 jupyterlab-logout \
+#                                 jupyterlab-theme-toggle
 
 # for tracking memory use with the system-monitor
 RUN pip install nbresuse
+
+RUN pip install jupyterlab-topbar
+RUN pip install jupyterlab-system-monitor
+# RUN jupyter labextension install jupyterlab-logout
 
 # bash kernel
 RUN pip install bash_kernel
