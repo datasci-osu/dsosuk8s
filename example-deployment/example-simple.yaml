@@ -1,0 +1,25 @@
+# requires helm-kush plugin from https://github.com/oneilsh/helm-kush
+
+# example deployment:
+# helm kush upgrade example-simple ../charts/ds-jupyterlab --install --kush-interpolate --timeout 10m0s --values <thisfile>
+
+# example uninstall:
+# helm kush run uninstall ../charts/ds-jupyterlab example-simple
+
+---
+
+kubeContext: hub-green
+clusterHostname: hub-green.datasci.oregonstate.edu
+
+
+securitySalt: supersecret
+createHomeDrive:
+  size: 50Gi
+  chart: https://datasci-osu.github.io/dsosuk8s/nfs-drive-1.1.0.tgz
+
+
+jupyterhub:
+  singleuser:
+    memory: {guarantee: 0.5G, limit: 1.0G}
+    cpu:    {guarantee: 0.1,  limit: 1.0}
+    

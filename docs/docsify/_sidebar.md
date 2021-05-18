@@ -1,4 +1,4 @@
 
 * [Home](/)
-* [Instructor Overview](/README_INSTRUCTORS.md)
+* [For System Administrators](/README_ADMINS.md)
 * [Test](test.md)
