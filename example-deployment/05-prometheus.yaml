@@ -1,5 +1,7 @@
-#!/usr/bin/env -S helm kush upgrade prometheus /datascience/dsosuk8s/charts/prometheus --kush-interpolate --install --values
-#!/usr/bin/env -S helm kush template prometheus /datascience/dsosuk8s/charts/prometheus --kush-interpolate --values
+# requires helm-kush plugin from https://github.com/oneilsh/helm-kush
+
+# example deployment:
+# helm kush upgrade prometheus ../charts/prometheus --kush-interpolate --install --values <thisfile>
 
 # uninstall: helm delete prometheus -n cluster-tools 
 

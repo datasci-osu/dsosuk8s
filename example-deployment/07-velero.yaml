@@ -1,11 +1,11 @@
-#!/usr/bin/env -S helm kush upgrade velero /datascience/dsosuk8s/charts/velero --kush-interpolate --install --values
-#!/usr/bin/env -S helm kush template velero /datascience/dsosuk8s/charts/velero --kush-interpolate --values
+# requires helm-kush plugin from https://github.com/oneilsh/helm-kush
+
+# example deployment:
+# helm kush upgrade velero ../charts/velero --kush-interpolate --install --values <thisfile>
 
 # uninstall: helm delete velero -n cluster-tools
 
 kubeContext: hub-green
-# velero wants to be installed in the velero namespace, unless you want to add --namespace to all the velero commands...
-createNamespace: velero 
 
 veleroS3Bucket: velero-backups-dsosu
 veleroBackupRegion: us-west-2
@@ -13,6 +13,8 @@ eksClusterName: hub-green
 veleroCredentialsFile: /datascience/keys/awsconfigs/velero-backups-dsosu.credentials
 
 
+# velero wants to be installed in the velero namespace, unless you want to add --namespace to all the velero commands...
+createNamespace: velero 
 
 credentials:
   secretContents:

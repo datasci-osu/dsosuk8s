@@ -1,13 +1,17 @@
-#!/usr/bin/env -S helm kush upgrade grafana /datascience/dsosuk8s/charts/grafana --kush-interpolate --install --values
-#!/usr/bin/env -S helm kush template grafana /datascience/dsosuk8s/charts/grafana --kush-interpolate --values
+# requires helm-kush plugin from https://github.com/oneilsh/helm-kush
+
+# example deployment:
+# helm kush upgrade grafana ../charts/grafana --kush-interpolate --install --values <thisfile>
 
 # uninstall: helm delete grafana -n cluster-tools 
 
 clusterHostname: hub-green.datasci.oregonstate.edu
 kubeContext: hub-green
+adminPassword: admin
+
+
 createNamespace: cluster-tools
 
-adminPassword: admin
 
 ingress:
   enabled: true

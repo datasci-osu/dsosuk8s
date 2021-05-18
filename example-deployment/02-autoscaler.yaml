@@ -1,5 +1,7 @@
-#!/usr/bin/env -S helm kush upgrade autoscaler /datascience/dsosuk8s/charts/eksctl-autoscaler --kush-interpolate --install --values
-#!/usr/bin/env -S helm kush template autoscaler /datascience/dsosuk8s/charts/eksctl-autoscaler --kush-interpolate --debug --values
+# requires helm-kush plugin from https://github.com/oneilsh/helm-kush
+
+# example deployment:
+# helm kush upgrade autoscaler ../charts/eksctl-autoscaler --kush-interpolate --install --values <thisfile>
 
 kubeContext: hub-green
 

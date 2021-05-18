@@ -1,5 +1,7 @@
-#!/usr/bin/env -S helm kush upgrade registry /datascience/dsosuk8s/charts/docker-registry --install --kush-interpolate --values
-#!/usr/bin/env -S helm kush template registry /datascience/dsosuk8s/charts/docker-registry --kush-interpolate --values
+# requires helm-kush plugin from https://github.com/oneilsh/helm-kush
+
+# example deployment:
+# helm kush upgrade registry ../charts/docker-registry --install --kush-interpolate --values <thisfile>
 
 kubeContext: hub-green
 createNamespace: cluster-tools

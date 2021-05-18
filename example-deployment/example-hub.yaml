@@ -19,7 +19,6 @@ jupyterhub:
   singleuser:
     memory: {guarantee: 0.5G, limit: 1.0G}
     cpu:    {guarantee: 0.1,  limit: 1.0}
-    image:  {name: localhost:30050/oneilsh/jupyterlab-ubuntu-nvidia-scipy-rjulia, tag: v1.1.1, pullPolicy: Always} 
     
     profileList:
     - display_name: "Standard"
@@ -58,16 +57,3 @@ jupyterhub:
         admins: {initialBalance: 4, newTokensPerDay:  1, maxBalance: 4}
         users:  {initialBalance: 4, newTokensPerDay:  1, maxBalance: 4}
      
-      networkTools:
-      image: {name: 'localhost:30050/jupyterhub/k8s-network-tools', tag: '0.9.0-alpha.1.000.f995427'} 
-
-  hub:
-    image: {name: 'localhost:30050/oneilsh/jupyterlab-k8s-hub', tag: v1.5.4}
-
-  proxy: 
-    chp:
-      image: {name: 'localhost:30050/jupyterhub/configurable-http-proxy', tag: 4.2.0}
-
-  prePuller:
-    hook:
-      image: {name: 'localhost:30050/jupyterhub/k8s-image-awaiter', tag: '0.9.0-alpha.1.000.f995427'}

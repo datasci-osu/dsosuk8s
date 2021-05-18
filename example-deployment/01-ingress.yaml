@@ -1,5 +1,7 @@
-#!/usr/bin/env -S helm kush upgrade master-ingress /datascience/dsosuk8s/charts/nginx-ingress --install --kush-interpolate --values
-#!/usr/bin/env -S helm kush template master-ingress /datascience/dsosuk8s/charts/nginx-ingress --kush-interpolate --values
+# requires helm-kush plugin from https://github.com/oneilsh/helm-kush
+
+# example deployment:
+# helm kush upgrade master-ingress ../charts/nginx-ingress --install --kush-interpolate --values <thisfile>
 
 kubeContext: hub-green
 createNamespace: cluster-tools

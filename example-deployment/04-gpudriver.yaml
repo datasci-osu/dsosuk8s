@@ -1,5 +1,7 @@
-#!/usr/bin/env -S helm kush upgrade gpudriver /datascience/dsosuk8s/charts/nvidia-device-plugin --kush-interpolate --install --values
-#!/usr/bin/env -S helm kush template gpudriver /datascience/dsosuk8s/charts/nvidia-device-plugin --kush-interpolate --values
+# requires helm-kush plugin from https://github.com/oneilsh/helm-kush
+
+# example deployment:
+# helm kush upgrade gpudriver ../charts/nvidia-device-plugin --kush-interpolate --install --values <thisfile>
 
 kubeContext: hub-green
 createNamespace: kube-system

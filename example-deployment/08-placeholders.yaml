@@ -1,6 +1,7 @@
-#!/usr/bin/env -S helm kush upgrade placeholders /datascience/dsosuk8s/charts/ds-jupyterlab --install --kush-interpolate --timeout 10m0s --values
-#!/usr/bin/env -S helm kush run uninstall /datascience/dsosuk8s/charts/ds-jupyterlab placeholders
-#!/usr/bin/env -S helm kush template placeholders /datascience/dsosuk8s/charts/ds-jupyterlab --kush-interpolate --values
+# requires helm-kush plugin from https://github.com/oneilsh/helm-kush
+
+# example deployment:
+# helm kush upgrade placeholders ../charts/ds-jupyterlab --install --kush-interpolate --timeout 10m0s --values
 
 
 ---
@@ -14,36 +15,20 @@ createHomeDrive:
   size: 10Gi
   chart: https://datasci-osu.github.io/dsosuk8s/nfs-drive-1.1.0.tgz
 
-## lti is default, other options: dummy (no passwords), native (self-contained passwords, admin-managed)
-authType: native
-## only used if authType is not lti
-adminUsers: shhhh
-
 
 jupyterhub:
   scheduling: 
-    userScheduler:
-      enabled: true
-      replicas: 4
     userPlaceholder:
       enabled: true
+      # configure number of placeholder here:
       replicas: 20
 
+    userScheduler:
+      enabled: true
+      replicas: 3
+
   singleuser:
+    # configure size of placeholders here (via guarantees; just set limits to be larger)
     memory: {guarantee: 0.5G, limit: 1.0G}
     cpu:    {guarantee: 0.1,  limit: 1.0}
-    image:  {name: localhost:30050/oneilsh/jupyterlab-ubuntu-nvidia-scipy-rjulia, tag: v1.1.1, pullPolicy: Always} 
-    
-    networkTools:
-      image: {name: 'localhost:30050/jupyterhub/k8s-network-tools', tag: '0.9.0-alpha.1.000.f995427'} 
 
-  hub:
-    image: {name: 'localhost:30050/oneilsh/jupyterlab-k8s-hub', tag: v1.5.4}
-
-  proxy: 
-    chp:
-      image: {name: 'localhost:30050/jupyterhub/configurable-http-proxy', tag: 4.2.0}
-
-  prePuller:
-    hook:
-      image: {name: 'localhost:30050/jupyterhub/k8s-image-awaiter', tag: '0.9.0-alpha.1.000.f995427'}

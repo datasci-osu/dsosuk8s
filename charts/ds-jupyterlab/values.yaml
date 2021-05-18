@@ -38,6 +38,8 @@ jupyterhub:
     https:
       enabled: true
       type: offload
+    chp:
+      image: {name: 'localhost:30050/jupyterhub/configurable-http-proxy', tag: 4.2.0}
 
   singleuser:
     # looks like these should be set null to delete the key (including those defaulted in the jupyterhub chart) for the c.Spawner limits below to be used
@@ -48,8 +50,8 @@ jupyterhub:
       limit: 1.0
       guarantee: 0.1
     image:
-      name: oneilsh/ktesting-datascience-notebook
-      tag: "v1.1.6"
+      name: 'localhost:30050/oneilsh/jupyterlab-ubuntu-nvidia-scipy-rjulia'
+      tag: 'v1.1.1'      
     defaultUrl: "/lab/tree/{username}"
     cmd: ["start-singleuser.sh", "--allow-root"]  # don't think I need this? 
     storage:
@@ -77,7 +79,9 @@ jupyterhub:
     profileQuota:
       checkEvery: 600  # default 600
       quotaDbFilename: "/srv/jupyterhub/profile_quotas.sqlite" # default "/srv/jupyterhub/profile_quotas.sqlite"
-
+    networkTools:
+      image: {name: 'localhost:30050/jupyterhub/k8s-network-tools', tag: '0.9.0-alpha.1.000.f995427'} 
+      
   ingress:
     enabled: true
     annotations:
@@ -89,15 +93,20 @@ jupyterhub:
     tls:
       - hosts:
         - <%= $(index clusterHostname "") %>
-  
+
+  prePuller:
+    hook:
+      image: {name: 'localhost:30050/jupyterhub/k8s-image-awaiter', tag: '0.9.0-alpha.1.000.f995427'}
+ 
+ 
   hub:
     baseUrl: <%= "/$RELEASE_NAME/" %>
     db:
       type: "sqlite-pvc"
       upgrade: false 
     image:
-      name: oneilsh/jupyterlab-k8s-hub
-      tag: "v1.4.3" 
+      name: 'localhost:30050/oneilsh/jupyterlab-k8s-hub'
+      tag: "v1.5.4" 
     uid: 0
     fsGid: 0
     extraVolumes:
@@ -121,7 +130,6 @@ jupyterhub:
       LTI_ADMIN_ROLES: '["Instructor", "TeachingAssistant", "ContentDeveloper"]'
       LTI_CLIENT_KEY: <%= $LTI_CLIENT_KEY %>
       LTI_CLIENT_SECRET: <%= $LTI_CLIENT_SECRET %>
-      # TODO:
       NFS_SVC_HOME: <%= $DRIVE_RELEASE_NAME %>
       # e.g. oneils,keistc
       # but only used if not using lti AUTH_TYPE
