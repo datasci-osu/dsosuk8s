@@ -348,9 +348,333 @@ helm kush run uninstall dsosuk8s/charts/ds-jupyterlab placeholders
 
 ## Hub Deployment and Management
 
+With the cluster configured and ready, we can move onto deploying hubs. Hubs and shared storage components are managed as helm chart deployments, 
+with each hub/storage pair living in a kubernetes namespace of the same name. Consider a hub for the hypothetical class MB652; a deployment may
+consist of a kubernetes namespace `mb652hub`, containing a `mb652hub` helm deployment for the hub (consisting of the standard components defined by 
+[Z2JH](https://zero-to-jupyterhub.readthedocs.io/en/stable/)) and a `mb652hubhomedrive` helm deployment (consisting of an a kubernetes persistent volume 
+bound to an NFS server, which is then mounted by the hub components). (This split allows for better re-use of Z2JH stack and the planned for (but not yet
+implemented) ability to re-use or share storage across hubs, or connect multiple storage volumes to a single hub.)
+
+The helm-kush enhanced helm chart in `charts/ds-jupyterlab` enables minimal configuration work and coordianated commissioning and de-commissioning of the 
+component parts. 
+
+### Basic Hub Install (Canvas)
+
+The example deployment file `example-deployment/example-simple.yaml` describes required configuration for a basic Canvas-connecting hub, which is the default
+authentication option.
+
+```yaml
+kubeContext: hub-green
+clusterHostname: hub-green.datasci.oregonstate.edu
+
+
+securitySalt: supersecret
+createHomeDrive:
+  size: 50Gi
+  chart: https://datasci-osu.github.io/dsosuk8s/nfs-drive-1.1.0.tgz
+
+
+jupyterhub:
+  singleuser:
+    memory: {guarantee: 0.5G, limit: 1.0G}
+    cpu:    {guarantee: 0.1,  limit: 1.0}
+```
+
+The configuration fields `kubeContext` and `clusterHostname` are the same as for cluster components: these should be the target kubernetes clsuter context name
+(as reported by `kubectl config get-contexts`) and the cluster hostname (CNAME used during ingress setup). The `securitySalt` field should be any string
+and kept secret (non-whitespace unless wrapped in quotes as allowed by YAML syntax). Default Z2JH deployments utilize a security key which is required to be a
+32-character hex string; here we've customized the deployment to compute this based on a hash of the security salt and other hub metadata. 
+
+The `createHomedrive` section defines the shared storage space available to users (and points to the helm chart version used for the NFS server). *Note that it is not
+possible at this time to resize storage for a hub.* (This is possible in theory, but not implemented.) Storage utilizes standard AWS EBS volumes at 10 cents per gigabyte
+per month as of this writing. 
+
+Lastly, the `jupyterhub.singleuser` section defines the resources made available to logged in users: guarantees reserve that amount for the user regardless of usage,
+and limits allow users to utilize more resources if they are available. 
+
+Note that CPU is highly fungible and bursty in nature--most of the time most users require only a tiny fraction of CPU, but on occasion burst to needing several cores. 
+Given that kubernetes can fairly redistribute CPU resources proportionally it makes sense to set a low gaurantee and high limit for CPU. RAM on the other hand is less
+fungible: once allocated by a user it is reserved until the process releases it (frequently only on user logout). RAM resources thus should be be tailerd more closely
+to user needs. Fortunately, these values can be changed at any time with minimal disruption (see Changing Configuration below).
+
+The hub is deployed via
+
+```bash
+helm kush upgrade <hubName> ../charts/ds-jupyterlab --install --kush-interpolate --timeout 10m0s --values <hubConfig.yaml>
+```
+
+For example, `helm kush upgrade example-simple ../charts/ds-jupyterlab --install --kush-interpolate --timeout 10m0s --values example-simple.yaml`. Once the hub is deployed (which can take several minutes), the install will report 3 pieces of information necessary to connect the hub to Canvas:
+
+
 ```
 Hub launch URL: https://hub-green.datasci.oregonstate.edu/example-simple/hub/lti/launch
 Consumer Key: 9cc6ebca80d7aa322cfbafb72565b79f35ee374c22d98f5fa4160fa28a98f330
 Shared Secret: dbc3eb6f43a6ca0256c0a1a60c8fa11a336308cefc770d1afffb635e59e41974
 ```
+
+The hub then needs to be "connected" to the Canvas course in the following way (and this requires sufficient priveledges in the Canvas course such as Instructor or Designer). Under the course **Settings**, click the **Apps** tab, and then **View App Configurations** button. 
+
+![](media/canvas_app_configurations.png ':size=90%')
+
+Next, click the **+App** button near the top of the resulting page, and enter the launch URL, Consumer Key, and Shared Secret as shown below. Be sure to 
+select "Public" in the privacy dropdown: this allows Canvas to share user login names with the hub. 
+
+![](media/addapp.png ':size=60%')
+
+The hub can then be accessed in Canvas by adding either 1) an "External Tool" module int he Modules section, or 2) an assignment with the "External Tool" submission type. In both cases, use the Find button to locate the newly installed app, or just enter the launch URL in the link section of the dialog. Be sure to check
+"load This Tool In A New Tab" or it won't work. 
+
+![](media/canvas_external_tool.png ':size=70%')
+
+Finally, users (instructors and students) can log into the hub by opening the relavent assignment or module and click the "launch" button. The timeout for clicking the button after page load is short--if the the page is open for too long it will report an error, but refreshing the page restores the button and restarts the timer. 
+
+#### Username configuration
+
+Usernames in a Canvas-connected hub are parsed from information provided by the Canvas API. To complicate matters, institutions may customize this information
+and how/where it is stored in the response from Canvas. As Oregon State U., usernames are provded as `<username>@oregonstate.edu` in the `custom_canvas_user_login_id` field. (Information passed form Canvas to the hub on user login is is logged in the hub container logs, these can be used to inspect the fields and formatting provided. See Viewing Logs below for information.) This is true *unless* the instructor is using "student view" in Canvas, in which case the `custom_canvas_user_login_id` field is a long random hex string. The OSU Canvas instance also supports user-managed Canvas "Studio Sites" that allow social logins, and are nice options for short workshops etc. In these cases the username is reported as their social login email in the `lis_person_contact_email_primary` field.  
+
+These various username options need to be mapped to a username in the hub, and ideally usernames would be username-like: short, memorable, and unique. For regular class use, we can gaurantee that the `<username>` segment of `<username>@oregonstate.edu` is unique (and is in fact the users' OSU net ID) and so is a fine username. Social logins cannot use the same extraction; `joe@gmail.com` should not get access to the same account as `joe@oregonstate.edu` (or any other Joe). For these cases we use the entire social login email as the username. For usernames provided by the "student view" we truncate the long hex string IDs to just the first 6 characters, so `19ab34cfdd87168e` becomes hub username `19ab34`. 
+
+This is accomplished via a customized version of the [ltiauthenticator](https://github.com/oneilsh/ltiauthenticator) JupyterHub plugin to map potential usernames
+to hub usernames via a series of regular expressions with capture groups. Configuration can be customized via environment variables as follows:
+
+
+```yaml
+jupyterhub:
+  singleuser:
+    memory: {guarantee: 0.5G, limit: 1.0G}
+    cpu:    {guarantee: 0.1,  limit: 1.0}
+
+  hub:
+    extraEnv:
+      LTI_ID_KEYS: '["custom_canvas_user_login_id", "lis_person_contact_email_primary", "custom_canvas_user_login_id"]'
+      LTI_ID_REGEXES: '["(^[^@]+)@[^@]+$", "(^[^@]+@[^@]+$)", "(^[0-9a-f]{6,6})[0-9a-f]*$"]'
+      LTI_ADMIN_ROLES: '["Instructor", "TeachingAssistant", "ContentDeveloper"]'
+```
+
+The username-mapping process happens as follows: each field listed in `LTI_ID_KEYS` is matched in turn with the corresponding (by array index) 
+regular expression in `LTI_ID_REGEXES`. If a match is found, the username is grabbed from the first capture group (in `()`), otherwise the next in line
+is checked. (If none match, a default is used, the LTI user ID, which is unlikely to be anything more than a long random string.) Notice that this example, which is the
+default, implements the logic described above. 
+
+The `LTI_ADMIN_ROLES` value describes a set of Canvas-defined roles that should be given admin access in the hub. The example aboe makes Instructors, TAs, 
+and "Content Developers" admins, but one could e.g. remove `"TeachingAssistant"` from the list to make them regular users in the hub. This means that a person
+can be an admin in one hub, and a regular user in another, depending on their Canvas role. Roles and access can also be changed from within Canvas, and their group/admin
+permissions will be updated in the hub to reflect to the change (though all files previously owned by will preserve their permissions regardless of location). 
+
+One last thing to note: usernames are mapped to Unix UID numbers using a hash-based process for repeatability. When a user first logs in, this UID is associated with the username, but the UID->username mapping will only appear for user servers that were started *after* the mapping has been made (since the mapping is picked up on server start). The effect of this is that a user who lists files in the hub as other users are logging in for the first time will see UID values instead of usernames in the file listing, until they restart their own server to pickup the new UID->username mappings. 
+
+### Basic Hub Deployment (Native Authenticator)
+
+For deployments where Canvas is not preferred, DS@OSU is also configured to allow users to self-register with a desired username and password, with their access
+being subject to approval by an admin user. This is supported by the [NativeAuthenticator](https://native-authenticator.readthedocs.io/en/latest/) plugin. To use this, 
+just add two lines to the the configuration file as follows: 
+
+```yaml
+authType: native
+adminUsers: oneils, keistc
+
+jupyterhub:
+  singleuser:
+    memory: {guarantee: 0.5G, limit: 1.0G}
+    cpu:    {guarantee: 0.1,  limit: 1.0}
+```
+
+where `authType: native` specifies to use the native authenticator, and `adminUsers` is a comma-separated list of initial usernames to designate as admins (admins
+can promote other users to admin status later). 
+
+Although [well-documented](https://native-authenticator.readthedocs.io/en/latest/), the workflow for Native Authenticator
+is a little confusing. Users can sign up (pick a username and password) at the hub URL `https://<clusterHostname>/<hubName>/hub/signup`, which is linked from the main login page at `https://<clusterHostname>/<hubName>`, though the login and signup pages are very similar looking and may be confusing to users. Admin users can login and authorize/de-authorize users at `https://<clusterHostname>/<hubName>/hub/authorize`, after which those users will be able to login. Admin usernames specified in the hub
+config above are *pre-authorized*, but the passwords for these usernames need to be set initially by using the signup form. All users can change their password after login by navigating to `https://<clusterHostname>/<hubName>/hub/change-password`.
+
+### Uninstalling a Hub
+
+To avoid issues with unmounting and releasing storage volumes hub components need to be de-commissioned in a specific order; the helm-kush enhanced chart handles this
+via a custom `run` script. A hub installed with `helm kush upgrade <hubName> charts/ds-jupyterlab ...` can be removed with 
+
+```bash
+helm kush run uninstall charts/ds-jupyterlab <hubName>
+```
+
+Note that both install and uninstall utilize information in the chart (`charts/ds-jupyterlab`), so the same version of the chart should be used for both operations to ensure proper cleanup. 
+
+Uninstalling a hub performs the following actions:
+
+* Stopping any running user pods/servers
+* Removing the main hub pod and other JuptyerHub components
+* Removing the NFS server component and detaching the persistent volume for shared storage
+* Removing the persistent volume claim and persistent volume (from the kuternetes cluster)
+* Removing the kubernetes namespace (unless for some reason any resources still exist, in which case a warning is reported)
+
+### Compute Profiles and Resource Allocation
+
+The `simple-example` hub above defines simply the gauranteed and maximum allowed RAM and CPU, and user servers (the term used by JupyterHub for docker containers
+running user processes) are defined by a "standard" docker image containing Python, R, Julia, and a variety of common libraries and tools. The
+
+There may be cases, however, where a user needs to use more resources for a particular session, or a need may arise for different software stacks. Such "profiles"
+are supported by JupyterHub natively, but we additionally add features via a [custom JupyterHub plugin](https://github.com/oneilsh/jh-profile-quota) for token-bucket
+based quotas--these quotas limit the total time a user may use a profile, which is useful for management of expensive resources like GPUs. 
+
+To use profiles and quotas, include a `profileList` section in the hub configuration. The `example-deployment/example-profiles.yaml` file provides an example:
+
+```yaml
+jupyterhub:
+  singleuser:
+    memory: {guarantee: 0.5G, limit: 1.0G}
+    cpu:    {guarantee: 0.1,  limit: 1.0}
+    
+    profileList:
+    - display_name: "Standard"
+      slug: "standard"
+      default: True
+      description: "Standard server type suitable for programming and most analyses: 0.1 CPU gauranteed (1.0 maximum where available) and 0.5G RAM gauranteed (1G max where available)."
+    - display_name: "Large"
+      description: "For slightly larger computation needs: 0.25 CPU gauranteed (2.0 maximum where available) and 2G RAM gauranteed (4G max where available). <br /><br />Please note that servers with this profile may take longer than usual to start."
+      slug: "large"
+      kubespawner_override: {mem_guarantee: 1.9G, mem_limit: 4.0G, cpu_gaurantee: 0.25, cpu_limit: 2.0}
+      quota:
+        minBalanceToSpawn: 0.5
+        admins: {initialBalance: 4, newTokensPerDay: 2, maxBalance: 8}
+        users:  {initialBalance: 4,  newTokensPerDay: 2, maxBalance: 8}
+    - display_name: "X-Large"
+      description: "For heavy computation needs: 0.5 CPU gauranteed (8.0 maximum where available) and 8G RAM gauranteed (12G max where available). <br /><br />Please note that servers with this profile may take longer than usual to start."
+      slug: "xlarge"
+      kubespawner_override: {mem_guarantee: 7.9G, mem_limit: 12.0G, cpu_gaurantee: 0.5, cpu_limit: 8.0}
+      quota:
+        minBalanceToSpawn: 0.5
+        admins: {initialBalance: 4, newTokensPerDay:  1, maxBalance: 6, active: false}
+        users:  {initialBalance: 4,  newTokensPerDay: 1, maxBalance: 6}
+    - display_name: "X-Large w/ GPU"
+      description: "GPU-Based Compute: 4.0 CPU, 16G RAM, and one NVIDIA T4 GPU gauranteed. Tensorflow installed. <br /><br />Please note that servers with this profile *will* take longer than usual to start."
+      slug: "gpu"
+      kubespawner_override:
+        mem_guarantee: 15.0G
+        mem_limit: 16.0G
+        cpu_gaurantee: 3.5
+        cpu_limit: 4.0
+        extra_resource_limits: {"nvidia.com/gpu": "1"}
+        image: "localhost:30050/oneilsh/jupyterlab-ubuntu-nvidia-scipy-rjulia-gpu:v1.1.0"
+      quota:
+        minBalanceToSpawn: 1
+        admins: {initialBalance: 4, newTokensPerDay:  1, maxBalance: 4}
+        users:  {initialBalance: 4, newTokensPerDay:  1, maxBalance: 4, disabled: true}
+```
+
+This `profileList` defines 4 profiles: the "Standard" profiled defined by the main `singleuser` configuration (with no overrides, but an added display name and description), a "Large" profile, "X-Large", and finally "X-Large w/ GPU". Note that in this section only the `quota` subsections are provided by our custom module, JupyterHub provides profiles and overrides out of the box, including the options given to `kubespawner_override` which are documented [here](https://zero-to-jupyterhub.readthedocs.io/en/stable/jupyterhub/customizing/user-environment.html?highlight=kubespawner_override#using-multiple-profiles-to-let-users-select-their-environment) and [here](https://jupyterhub-kubespawner.readthedocs.io/en/latest/spawner.html). These profile options are as described in those documentation, including `display_name`, `description`, `default`, `kubespawner_override`, and `slug`, which is a machine-readable label for the profile. 
+
+Quota configuration relies on the concept of "tokens", where 1 token equates to 1 hour of profile use, and token balances are tracked per-user, per-profile. Many settings are set indepenedently for admins and regular users, for example to allow admins (like instructors and TAs) more resources for course development. These settings are fairly self-explanatory: `initialBalance` defines the number of initial tokens, `newTokensPerDay` defines how many tokens are added to each users' balance per day (in ten minute increments by default), and `maxBalance` defines an upper limit on how many tokens a user may bank. 
+
+The `minBalanceToSpawn` option is set profile-wide rather than for admins and users separately, and a users' token balance must be at least this much to start a server with the profile. During use, we do *not* stop user servers if they run out of tokens (usage is also accounted by checking for activity every 10 minutes). Rather than interrupting work unexpectedly, we allow token balances to go negative. This means however that the user won't be able to use the profile again after their server stops via normal means (see the next two sections for details on "normal" server stops) until they have accumulated enough token to bring their balance back above the `minBalanceToSpawn` value. Although defaults for these various options are [defined](https://github.com/oneilsh/jh-profile-quota), you should specify them explicitly for clarity. 
+
+Two other options are available as shown in the X-Large and GPU profiles above: `active` which can be set to `false` to disable quota checking and accounting, and `disabled` which can be set to `true` to disable a profile for usage. 
+
+Lastly, notice that the "X-Large w/ GPU" profile specifies a custom image, which is larger than the default image having a tensorflow-based software stack installed. We prefix the image name with `localhost:30050/` to indicate that images should refer to pull-through docker registry cache for efficiency. (As of this writing the only images you're likely to want to use are the default and this GPU-based image.)
+
+Quota information is compiled in the UI where users can select their profile on server start; note that HTML is allowed in the profile description fields and we've 
+included warnings about startup times for these large profiles since they are much more likely to require a cluster autoscale to start. 
+
+![](media/dshub_profiles.png ':size=45%')
+![](media/dshub_profiles_popup.png ':size=45%')
+
+It is useful to consider profile resources in light of the cluster nodepool resources and usage patterns. The `t3a.large` nodepool defined in the example cluster
+config has 16G RAM while the `t3a.2xlarge` nodes have 32G RAM. The smaller of these can thus support 4 to 8 Large profile servers (and we set the `mem_guarantee` to `1.9G` to allow for memory for the OS and other node components to support 8), or 1 or 2 X-Large profiles, with remaining space being used by some number of smaller profiles. Depending on usage patterns, this may be suboptimal: after the X-Large servers stop, the node will continue to run and support the smaller profiles until all of those stop as well (and assuming no new ones show up and land on the node), leaving the larger more-expensive node mostly empty. The example cluster configuration adds information to nodepools as *labels*, for example each nodepool contains a `nodesize` label with values of e.g. `t3a.2xlarge`. A `node_selector` field can then be added to the `kubernetes_override` section to target profiles to particular node types by label, for example `kubespawner_override: {mem_guarantee: 7.9G, mem_limit: 12.0G, cpu_gaurantee: 0.5, cpu_limit: 8.0, node_seletor: {nodesize: t3a.2xlarge}}`. Additional labels could be used to define targettable sets of nodepools. 
+
+It is more difficult to prevent profiles from landing on a particular nodepool, though it is possible using KubeSpawner's `tolerations` option and node "taints" defined in the cluster config. [TODO: document an example!] Alternatively, in some cases it suffices to allocate resources carefully. For example, the `g4dn.xlarge` nodes have one GPU, 4 vCPUs, and 16G RAM. Since these machines are expensive, we dont' want to put any non-GPU profiles on these nodes. In fact, these should only ever support a single user at a time, and we may as well allocate to that user all available resources, so we set the gaurantees to be large enough to reserve a node to a single user (but leave a little extra for OS and other components.) [TODO: taints and tolerations are really the better solution.]
+
+One last thing: the dynamics of the scheduler (which uses a strategy that packs nodes as tightly as possible) and the autoscaler (which uses a "cheapest first" strategy to decide which nodepool to scale up) can result in non-intuitive behavior. If for example the above were the only profiles in use on the cluster, the `t3a.2xlarge` nodepool will never be used, because there is no profile that requires this more expensive node type in liu of a cheaper one. 
+
+### Inactivity Culling and Other Useful Config
+
+Z2JH provides a [large number of options](https://github.com/jupyterhub/zero-to-jupyterhub-k8s/blob/main/jupyterhub/values.yaml) that can be added to hub configuration. Of particular interest (especially where profiles and resource allocation are concerned) are those that manage inactivity and max-runtime limits. Though user servers *can* be allowed to run forever, it isn't wise to allow this, as resources will stay tied up and the cluster will never be able to scale down. Turning off user servers after a period of inactivity or maximum runtime is known as *culling*. We can configure this via a `cull` section in the config, where the default values are as shown:
+
+```yaml
+jupyterhub:
+  singleuser:
+    memory: {guarantee: 0.5G, limit: 1.0G}
+    cpu:    {guarantee: 0.1,  limit: 1.0}
+
+  cull:
+    enabled: true   # turn on culling?
+    timeout: 3600   # 1 hour (in seconds)
+    every: 600      # 10 minutes
+    maxAge: 28800   # 8 hours
+```
+
+In these default settings, culling is enabled, and every 10 minutes the hub queries user servers for inactivity--if no activity is found for 1 hour, the server is removed (including stopping of all running processes!) "Activity" here is defined as *a browser window or tab open to the JupyterLab interface.* This means that a user logged in who leaves their browser open and logged in is active, even if they've stepped away from the keyboard for an extended period. By contrast, a user who opens RStudio (which opens in a new browser tab) and then closes the JupyterLab tab is *inactive*, even if they are actively working in RStudio. Browser extensions such as Chrome's tab-suspender that suspend non-active tabs may also result in apparent inactivity. 
+
+To reduce the risk of apparently-always-active users, `maxAge` configures the maximum allowable runtime for a user server. Once a server is culled, the user may still start a new server to reset the timer of course, but this effectively limits the runtime of a single server and any process within it. 
+
+By default logging out of the JupterLab interface (via File -> Logout) does *not* stop the users' server. If they were to log back in again within the timeout period their login would be nearly instantaneous as their their server already exists. This can be changed to stop a server on logout (which still requires users to explicitly log out, rather than close the browswer tab):
+
+```yaml
+jupyterhub:
+  singleuser:
+    memory: {guarantee: 0.5G, limit: 1.0G}
+    cpu:    {guarantee: 0.1,  limit: 1.0}
+
+  cull:
+    enabled: true   # turn on culling?
+    timeout: 3600   # 1 hour (in seconds)
+    every: 600      # 10 minutes
+    maxAge: 28800   # 8 hours
+
+  hub:
+    shutdownOnLogout: true
+```
+
+### Changing Configuration
+
+With the exception of shared storage size and primary hub information like hub name, clusterHostname, and kubeContext, most options can be changed without user interruption by adjusting the config file and redeploying with the deployment command (`helm kush upgrade <hubName> charts/ds-jupyterlab ...`). Adjustments to user servers such as RAM and CPU allocation will not be picked up until they stop and restart. [TODO: test whether redeploying resets user quota balances. I don't think it does.]
+
+### Viewing Logs, Exec'ing, and Killing Pods/Servers
+
+Kuberentes supports viewing logs for, and dynamically logging into, running containers. This can be somewhat complex in general because kubernetes pods are the unit of reference, and a single pod may contain multiple containers. However, this feature is not used here and kubernetes is smart enough to work with the container directly if a pod only contains one. 
+
+To view the running pods for a hub, use
+
+```bash
+kubectl get pods -n <hubName>
+```
+
+(Since `<hubName>` is also the namespace for a given hub.) For our simple example hub, `kubectl get pods -n simple-example` reveals 3 pods of particular interest: the
+"hub" pod (`hub-787b87b8bd-fs6h8`) which handles login and "master control" of user servers, the NFS server pod (`nfs-example-simplehomedrive-dep-0`), and a single user-server pod (`jupyter-oneils`): 
+
+```
+NAME                                READY   STATUS    RESTARTS   AGE
+continuous-image-puller-fxxjz       1/1     Running   0          4d
+continuous-image-puller-wr5cg       1/1     Running   0          4d
+hub-787b87b8bd-fs6h8                1/1     Running   0          5h32m
+jupyter-oneils                      1/1     Running   0          10m
+nfs-example-simplehomedrive-dep-0   1/1     Running   0          4d
+proxy-f895989c6-68spb               1/1     Running   0          4d
+```
+
+Viewing logs for one of these pods is as simple as 
+
+```bash
+kubectl logs -n <hubName> <podName>
+```
+
+For example, `kubectl logs -n example-simple hub-787b87b8bd-fs6h8` shows the logs for the hub. In some cases a pod may fail and auto-restart; if this happens adding a `--previous` option will show logs for the previous failed pod for debugging. Other options of interest include `--tail <numberOfLines>` to show only the last `<numberOfLines>` lines, and `--follow` to watch as new logs are added. Hub logs especially can provide a variety of useful information, as can viewing a pods' metadata with `describe`, as in `kubectl describe pod -n simple-example hub-787b87b8bd-fs6h8`, especially the output listed in the `events` section. 
+
+We can also log into a pod to interact with the filesystem directly. The general syntax is
+
+```bash
+kubectl exec -n <hubName> -it <podName> -- <command>
+```
+
+This can be especially useful for logging into the NFS server pods to access user data directly (as root in this case), for example with
+
+```bash
+kubectl exec -n example-simple -it nfs-example-simplehomedrive-dep-0 -- /bin/bash
+```
+The NFS server exports the `/nfsshare` directory, and this can provide a means to offload data to another server or external system via `scp` or similar (you may need to install `scp` or the tool you wish to use first). 
+
+Finally, to delete a pod use
+
+```bash
+kubectl delete pod -n <hubName> <podName>
+```
+
+Removing user-server pods this way stops their processes and turns off the server, much as if the server had died via more natural means. However, pods controlled by a a kubernetes replicaset or similar will auto-restart (possibly with a new randomized name). For example, you can delete the hub pod, and use `kubectl get pods -n <hubName>` to watch as kubernetes starts another to take its place. This doesn't even interrupt ongoing user servers and their work and access! (Though the hub pod controls login, so logging in will be temporarily affected while the new hub pod comes online). Try it! (Warning: theoretically removing the NFS server pod also causes it to restart with user data intact, but we haven't tested this. Additionally, it will likely cause other pods--specifically the hub and user pods--to hang as they lose their NFS mount.)
 
