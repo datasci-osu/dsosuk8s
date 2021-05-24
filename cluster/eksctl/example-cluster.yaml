@@ -35,6 +35,7 @@ nodeGroups:
     volumeSize: 20
     labels: 
       nodegroup-role: clustertools
+      nodesize: t3a.large
     tags:
       nodegroup-role: clustertools
     # https://github.com/weaveworks/eksctl/issues/1460#issuecomment-576366059
@@ -69,6 +70,7 @@ nodeGroups:
     labels:
       nodegroup-role: jhcontrolplane 
       hub.jupyter.org/node-purpose: core
+      nodesize: t3a.large
     tags:
       nodegroup-role: jhcontrolplane
     # https://github.com/weaveworks/eksctl/issues/1460#issuecomment-576366059
@@ -104,6 +106,7 @@ nodeGroups:
     labels:
       nodegroup-role: jhusers
       hub.jupyter.org/node-purpose: user
+      nodesize: t3a.large
     taints:
       hub.jupyter.org/dedicated: user:NoSchedule
     tags:
@@ -137,6 +140,7 @@ nodeGroups:
     labels: 
       nodegroup-role: jhusers
       hub.jupyter.org/node-purpose: user
+      nodesize: t3a.2xlarge
     taints:
       hub.jupyter.org/dedicated: user:NoSchedule
     tags:
@@ -177,6 +181,7 @@ nodeGroups:
       nodegroup-role: jhusers
       hub.jupyter.org/node-purpose: user
       nvidia-gpu: "true"
+      nodesize: g4dn.xlarge
     taints:
       hub.jupyter.org/dedicated: user:NoSchedule
     tags:

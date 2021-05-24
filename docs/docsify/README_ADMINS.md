@@ -348,3 +348,9 @@ helm kush run uninstall dsosuk8s/charts/ds-jupyterlab placeholders
 
 ## Hub Deployment and Management
 
+```
+Hub launch URL: https://hub-green.datasci.oregonstate.edu/example-simple/hub/lti/launch
+Consumer Key: 9cc6ebca80d7aa322cfbafb72565b79f35ee374c22d98f5fa4160fa28a98f330
+Shared Secret: dbc3eb6f43a6ca0256c0a1a60c8fa11a336308cefc770d1afffb635e59e41974
+```
+

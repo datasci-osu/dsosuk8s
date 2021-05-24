@@ -1,8 +1,10 @@
-#!/usr/bin/env -S helm kush upgrade dsosu-playground /datascience/dsosuk8s/charts/ds-jupyterlab --install --kush-interpolate --timeout 10m0s --values
-#!/usr/bin/env -S helm kush template dsosu-playground /datascience/dsosuk8s/charts/ds-jupyterlab --kush-interpolate --values
-#!/usr/bin/env -S helm kush run uninstall /datascience/dsosuk8s/charts/ds-jupyterlab dsosu-playground
+# requires helm-kush plugin from https://github.com/oneilsh/helm-kush
 
+# example deployment:
+# helm kush upgrade example-profiles ../charts/ds-jupyterlab --install --kush-interpolate --timeout 10m0s --values <thisfile>
 
+# example uninstall:
+# helm kush run uninstall ../charts/ds-jupyterlab example-profiles
 ---
 
 kubeContext: hub-green
@@ -28,7 +30,7 @@ jupyterhub:
     - display_name: "Large"
       description: "For slightly larger computation needs: 0.25 CPU gauranteed (2.0 maximum where available) and 2G RAM gauranteed (4G max where available). <br /><br />Please note that servers with this profile may take longer than usual to start."
       slug: "large"
-      kubespawner_override: {mem_guarantee: 2.0G, mem_limit: 4.0G, cpu_gaurantee: 0.25, cpu_limit: 2.0}
+      kubespawner_override: {mem_guarantee: 1.9G, mem_limit: 4.0G, cpu_gaurantee: 0.25, cpu_limit: 2.0}
       quota:
         minBalanceToSpawn: 0.5
         admins: {initialBalance: 4, newTokensPerDay: 2, maxBalance: 8}
@@ -36,18 +38,17 @@ jupyterhub:
     - display_name: "X-Large"
       description: "For heavy computation needs: 0.5 CPU gauranteed (8.0 maximum where available) and 8G RAM gauranteed (12G max where available). <br /><br />Please note that servers with this profile may take longer than usual to start."
       slug: "xlarge"
-      kubespawner_override: {mem_guarantee: 8.0G, mem_limit: 12.0G, cpu_gaurantee: 0.5, cpu_limit: 8.0}
+      kubespawner_override: {mem_guarantee: 7.9G, mem_limit: 12.0G, cpu_gaurantee: 0.5, cpu_limit: 8.0}
       quota:
         minBalanceToSpawn: 0.5
-        admins: {initialBalance: 4, newTokensPerDay:  1, maxBalance: 6}
+        admins: {initialBalance: 4, newTokensPerDay:  1, maxBalance: 6, active: false}
         users:  {initialBalance: 4,  newTokensPerDay: 1, maxBalance: 6}
-      image: "localhost:30050/oneilsh/jupyterlab-ubuntu-nvidia-scipy-rjulia:v1.1.0"
     - display_name: "X-Large w/ GPU"
       description: "GPU-Based Compute: 4.0 CPU, 16G RAM, and one NVIDIA T4 GPU gauranteed. Tensorflow installed. <br /><br />Please note that servers with this profile *will* take longer than usual to start."
       slug: "gpu"
       kubespawner_override:
-        mem_guarantee: 10.0G
-        mem_limit: 14.0G
+        mem_guarantee: 15.5G
+        mem_limit: 16.0G
         cpu_gaurantee: 3.5
         cpu_limit: 4.0
         extra_resource_limits: {"nvidia.com/gpu": "1"}
@@ -55,5 +56,5 @@ jupyterhub:
       quota:
         minBalanceToSpawn: 1
         admins: {initialBalance: 4, newTokensPerDay:  1, maxBalance: 4}
-        users:  {initialBalance: 4, newTokensPerDay:  1, maxBalance: 4}
+        users:  {initialBalance: 4, newTokensPerDay:  1, maxBalance: 4, disabled: true}
      
