@@ -47,7 +47,7 @@ jupyterhub:
       description: "GPU-Based Compute: 4.0 CPU, 16G RAM, and one NVIDIA T4 GPU gauranteed. Tensorflow installed. <br /><br />Please note that servers with this profile *will* take longer than usual to start."
       slug: "gpu"
       kubespawner_override:
-        mem_guarantee: 15.5G
+        mem_guarantee: 15.0G
         mem_limit: 16.0G
         cpu_gaurantee: 3.5
         cpu_limit: 4.0
