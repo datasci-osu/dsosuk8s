@@ -102,3 +102,75 @@ First, when the system administrator creates the hub, they will need one or more
 The Signup! page is linked from this login page, and will redirect to `https://some.hostname.edu/hubname/hub/signup`. This is where students and others can signup to gain access by specifying a username and password, but beware that the signup and login pages *look very similar* (both show a similar username/password box and orange header). The initial admin user (probably you) must also use this signup page to set the password for their corresponding initial admin username. After navigating back to to the login page, the admin user can then login with that password as they are pre-authorized.
 
 Two other important pages do not have direct links in the interface: `https://some.hostname.edu/hubname/hub/authorize`, where admin users can authorize and de-authorize signed-up accounts, and `https://some.hostname.edu/hubname/hub/change-password`, where users can change their passwords if they wish. 
+
+## Managing Your Server
+
+When logging into a hub, you will be presented with the opportunity to "Start My Server" (first screenshot below) or to access your already-running server (second screenshot) if one already happens to be running from a previous session. 
+
+![](media/start_my_server.png ':size=40%') ![](media/stop_my_server.png ':size=40%')
+
+If starting a new server and the hub has implemented optional profiles, you'll be given the opportunity to select the profile of the server as described above. 
+
+If there are not enough resources available to start the server (which usually happens when using a larger profile or many other users are logging in simultaneously), login can take several minutes while a new cloud-based node (virtual machine) is created to host the server. **Note: during this time you may see warnings indicating "pod didn't trigger scale up"; these are normal and not an indication of an error.** Please give the login process up to 10 minutes to start; startup times longer than this can be reported by hub admins to the system administrator for investigation. 
+
+![](media/scale_up_scary_warning.png ':size=60%') 
+
+After your server starts you'll be taken to the main JupyterLab interface. To return to the server management interface, aka the *Hub Control Panel*, in JupyterLab navigate to **File -> Hub Control Panel**. From the default 'Home' tab you can also stop your running server--for exampe to be a good samaritan and free resources for use by others, or to start a new server with a different profile. (Stopping your server also stops any processes or analyses running inside it.)
+
+Remember: servers are subject to being stopped automatically due to "inactivity" (after 1 hour for most hubs), or after a maximum runtime (8 hours for most hubs). Activity is defined as a browser tab open to the JupyterLab interface; closing this browser tab to work in RStudio for example (which opens in a new tab) will make you 'inactive' even if you are actively computing, and leaving the JupyterLab interface tab open but doing nothing counts as activity. 
+
+## Managing Other Servers/Hub Admin
+
+As a hub admin, you can also start and stop servers on behalf of other users via the 'Admin' tab of the Hub Control Panel (found via the JupyterLab interface under **File -> Hub Control Panel**):
+
+![](media/hub_control_admin.png ':size=60%') 
+
+Pre-starting user servers ~30 minutes before a class or workshop can be a convenient way to ensure users don't need to wait on scale-up events during login. If the hub is configured to use multiple profiles, you'll have to click "start server" for users individually, selecting the profile to start for each. If not using profiles, a "start all" button near the top will appear allowing you to start all servers en masse, though for hubs with more than ~40 users we recommend avoiding this and starting servers in batches or in sequence to help the scheduler coordinate resources efficiently. 
+
+The Admin tab of the hub control panel also allows you to "access" a running server *as that user*, effectively logging you into the users' server with their own username. (The shared-data model of DS@OSU largely obviates this need however.)
+
+Finally, when using the Native Authenticator (not Canvas) you can promote/demote users to admin status via the "edit user" button, and remove user accounts with "delete user." Note that this does *not* delete the users' home directory or data; should the user ever become re-authorized and log back in their information will be intact. When using Canvas login the "edit user" and "delete user" buttons have no effect, as usernames and roles are served by Canvas during login. 
+
+The "Shutdown Hub" button has no real effect - clicking it will stop the hub temporarily preventing login, but a new one will be spawn automatically within minutes to take its place. The "Add Users" button similarly has little use; though one could in theory create a user, start a server for it, and access that server via the "access server" button, there are betters to create test user accounts (see below). 
+
+## Shared Data Space & Permissions
+
+After login the left navigation menu in JupyterLab will show the contents of your hub home directory, as indicated above in the filepath showing `📁/<username>`, where 📁 references `/home` where all hub-specific/shared data lives. (Data outside of `/home` is defined by the server image and cannot be modified.) Clicking this icon reveals all users' home directories (to admins, students only see their own home directory in this view) as all as the `hub_data_share` folder. 
+
+![](media/lab_initial_login.png ':size=45%') &nbsp; &nbsp;
+![](media/terminal_permissions.png ':size=45%') 
+
+Permissions in the hub are configured with Unix permissions to allow admins to read and write everywhere (inside `/home`) including other users' home folders, but for regular users to have read+write in their own home folder and read-only access to contents of `hub_data_share`, which can thus serve as a staging area for course data and materials. By default, files created by an admin user in another users' home folder are readable by that user, but not writable. For advanced users, these behaviors are accomplished via a combination of [umask](https://en.wikipedia.org/wiki/Umask), [setgid bits](https://linuxconfig.org/how-to-use-special-permissions-the-setuid-setgid-and-sticky-bits), and creative default ownership of home directories. All users are part of the `dsusers` group, and admins are additionally part of the `dsadmins` group--you can thus create new folders (inside `hub_data_share` or elsewhere inside `/home`) with custom access schemes via standard Unix permissions tooling.
+
+*Note:* Users are assigned psuedorandom numeric user IDs (UIDs), however the mapping between these and usernames only happens on server start. If you are seeing numeric user IDs instead of usernames when listing files and permissions, try restarting your server to pick up newly added UID <-> username mappings. 
+
+## Testing Student Permissions
+
+Given the intricacies of file Unix permissions, it is important to periodically test that permissions are properly setup to allow the intended access: assigning students a homework they can't access is a sure way to make them feel unwelcome!
+
+If are your using the Native Authenticator (non-Canvas login), the best way to do so is to simply signup with a 'teststudent' (or similar) user account for your own use. 
+
+When using Canvas, you can instead use the [Student View](https://community.canvaslms.com/t5/Instructor-Guide/How-do-I-view-a-course-as-a-test-student-using-Student-View/ta-p/1122) feature provided by Canvas. Before doing so, first login to the hub with your regular admin/instructor account and then **log out** of the hub via the JupterLab interface under **File -> Log Out**. 
+
+![](media/lab_logout.png ':size=45%') 
+
+Next, in Canvas, open the Student View and then re-open the hub--this will open the hub as the student view user, with a username consisting of random letters and numbers. (The need to explicitly logout first is because otherwise the hub will remember your previous login session and not pickup the test from the canvas student view.)
+
+## Installing Packages & Scripts Hub-Wide
+
+Users generally are able to install Python packages, R packages, and command-line utilities in their home folders via standard means (`pip install --user`, `install.packages()`, etc.). For convenience, as an admin you can also install such tools for all users of your hub. 
+
+**Python packages** can be installed in to the hub Python library with the custom `hubpip` utility (a simple wrapper around `pip --prefix=/home/.hub_local/python_libs`, where that package library is by default in users' `$PYTHONPATH`). For example, to install the `black` package just open a terminal and run `hubpip install black`. 
+
+Note that as of this writing, this hub python library takes precendence over user libraries, which in turn take precendence over default installed package versions; it needs to be fixed so that user-installed library versions take precendence.
+
+**R packages** from CRAN can be installed in the hub R library with the custom `hub.install.packages()` function, for example `hub.install.packages("rstackdeque")`. Similar helpers exist for installing hub-wide from BioConductor, as in `hub.install_bioconductor("DESeq2")`, and GitHub, as in `hub.install_github("oneilsh/tidytensor")`. 
+
+By default, packages installed by a user ini their own home directory with `install.packages()` or similar will take precendence over the hub library, which in turn takes precendence over default installed versions. 
+
+**Command-line scripts and software** can also be installed hub-wide; the path `/home/.hub_local/bin` is in all users' `$PATH`, so executables placed here are available for everyone. For configure/make/make install-based installations you should use `./configure --prefix=/home/.hub_local` so that `make && make install` will place binaries here. 
+
+Unfortunately, while you are free to modify anything in the shared data space `/home`, we cannot give hub admins `sudo` or root access or the ability to install system-level software with Ubuntu's `apt-get`. If you need such a system-level package or dependency, please reach out to your system administrator. 
+
+
+
