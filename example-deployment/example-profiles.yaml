@@ -16,6 +16,8 @@ createHomeDrive:
   size: 50Gi
   chart: https://datasci-osu.github.io/dsosuk8s/nfs-drive-1.1.0.tgz
 
+authType: native
+adminUsers: oneils
 
 jupyterhub:
   singleuser:
