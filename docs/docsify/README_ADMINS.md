@@ -134,7 +134,7 @@ helm kush upgrade master-ingress dsosuk8s/charts/eksctl-autoscaler --install --k
 
 *A special note about the AWS autoscaler*: due to the way previous versions of the AWS autoscaler worked, it may be unaware of resources provided by nodepools
 until it sees at least one node from that nodepool, causing known issues with scaling from 0. (Though these issues may be fixed with [`recent improvements`](https://eksctl.io/usage/autoscaling/#scaling-up-from-0) to
-AWS and eksctl, your milage may vary). It is for this reason that the example `eksctl` cluster definition files sets the desired size for new nodepools to 1: the
+AWS and eksctl, [your milage may vary](https://github.com/kubernetes/autoscaler/issues/3780)). It is for this reason that the example `eksctl` cluster definition files sets the desired size for new nodepools to 1: the
 cluster is created with a single node in every pool, and when the autoscaler comes online it uses these to determine nodepool resources. Then, it should
 realize that some of these are running no workloads and scale them back down to 0. If for some reason you find that the nodepool is not scaling up from 0
 as expected, try setting the minimum size to 1 in the AWS GUI console (in the EC2 panel, under autoscaling groups), or with `eksctl scale` which should
@@ -743,4 +743,5 @@ This latter reason might be avoided on infrastructures other than AWS; because k
 
 The former reason might be also be difficult to avoid, but at least this reason doesn't require `CAP_SYS_ADMIN`. The NFS mount points are not protected by `root_squash` as permissions are configured via root-owned files in the shared NFS space (and written by the containers prior to permissions dropping). On the whole, this means that should a user find a `root`-level escalation exploit, they could in theory re-mount the shared data space for their hub with read+write as root as well. Given that NFS mounts are available cluster-wide, such an exploit could permit re-mounting *any* hub's data. Kubernetes network policies that restrict traffic between namespaces should negate this risk but haven't been implemented yet.
 
-It is thus important to be aware of potential root-level exploits and keep user-facing docker images up to date accordingly. We continue to investigate alternatives for shared data spaces (especially first-class kubernetes RWX volumes) and rootless permission attribution.
+It is thus important to be aware of potential root-level exploits and keep user-facing docker images up to date accordingly. We continue to investigate alternatives for shared data spaces (especially first-class kubernetes RWX volumes) and rootless permission attribution (for which init containers may be a solution).
+
