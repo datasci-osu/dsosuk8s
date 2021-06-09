@@ -13,7 +13,7 @@ certifi==2020.6.20        # via kubernetes, requests
 certipy==0.1.3            # via jupyterhub
 cffi==1.14.2              # via bcrypt, cryptography
 chardet==3.0.4            # via requests
-cryptography==3.2         # via pyjwt, pyopenssl
+cryptography==3.3.2       # via pyjwt, pyopenssl
 decorator==4.4.2          # via traitlets
 entrypoints==0.3          # via jupyterhub
 escapism==1.0.1           # via jupyterhub-kubespawner

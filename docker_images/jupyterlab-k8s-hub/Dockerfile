@@ -105,9 +105,10 @@ WORKDIR /root
 RUN pip3 install jupyterhub-ltiauthenticator
 RUN pip3 install git+https://github.com/oneilsh/ltiauthenticator.git@multi-key
 
-# TARGET jupyterlab-k8s-hub v1.5.5 
+# TARGET jupyterlab-k8s-hub v1.5.6
 
 # changelog
+# 1.5.6; 6/9/21 - another dependabot update, to cryptography==3.3.2
 # 1.5.5; 6/9/21 - updated libs due to github dependabot alerts (rsa, PyYAML, jinja2, cryptography; urllib3 cannot be updated [conflict] but is a denial of service risk only, https://cve.mitre.org/cgi-bin/cvename.cgi?name=CVE-2021-33503)
 # 1.5.4; 2/26/21 - added back nativeauthentictor, udpate to latest jupyterhub 1.3
 
