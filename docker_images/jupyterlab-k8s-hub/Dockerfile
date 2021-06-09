@@ -1,4 +1,4 @@
-FROM ubuntu:18.04
+FROM ubuntu:18.04 as jupyterlab-k8s-hub
 # forked from https://github.com/jupyterhub/zero-to-jupyterhub-k8s/blob/master/images/hub/Dockerfile
 
 ARG JUPYTERHUB_VERSION=1.1.*
@@ -90,6 +90,7 @@ RUN apt-get update \
 # created a fork that has most of the pull requests, 
 # but not this one which is buggy: https://github.com/jupyterhub/nativeauthenticator/pull/88
 # we'll put it in /usr/local/lib/nativeauthenticator
+
 # to use the fancy template (https://github.com/jupyterhub/nativeauthenticator/pull/79)
 # add c.JupyterHub.template_paths = ["/usr/local/lib/nativeauthenticator/nativeauthenticator/templates/"] to config
 # (/home/jovyan is the container user, so that's where we have write/install privs other than /tmp)
@@ -104,10 +105,10 @@ WORKDIR /root
 RUN pip3 install jupyterhub-ltiauthenticator
 RUN pip3 install git+https://github.com/oneilsh/ltiauthenticator.git@multi-key
 
-#IMAGE oneilsh/jupyterlab-k8s-hub
-#TAG v1.5.4
+# TARGET jupyterlab-k8s-hub v1.5.5 
 
 # changelog
+# 1.5.5; 6/9/21 - updated libs due to github dependabot alerts (rsa, PyYAML, jinja2, cryptography; urllib3 cannot be updated [conflict] but is a denial of service risk only, https://cve.mitre.org/cgi-bin/cvename.cgi?name=CVE-2021-33503)
 # 1.5.4; 2/26/21 - added back nativeauthentictor, udpate to latest jupyterhub 1.3
 
 WORKDIR /srv/jupyterhub
