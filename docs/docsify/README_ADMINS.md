@@ -678,3 +678,69 @@ kubectl delete pod -n <hubName> <podName>
 
 Removing user-server pods this way stops their processes and turns off the server, much as if the server had died via more natural means. However, pods controlled by a a kubernetes replicaset or similar will auto-restart (possibly with a new randomized name). For example, you can delete the hub pod, and use `kubectl get pods -n <hubName>` to watch as kubernetes starts another to take its place. This doesn't even interrupt ongoing user servers and their work and access! (Though the hub pod controls login, so logging in will be temporarily affected while the new hub pod comes online). Try it! (Warning: theoretically removing the NFS server pod also causes it to restart with user data intact, but we haven't tested this. Additionally, it will likely cause other pods--specifically the hub and user pods--to hang as they lose their NFS mount.)
 
+
+## Cost Evaluation
+
+The cost of running DS@OSU is difficult to predict exactly, due to autoscaling depending actual usage and demand over time. To make matters worse, although both the scheduler and autoscaler are designed to maximize resource utilization, it will never be 100%--a single compute node (cloud VM) may reliably cost $0.30/hr, but in one hour it might be 90% used by 24 students from 5 different classes, and in the next may be only 20% used by 4 students from a single class. Only post-hoc cost breakdowns could reliably factor out these costs accurately on a per-class or per-user basis, and we do not yet have tools designed to do so. One could of course isolate clusters (or even nodepools within a cluster) as cost-accounting units, but doing so hobbles the ability of the scheduler and autoscaler to most efficiently allocate resources and save on costs. These are options, however, for those needing strictly isolated accounting. 
+
+### Base Cluster Cost
+
+All that said, we can compute the rough **base cost** for running a cluster on AWS supporting a minimal number of students, and then attempt to describe additional costs as usage grows based on hypothetical usage patterns. 
+
+As mentioned elsewhere, DS@OSU currently only supports AWS. While the below doesn't cover every cost item involved, it does hit the top items, including the AWS EKS service, supporting networking services (load balancer, NAT gateway), a cluster support tooling node (for ingress, autoscaler, scheduler, etc), one "hub control plane" node (for hub-central resources like login processes and proxies), and one "user node" to host user servers. 
+
+Costs shown are for the `us-west-2` AWS region as of 6/8/2021 and we consider 1 month to be 28 days (4 weeks).
+
+| AWS Resource | Description | ~ Cost in $/mo (4 weeks) |
+| --- | --- | --- | 
+| AWS EKS | Kubernetes Cluster Service | 67.20 | 
+| Load Balancer (Classic) | Networking | 16.80 |
+| NAT Gateway | Networking | 30.24 |
+| t3a.large w/ 20G EBS Storage | Cluster Tooling | 52.53 |
+| t3a.large w/ 60G EBS Storage | Hub Control Plane | 56.53 |
+| t3a.large w/ 60G EBS Storage | User Node | 56.53 |
+|    |    |  **279.83** |
+
+Note that the last three costs can be reduced by up to 50% by utilizing reserved instances on AWS (with between 1 and 3 year reservations) rather than on-demand pricing. 
+
+This cluster and the primary user-facing resource (the t3a.large User Node instance with 2 CPUs and 8G of RAM) can support up to 16 simultaneous users performing basic coding and computation (i.e., 12.5% of a CPU core and 0.5G RAM usage), but this does not account for user data storage (at $0.10/GB/Month on AWS EBS) or data transfer (~ 0.06 per GB through the NAT Gateway and Load Balancer). 
+
+### Multiple Clusters and Other Costs
+
+From a system administration perspective we recommend running multiple clusters whenever it makes sense to do so: one 'production' cluster for hosting actual users, and another 'development' cluster for testing and practicing potentially disruptive management operations (e.g. software updates, practicing restoring data backups, etc). Finally, don't forget to factor in personnel costs, as managing DS@OSU requires at least basic familiarity with many in-demand skills including Docker, Kubernetes, and AWS. 
+
+### Cost Per Student?
+
+Estimating additional costs as usage scales to dozens of classes and hundreds or thousands of users depends almost entirely on the composition of work and usage. For light work a t3a.large node as described above can support up to 16 users simultaneously without difficulty, but for heavier classes where we gaurantee more resources per user that number will be reduced. While most costs beyond the "base" above can be computed per-user, others are at the hub/class level. Every hub for example requires 1/16 a t3a.large "hub control plane" node (1/16 of $56.53, or $3.53, per month, but only if enough courses are running to get to 100% utilization of these), and courses with heavy data storage needs will require more storage and bandwidth (at $0.10/GB/month + ~$0.06/GB in transfer costs) that don't scale with the number of students directly.
+
+#### Example 1
+
+Let's consider a hypothetical large introduction to programming class for 400 students; here the instructor supposes they will want a single hub ($3.53/Mo) with 1G of storage per student ($0.10/Student/Month) and 20G extra as "buffer" ($2/Mo). For this workload (assuming 0.5G to 1G of RAM usage per student) the extra compute costs come out to between $0.0094 and $0.0047 per student, per hour, assuming 100% resource utilization (a `t3a.large` instance costs $0.0752/hr on-demand, and can host between 8 students at 1G of RAM each to 16 students at 0.5G RAM each). Let's assume $0.01/student/hr for simplicity and generosity. Resource utilization is never 100% (we're always paying for more than what we need), if we naively assume 50% utilization we'll double that to $0.02/student/hr. If we assume the average student actively works on the system for 6 hours per week, and account for their server running ~50% extra time while inactive, we'll suppose 10 hours per student per week at this cost, or ~$0.80/Student/Month. In summary, we'd estimate approximately $0.90/student/month for this course (storage plus compute) plus an extra ~$10/Month for the hub itself (buffer storage and hub control plane node assuming 50% utilization). 
+
+#### Example 2
+
+Let's consider another, a smaller 30 student class where students are to perform moderate bioinformatics analyses. The instructor wants to upload about 100G of data (costing about $6 in transfer fees), and expects the students to use around 20G of data each over the term; to provide a measure of safety we'll allocate the 100G (for a "base" hub cost of closer $15/Month) and 30G/Student ($0.30/Student/Month). The intructor plans to assign 4 hours of light computation homework per week (for which we'll use the same $0.02/Student/hr estimate with adjustment for inactivity, ~$0.48/Student/Month), as well as a weekly assignment that will require between 8 and 16G of RAM and run for up to 2 hours. These RAM requirements are significantly more expensive, but fortunately within the `t3a` node class the costs scale linearly, so we can expect the hourly costs to be 16X as much, or ~$0.32/Student/hr, and with the same adjustments we can figure these extra assignments will cost $3.84/Student/Month ($0.32 * 1.5 * 2 hrs/week). To summarize, we estimate this hub to cost $6 to set up and $15/Month to run, as well as $4.16/Student/Month.
+
+#### GPUs
+
+Lastly, while DS@OSU provides experimental support for GPU-based compute (for e.g. deep learning), these resources aren't cheap, at minimum $0.90 *per hour* for a single GPU as part of a `g4dn.2xlarge` AWS node. 
+
+### Cost Wrapup
+
+Hopefully it's clear that the cost estimates above will inevitably be wildly inaccurate: they simply require too many assumptions about usage patterns and we've simplified the dynamic nature of the system considerably. Consider that in the middle of the night resource usage is very low, but we always leave some "lights on" for students wishing to working late. The assumption of 50% utilization is a guess (though not too far from reality in our experience), and in reality varies considerably on time of day and overall cluster size. A cluster with 3 classes and 100 users will likely be low utilization efficiency most of the time with peaks of higher efficiency, while one with 50 classes and 1000 users should see the overall utilization be higher and smoother. 
+
+For what it's worth, the Z2JH project (the basis for DS@OSU) has collected some cost information [here](https://zero-to-jupyterhub.readthedocs.io/en/latest/administrator/cost.html). You may also find useful the [cost breakdown](https://github.com/jupyterhub/binder-billing) for mybinder.org, a large-scale system with similar architecture (but run primarily on Google GCP).
+
+In any case, the autoscaling nature of DS@OSU provide an opportunity for reasonable base system costs (on the order of a several hundred dollar per month) and efficient per-student costs (on the order of dollars per month per student). Still, it is wise to consider the personnel costs of running a complex kubernetes-based service, as well as ancillary IT costs such as development and testing clusters, demo hubs, and so on. 
+
+## Security
+
+DS@OSU was designed for light security requirements--authentication when using Canvas leverages Canvas' security and access measures, and all traffic in and out of the cluster is encrypted (TLS). Traffic inside the cluster pertaining to data transfer is unencrypted (since we use in-cluster NFS mounts), but permissions are used to prevent unauthorized data access. 
+
+In the interest of full disclosure, there are some security considerations worth noting. In most applications of Docker or Kubernetes, containers are not normally run with the `root` user. DS@OSU does run containers with `root`, but then `sudo` is used to drop permissions before starting the user-facing web interface. There are two reasons for this: first, running the container as `root` before dropping priveledges supports the admin/user permissions distinction. Second, the shared data space is mounted via NFS, which can only be done by `root` from the container via `mount` (see next paragraph), and furthermore requires the container be given the `CAP_SYS_ADMIN` [capability](https://opensource.com/business/14/9/security-for-docker). 
+
+This latter reason might be avoided on infrastructures other than AWS; because kubernetes supports NFS-mounted volumes as a native volume type, the container *shouldn't* need to run `mount` itself. However, this is only possible when the cluster *nodes* can resolve DNS entries in the cluster itself (since the NFS servers are in-cluster and managed by kubernetes, but kubernetes NFS volume mounts are resolved by the host OS). On GCP it appears cluster nodes do have kubedns resolution, whereas on AWS they do/did not. 
+
+The former reason might be also be difficult to avoid, but at least this reason doesn't require `CAP_SYS_ADMIN`. The NFS mount points are not protected by `root_squash` as permissions are configured via root-owned files in the shared NFS space (and written by the containers prior to permissions dropping). On the whole, this means that should a user find a `root`-level escalation exploit, they could in theory re-mount the shared data space for their hub with read+write as root as well. Given that NFS mounts are available cluster-wide, such an exploit could permit re-mounting *any* hub's data. Kubernetes network policies that restrict traffic between namespaces should negate this risk but haven't been implemented yet.
+
+It is thus important to be aware of potential root-level exploits and keep user-facing docker images up to date accordingly. We continue to investigate alternatives for shared data spaces (especially first-class kubernetes RWX volumes) and rootless permission attribution.
