@@ -1,6 +1,5 @@
 FROM jupyterlab-ubuntu-nvidia-scipy-rjulia as jupyterlab-ubuntu-nvidia-scipy-rjulia-gpu
 
-# TARGET jupyterlab-ubuntu-nvidia-scipy-rjulia-gpu v1.1.1
 # 1.1.1: upgrade sudo to address root exploit https://ubuntu.com/security/notices/USN-4705-1
 
 ############################################################################
