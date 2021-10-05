@@ -24,18 +24,19 @@ spec:
 {{- end }}
       serviceAccountName: cluster-autoscaler
       containers:
-        - image: us.gcr.io/k8s-artifacts-prod/autoscaling/cluster-autoscaler:v1.16.6
+        - image: us.gcr.io/k8s-artifacts-prod/autoscaling/cluster-autoscaler:v1.16.7
           name: cluster-autoscaler
           resources:
             limits:
               cpu: 100m
-              memory: 300Mi
+              memory: 600Mi
             requests:
               cpu: 100m
               memory: 300Mi
           command:
             - ./cluster-autoscaler
-            - --v=3
+            - --v=4
+            - --logtostderr=true
             - --stderrthreshold=warning
             - --cloud-provider=aws
             - --skip-nodes-with-local-storage=0
