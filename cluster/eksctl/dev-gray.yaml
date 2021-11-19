@@ -1,0 +1,204 @@
+apiVersion: eksctl.io/v1alpha5
+kind: ClusterConfig
+
+metadata:
+  name: dev-gray
+  region: us-west-2
+  version: "1.21"
+
+availabilityZones: ["us-west-2a", "us-west-2b", "us-west-2c"]
+
+nodeGroups:
+  - name: clustertools
+    ami: auto
+    instanceType: mixed
+    desiredCapacity: 1
+    minSize: 1
+    maxSize: 4
+    volumeSize: 20
+    volumeType: gp2
+    ssh:
+      allow: true
+      publicKeyPath: /datascience/keys/sshkeys/eksctl_id_rsa.pub
+    iam:
+      attachPolicyARNs:
+        - arn:aws:iam::aws:policy/service-role/AmazonEC2RoleforSSM
+        - arn:aws:iam::aws:policy/AmazonEKS_CNI_Policy
+        - arn:aws:iam::aws:policy/AmazonEKSWorkerNodePolicy
+        - arn:aws:iam::aws:policy/AmazonEC2ContainerRegistryReadOnly
+      withAddonPolicies:
+        autoScaler: true
+        ebs: true
+    instancesDistribution:
+      onDemandPercentageAboveBaseCapacity: 0
+      instanceTypes:
+        - t3.large
+      spotInstancePools: 1
+    tags:
+      nodegroup-role: clustertools
+      k8s.io/cluster-autoscaler/enabled: 'true'
+    labels:
+      nodegroup-role: clustertools 
+      lifecycle: Ec2Spot
+    privateNetworking: true
+    availabilityZones: ["us-west-2b"]
+    # https://github.com/weaveworks/eksctl/issues/1460#issuecomment-576366059
+    kubeletExtraConfig:
+      readOnlyPort: 0
+      protectKernelDefaults: true  # (setting this required the preBootstrapCommands below)
+      eventRecordQPS: 0
+    preBootstrapCommands:
+      - "#!/bin/bash -xe"
+      - "cat > /etc/sysctl.d/90-kubelet.conf << EOF \nvm.overcommit_memory=1 \nkernel.panic=10 \nkernel.panic_on_oops=1 \nEOF"
+      - "sysctl -p /etc/sysctl.d/90-kubelet.conf"
+      # Not sure if these are loaded by default on Amazon Linux 2, but worth blacklisting anyway RE https://kubernetes.io/docs/tasks/administer-cluster/securing-a-cluster/#preventing-containers-from-loading-unwanted-kernel-modules
+      - "echo blacklist dccp >> /etc/modprobe.d/kubernetes-blacklist.conf"
+      - "echo blacklist sctp >> /etc/modprobe.d/kubernetes-blacklist.conf"
+
+  - name: jhcontrolplane
+    ami: auto
+    instanceType: mixed
+    desiredCapacity: 1
+    minSize: 1
+    maxSize: 10
+    volumeSize: 30
+    volumeType: gp2
+    ssh:
+      allow: true
+      publicKeyPath: /datascience/keys/sshkeys/eksctl_id_rsa.pub
+    iam:
+      attachPolicyARNs:
+        - arn:aws:iam::aws:policy/service-role/AmazonEC2RoleforSSM
+        - arn:aws:iam::aws:policy/AmazonEKS_CNI_Policy
+        - arn:aws:iam::aws:policy/AmazonEKSWorkerNodePolicy
+        - arn:aws:iam::aws:policy/AmazonEC2ContainerRegistryReadOnly
+      withAddonPolicies:
+        autoScaler: true
+        ebs: true
+        albIngress: true
+        cloudWatch: true
+    instancesDistribution:
+      onDemandPercentageAboveBaseCapacity: 0
+      instanceTypes:
+        - t3.large
+      spotInstancePools: 10
+    tags:
+      nodegroup-role: jhcontrolplane
+    labels:
+      nodegroup-role: jhcontrolplane
+      hub.jupyter.org/node-purpose: core
+      lifecycle: Ec2Spot
+    privateNetworking: true
+    availabilityZones: ["us-west-2b"]
+    # https://github.com/weaveworks/eksctl/issues/1460#issuecomment-576366059
+    kubeletExtraConfig:
+      readOnlyPort: 0
+      protectKernelDefaults: true  # (setting this required the preBootstrapCommands below)
+      eventRecordQPS: 0
+    preBootstrapCommands:
+      - "#!/bin/bash -xe"
+      - "cat > /etc/sysctl.d/90-kubelet.conf << EOF \nvm.overcommit_memory=1 \nkernel.panic=10 \nkernel.panic_on_oops=1 \nEOF"
+      - "sysctl -p /etc/sysctl.d/90-kubelet.conf"
+      # Not sure if these are loaded by default on Amazon Linux 2, but worth blacklisting anyway RE https://kubernetes.io/docs/tasks/administer-cluster/securing-a-cluster/#preventing-containers-from-loading-unwanted-kernel-modules
+      - "echo blacklist dccp >> /etc/modprobe.d/kubernetes-blacklist.conf"
+      - "echo blacklist sctp >> /etc/modprobe.d/kubernetes-blacklist.conf"
+
+  - name: jhworkers
+    ami: auto
+    instanceType: mixed
+    desiredCapacity: 1
+    minSize: 1
+    maxSize: 60
+    volumeSize: 30
+    volumeType: gp2
+    ssh:
+      allow: true
+      publicKeyPath: /datascience/keys/sshkeys/eksctl_id_rsa.pub
+    iam:
+      attachPolicyARNs:
+        - arn:aws:iam::aws:policy/service-role/AmazonEC2RoleforSSM
+        - arn:aws:iam::aws:policy/AmazonEKS_CNI_Policy
+        - arn:aws:iam::aws:policy/AmazonEKSWorkerNodePolicy
+        - arn:aws:iam::aws:policy/AmazonEC2ContainerRegistryReadOnly
+      withAddonPolicies:
+        autoScaler: true
+        ebs: true
+    instancesDistribution:
+      onDemandPercentageAboveBaseCapacity: 0
+      instanceTypes:
+        - t3.large
+        - t3.xlarge
+        - t3a.large
+        - t3a.2xlarge
+      spotInstancePools: 20
+    tags:
+      nodegroup-role: jhusers
+      k8s.io/cluster-autoscaler/enabled: 'true'
+    labels:
+      nodegroup-role: jhusers
+      hub.jupyter.org/node-purpose: user
+      lifecycle: Ec2Spot
+    taints:
+      hub.jupyter.org/dedicated: user:NoSchedule
+    privateNetworking: true
+    # https://github.com/weaveworks/eksctl/issues/1460#issuecomment-576366059
+    kubeletExtraConfig:
+      readOnlyPort: 0
+      protectKernelDefaults: true  # (setting this required the preBootstrapCommands below)
+      eventRecordQPS: 0
+    preBootstrapCommands:
+      - "#!/bin/bash -xe"
+      - "cat > /etc/sysctl.d/90-kubelet.conf << EOF \nvm.overcommit_memory=1 \nkernel.panic=10 \nkernel.panic_on_oops=1 \nEOF"
+      - "sysctl -p /etc/sysctl.d/90-kubelet.conf"
+      # Not sure if these are loaded by default on Amazon Linux 2, but worth blacklisting anyway RE https://kubernetes.io/docs/tasks/administer-cluster/securing-a-cluster/#preventing-containers-from-loading-unwanted-kernel-modules
+      - "echo blacklist dccp >> /etc/modprobe.d/kubernetes-blacklist.conf"
+      - "echo blacklist sctp >> /etc/modprobe.d/kubernetes-blacklist.conf"
+
+ # spot GPU NG - west-2a AZ, scale from 0
+  - name: gpu-spot-ng-a
+    ami: auto
+    amiFamily: AmazonLinux2
+    instanceType: mixed
+    desiredCapacity: 1
+    minSize: 0
+    maxSize: 10
+    volumeSize: 30
+    volumeType: gp2
+    volumeEncrypted: true
+    ssh:
+      allow: true
+      publicKeyPath: /datascience/keys/sshkeys/eksctl_id_rsa.pub
+    iam:
+      attachPolicyARNs:
+        - arn:aws:iam::aws:policy/service-role/AmazonEC2RoleforSSM
+        - arn:aws:iam::aws:policy/AmazonEKS_CNI_Policy
+        - arn:aws:iam::aws:policy/AmazonEKSWorkerNodePolicy
+        - arn:aws:iam::aws:policy/AmazonEC2ContainerRegistryReadOnly
+      withAddonPolicies:
+        autoScaler: true
+        ebs: true
+    instancesDistribution:
+      onDemandPercentageAboveBaseCapacity: 0
+      instanceTypes:
+        - p2.xlarge
+        - p2.8xlarge
+        - p2.16xlarge
+      spotInstancePools: 5
+    tags:
+      nodegroup-role: jhusers
+      k8s.io/cluster-autoscaler/node-template/label/nodegroup-role: jhusers
+      k8s.io/cluster-autoscaler/node-template/label/hub.jupyter.org/nodegroup-purpose: user
+      k8s.io/cluster-autoscaler/node-template/taint/hub.jupyter.org/dedicated: "user:NoSchedule"
+      k8s.io/cluster-autoscaler/node-template/taint/dedicated: nvidia.com/gpu=true
+      k8s.io/cluster-autoscaler/node-template/label/nvidia.com/gpu: 'true'
+      k8s.io/cluster-autoscaler/enabled: 'true'
+    labels:
+      lifecycle: Ec2Spot
+      nodegroup-role: jhusers
+      hub.jupyter.org/node-purpose: user
+      nvidia.com/gpu: 'true'
+      k8s.amazonaws.com/accelerator: nvidia-tesla
+    taints:
+      nvidia.com/gpu: "true:NoSchedule"
+      hub.jupyter.org/dedicated: user:NoSchedule
+    privateNetworking: true
