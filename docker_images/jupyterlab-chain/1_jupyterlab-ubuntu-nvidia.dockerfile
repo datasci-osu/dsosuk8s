@@ -31,6 +31,7 @@ RUN apt-get update \
  && apt-get install -yq --no-install-recommends \
     wget \
     bzip2 \
+    zlib1g \
     ca-certificates \
     sudo \
     locales \

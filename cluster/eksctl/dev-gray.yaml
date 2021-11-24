@@ -15,7 +15,7 @@ nodeGroups:
     desiredCapacity: 1
     minSize: 1
     maxSize: 4
-    volumeSize: 20
+    volumeSize: 60
     volumeType: gp2
     ssh:
       allow: true
@@ -32,7 +32,7 @@ nodeGroups:
     instancesDistribution:
       onDemandPercentageAboveBaseCapacity: 0
       instanceTypes:
-        - t3.large
+        - t3a.large
       spotInstancePools: 1
     tags:
       nodegroup-role: clustertools
@@ -61,7 +61,7 @@ nodeGroups:
     desiredCapacity: 1
     minSize: 1
     maxSize: 10
-    volumeSize: 30
+    volumeSize: 90
     volumeType: gp2
     ssh:
       allow: true
@@ -80,7 +80,7 @@ nodeGroups:
     instancesDistribution:
       onDemandPercentageAboveBaseCapacity: 0
       instanceTypes:
-        - t3.large
+        - t3a.large
       spotInstancePools: 10
     tags:
       nodegroup-role: jhcontrolplane
@@ -108,8 +108,8 @@ nodeGroups:
     instanceType: mixed
     desiredCapacity: 1
     minSize: 1
-    maxSize: 60
-    volumeSize: 30
+    maxSize: 30
+    volumeSize: 90
     volumeType: gp2
     ssh:
       allow: true
@@ -126,10 +126,10 @@ nodeGroups:
     instancesDistribution:
       onDemandPercentageAboveBaseCapacity: 0
       instanceTypes:
-        - t3.large
-        - t3.xlarge
         - t3a.large
+        - t3a.xlarge
         - t3a.2xlarge
+        - m6i.4xlarge
       spotInstancePools: 20
     tags:
       nodegroup-role: jhusers
@@ -162,7 +162,7 @@ nodeGroups:
     desiredCapacity: 1
     minSize: 0
     maxSize: 10
-    volumeSize: 30
+    volumeSize: 90
     volumeType: gp2
     volumeEncrypted: true
     ssh:
