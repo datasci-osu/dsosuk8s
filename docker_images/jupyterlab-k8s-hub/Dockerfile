@@ -1,7 +1,7 @@
 FROM ubuntu:18.04 as jupyterlab-k8s-hub
 # forked from https://github.com/jupyterhub/zero-to-jupyterhub-k8s/blob/master/images/hub/Dockerfile
 
-ARG JUPYTERHUB_VERSION=1.1.*
+ARG JUPYTERHUB_VERSION=1.3.*
 
 RUN apt-get update && \
     apt-get install -y --no-install-recommends \
@@ -45,6 +45,7 @@ RUN adduser --disabled-password \
 
 RUN python3 -m pip install --upgrade --no-cache setuptools pip
 COPY requirements.txt /tmp/requirements.txt
+
 RUN PYCURL_SSL_LIBRARY=openssl pip3 install --no-cache-dir \
          -r /tmp/requirements.txt \
          $(bash -c 'if [[ $JUPYTERHUB_VERSION == "git"* ]]; then \
@@ -105,9 +106,10 @@ WORKDIR /root
 RUN pip3 install jupyterhub-ltiauthenticator
 RUN pip3 install git+https://github.com/oneilsh/ltiauthenticator.git@multi-key
 
-# TARGET jupyterlab-k8s-hub v1.5.6
+# TARGET jupyterlab-k8s-hub v1.5.7
 
 # changelog
+# 1.5.7; 11/29/21 - fixing hub version
 # 1.5.6; 6/9/21 - another dependabot update, to cryptography==3.3.2
 # 1.5.5; 6/9/21 - updated libs due to github dependabot alerts (rsa, PyYAML, jinja2, cryptography; urllib3 cannot be updated [conflict] but is a denial of service risk only, https://cve.mitre.org/cgi-bin/cvename.cgi?name=CVE-2021-33503)
 # 1.5.4; 2/26/21 - added back nativeauthentictor, udpate to latest jupyterhub 1.3

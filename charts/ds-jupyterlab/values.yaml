@@ -106,7 +106,7 @@ jupyterhub:
       upgrade: false 
     image:
       name: 'localhost:30050/oneilsh/jupyterlab-k8s-hub'
-      tag: "v1.5.6" 
+      tag: "v1.5.7" 
     uid: 0
     fsGid: 0
     extraVolumes:
