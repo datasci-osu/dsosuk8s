@@ -52,7 +52,7 @@ jupyterhub:
     image:
       #name: 'localhost:30050/oneilsh/jupyterlab-ubuntu-nvidia-scipy-rjulia'
       name: 'localhost:30050/cjkeist/jupyterlab-ubuntu-nvidia-scipy-rjulia'
-      tag: 'v1.1.1'      
+      tag: 'v1.2.1-dev'      
     defaultUrl: "/lab/tree/{username}"
     cmd: ["start-singleuser.sh", "--allow-root"]  # don't think I need this? 
     storage:
