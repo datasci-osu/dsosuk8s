@@ -6,11 +6,10 @@ kind: ClusterConfig
 metadata:
   name: hub-blue
   region: us-west-2
-  version: "1.16"
+  version: "1.21"
 
 # default availabilityzones unless otherwise specified?
-availabilityZones: ["us-west-2a", "us-west-2b", "us-west-2c"]
-
+availabilityZones: ["us-west-2b", "us-west-2c"] 
 # eks now has managedNodeGroups, but they don't support taints, which are required for jupyterhub to put user pods in the right nodegroup. 
 # one could use 'kubectl taint' to add taints after creation, but new nodes created by an autoscaler won't have it
 # a potential workaround: https://github.com/jupyterhub/zero-to-jupyterhub-k8s/issues/299#issuecomment-413924333
@@ -25,7 +24,7 @@ nodeGroups:
     availabilityZones: ["us-west-2b"]
     ssh:
       allow: true
-      publicKeyPath: ~/Box/DataScience/sshkeys/eksctl_id_rsa.pub
+      publicKeyPath: /datascience/keys/sshkeys/eksctl_id_rsa.pub
     iam: 
       withAddonPolicies:
         autoScaler: true
@@ -58,14 +57,14 @@ nodeGroups:
     availabilityZones: ["us-west-2b"]
     ssh:
       allow: true
-      publicKeyPath: ~/Box/DataScience/sshkeys/eksctl_id_rsa.pub
+      publicKeyPath: /datascience/keys/sshkeys/eksctl_id_rsa.pub 
     iam: 
       withAddonPolicies:
         autoScaler: true
     minSize: 1
     maxSize: 10
     desiredCapacity: 1
-    volumeSize: 30
+    volumeSize: 60
     labels:
       nodegroup-role: jhcontrolplane 
       hub.jupyter.org/node-purpose: core
@@ -88,19 +87,20 @@ nodeGroups:
       - "modprobe nfsd"
 
   # user pod nodegroup
-  - name: jhworkers-t3a-large
+  - name: jhworkers-2vcpu-8gb
     instanceType: t3a.large
+    ami: auto
     ssh:
       allow: true
-      publicKeyPath: ~/Box/DataScience/sshkeys/eksctl_id_rsa.pub
+      publicKeyPath: /datascience/keys/sshkeys/eksctl_id_rsa.pub
     iam: 
       withAddonPolicies:
         autoScaler: true
     minSize: 1
     maxSize: 60
     desiredCapacity: 1
-    volumeSize: 30
-    ###availabilityZones: ["us-west-2a", "us-west-2b", "us-west-2c"]
+    volumeSize: 60
+    availabilityZones: ["us-west-2b"]
     labels:
       cents-per-hour: "7" 
       nodegroup-role: jhusers
@@ -121,11 +121,12 @@ nodeGroups:
       - "modprobe nfsd"
 
   # user pod nodegroup
-  - name: jhworkers-t3a-2xlarge
+  - name: jhworkers-8vcpu-32gb
     instanceType: t3a.2xlarge
+    ami: auto
     ssh:
       allow: true
-      publicKeyPath: ~/Box/DataScience/sshkeys/eksctl_id_rsa.pub
+      publicKeyPath: /datascience/keys/sshkeys/eksctl_id_rsa.pub
     iam: 
       withAddonPolicies:
         autoScaler: true
@@ -133,10 +134,10 @@ nodeGroups:
     maxSize: 10
     # spin one up for a bit so the cluster-autoscaler can get the config for the group and scale it back down if not needed: https://github.com/weaveworks/eksctl/issues/1481
     desiredCapacity: 1
-    volumeSize: 30
-    ###availabilityZones: ["us-west-2a", "us-west-2b", "us-west-2c"]
+    volumeSize: 60
+    availabilityZones: ["us-west-2b"]
     labels: 
-      cents-per-hour: "30"
+      cents-per-hour: "40"
       nodegroup-role: jhusers
       hub.jupyter.org/node-purpose: user
     taints:
@@ -157,14 +158,14 @@ nodeGroups:
       - "modprobe nfs"
       - "modprobe nfsd"
 
- 
   # user pod nodegroup
-  - name: jhworkers-g4dn-xlarge-ami-0d190d9117f2bca4a
+  - name: jhworkers-4vcpu-16gb-gpu
     instanceType: g4dn.xlarge
-    ami: "ami-0d190d9117f2bca4a"   # from https://docs.aws.amazon.com/eks/latest/userguide/gpu-ami.html for k8s 1.16; shot in the dark...
+    ami: auto
+    amiFamily: AmazonLinux2
     ssh:
       allow: true
-      publicKeyPath: ~/Box/DataScience/sshkeys/eksctl_id_rsa.pub
+      publicKeyPath: /datascience/keys/sshkeys/eksctl_id_rsa.pub
     iam: 
       withAddonPolicies:
         autoScaler: true
@@ -172,12 +173,14 @@ nodeGroups:
     maxSize: 10
     # spin one up for a bit so the cluster-autoscaler can get the config for the group and scale it back down if not needed: https://github.com/weaveworks/eksctl/issues/1481
     desiredCapacity: 1
-    volumeSize: 30
+    volumeSize: 60
+    availabilityZones: ["us-west-2b"]
     ###availabilityZones: ["us-west-2a", "us-west-2b", "us-west-2c"]
     labels: 
       cents-per-hour: "53"
       nodegroup-role: jhusers
       hub.jupyter.org/node-purpose: user
+      nvidia-gpu: "true"
     taints:
       hub.jupyter.org/dedicated: user:NoSchedule
     tags:
