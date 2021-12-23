@@ -36,6 +36,8 @@ RUN apt-get update \
     locales \
     fonts-liberation \
     run-one \
+    zlib1g-dev \
+    screen \
  && apt-get clean && rm -rf /var/lib/apt/lists/*
 
 ########################
