@@ -46,15 +46,21 @@ RUN mkdir /etc/julia && \
 
 
 # R packages including IRKernel which gets installed globally.
-RUN conda install --quiet --yes 'r-base=4.0.*'
+RUN conda install mamba -n base -c conda-forge
+# tests...
+#RUN conda install --quiet --yes mamba
+#RUN mamba install --quiet --yes 'readline=8.*'
+#RUN mamba install --yes 'python=3.10.*'
+RUN conda install --yes 'r-base=4.1.*'
+
     #'r-caret=6.0*' \
     #'r-crayon=1.3*' \
-RUN conda install --quiet --yes 'r-devtools=2.3*'
+RUN conda install --quiet --yes 'r-devtools=2.4*'
     #'r-forecast=8.10*' \
     #'r-hexbin=1.28*' \
 RUN conda install --quiet --yes 'r-htmltools=0.5*'
 RUN conda install --quiet --yes 'r-htmlwidgets=1.5*'
-RUN conda install --quiet --yes 'r-irkernel=1.1*'
+RUN conda install --quiet --yes 'r-irkernel=1.2*'
     #'r-nycflights13=1.0*' \
 #    'r-plyr=1.8*' \
     #'r-randomforest=4.6*' \
@@ -62,7 +68,7 @@ RUN conda install --quiet --yes 'r-rcurl=1.98*'
 #    'r-reshape2=1.4*' \
 RUN conda install --quiet --yes 'r-rmarkdown=2.3*'
 RUN conda install --quiet --yes 'r-rsqlite=2.2*'
-RUN conda install --quiet --yes 'r-shiny=1.5*'
+RUN conda install --quiet --yes 'r-shiny=1.7*'
     #'r-tidyverse=1.3*' \
 #    'rpy2=3.1*' \
 RUN conda clean --all -f -y
@@ -104,7 +110,7 @@ RUN conda update -n base conda -y
 RUN apt-get update && \
  	apt-get install -y --no-install-recommends \
  		libapparmor1 \
-                 libclang-dev \
+                libclang-dev \
  		libedit2 \
  		lsb-release \
  		psmisc \
@@ -113,17 +119,19 @@ RUN apt-get update && \
                 texlive-xetex \
                 lmodern \
                 texlive-fonts-recommended \
+# libpq is now required for rstudio server?
+                libpq5 \
  		;
  
 # You can use rsession from rstudio's desktop package as well.
-ENV RSTUDIO_PKG=rstudio-server-1.2.5019-amd64.deb
+ENV RSTUDIO_PKG=rstudio-server-2021.09.1-372-amd64.deb
 ENV RSTUDIO_URL=http://download2.rstudio.org/server/bionic/amd64
 RUN wget -q ${RSTUDIO_URL}/${RSTUDIO_PKG}
 RUN dpkg -i ${RSTUDIO_PKG}
 RUN rm ${RSTUDIO_PKG}
 
 # Shiny
-ENV SHINY_PKG=shiny-server-1.5.12.933-amd64.deb
+ENV SHINY_PKG=shiny-server-1.5.17.973-amd64.deb
 ENV SHINY_URL=https://download3.rstudio.org/ubuntu-14.04/x86_64
 RUN wget -q ${SHINY_URL}/${SHINY_PKG}
 RUN dpkg -i ${SHINY_PKG}
@@ -190,8 +198,9 @@ RUN echo "un-dropping server-proxy"
 
 
 #IMAGE oneilsh/jupyterlab-ubuntu-nvidia-scipy-rjulia
-#TAG v1.1.3
+#TAG v1.1.4
 # changelog:
+# 1.1.4: Updating R: 4.1*,devtools=2.4*,irkernel=1.2,r-shiny=1.7,shiny-server-1.5.17.973,rstudio-server-2021.09.1-372 
 # 1.1.3: more libs; libbz2-dev, liblzma, libcurl4, libssl
 # 1.1.2: added zlib1g-dev and ncurses dev libraries
 # 1.1.1: upgrade sudo to address root exploit https://ubuntu.com/security/notices/USN-4705-1

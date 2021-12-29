@@ -1,8 +1,9 @@
-# TARGET jupyterlab-ubuntu-nvidia v1.2.1
-# TARGET jupyterlab-ubuntu-nvidia-scipy v1.2.1
-# TARGET jupyterlab-ubuntu-nvidia-scipy-rjulia v1.2.1
-# TARGET jupyterlab-ubuntu-nvidia-scipy-rjulia-gpu v1.2.1
+# TARGET jupyterlab-ubuntu-nvidia v1.2.2-dev
+# TARGET jupyterlab-ubuntu-nvidia-scipy v1.2.2-dev
+# TARGET jupyterlab-ubuntu-nvidia-scipy-rjulia v1.2.2-dev
+# TARGET jupyterlab-ubuntu-nvidia-scipy-rjulia-gpu v1.2.2-dev
 
+# 1.2.2-dev: Upgrading R, RStudio and RShiny
 # 1.2.1: Final build. added zlib1g-dev and screen packages
 # 1.2.1-dev: added zlib1g-dev and screen packages
 # 1.2.0: restructuring as tagged multistage build, updating hub (1.3), notebook (6.2.0), and lab (3.0.14)
