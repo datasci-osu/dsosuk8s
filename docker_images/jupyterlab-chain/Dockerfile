@@ -1,8 +1,9 @@
-# TARGET jupyterlab-ubuntu-nvidia v1.2.2-dev
-# TARGET jupyterlab-ubuntu-nvidia-scipy v1.2.2-dev
-# TARGET jupyterlab-ubuntu-nvidia-scipy-rjulia v1.2.2-dev
-# TARGET jupyterlab-ubuntu-nvidia-scipy-rjulia-gpu v1.2.2-dev
+# TARGET jupyterlab-ubuntu-nvidia v1.3.0-dev
+# TARGET jupyterlab-ubuntu-nvidia-scipy v1.3.0-dev
+# TARGET jupyterlab-ubuntu-nvidia-scipy-rjulia v1.3.0-dev
+# TARGET jupyterlab-ubuntu-nvidia-scipy-rjulia-gpu v1.3.0-dev
 
+# 1.3.0-dev: Upgrading python, conda
 # 1.2.2-dev: Upgrading R, RStudio and RShiny
 # 1.2.1: Final build. added zlib1g-dev and screen packages
 # 1.2.1-dev: added zlib1g-dev and screen packages
@@ -108,9 +109,6 @@ RUN echo "auth requisite pam_deny.so" >> /etc/pam.d/su && \
     #fix-permissions $HOME && \
     #fix-permissions "$(dirname $CONDA_DIR)"
 
-USER $NB_UID
-WORKDIR $HOME
-ARG PYTHON_VERSION=default
 
 # Setup work directory for backward-compatibility
 RUN mkdir /home/$NB_USER/work 
@@ -118,33 +116,39 @@ RUN mkdir /home/$NB_USER/work
     #fix-permissions /home/$NB_USER
 
 # Install conda as jovyan and check the md5 sum provided on the download site
-ENV MINICONDA_VERSION=4.7.12.1 \
-    MINICONDA_MD5=81c773ff87af5cfac79ab862942ab6b3 \
-    CONDA_VERSION=4.7.12
+USER $NB_UID
+WORKDIR $HOME
 
-RUN cd /tmp && \
-    wget --quiet https://repo.continuum.io/miniconda/Miniconda3-${MINICONDA_VERSION}-Linux-x86_64.sh && \
-    echo "${MINICONDA_MD5} *Miniconda3-${MINICONDA_VERSION}-Linux-x86_64.sh" | md5sum -c - && \
-    /bin/bash Miniconda3-${MINICONDA_VERSION}-Linux-x86_64.sh -f -b -p $CONDA_DIR && \
-    rm Miniconda3-${MINICONDA_VERSION}-Linux-x86_64.sh && \
-    echo "conda ${CONDA_VERSION}" >> $CONDA_DIR/conda-meta/pinned && \
-    conda config --system --prepend channels conda-forge && \
-    conda config --system --set auto_update_conda false && \
-    conda config --system --set show_channel_urls true && \
-    if [ ! $PYTHON_VERSION = 'default' ]; then conda install --yes python=$PYTHON_VERSION; fi && \
-    conda list python | grep '^python ' | tr -s ' ' | cut -d '.' -f 1,2 | sed 's/$/.*/' >> $CONDA_DIR/conda-meta/pinned && \
-    conda install --quiet --yes conda && \
-    conda install --quiet --yes pip && \
-    conda update --all --quiet --yes && \
-    conda clean --all -f -y && \
-    rm -rf /home/$NB_USER/.cache/yarn
+ENV MINICONDA_VERSION=py39_4.10.3 \
+    MINICONDA_MD5=8c69f65a4ae27fb41df0fe552b4a8a3b \
+    CONDA_VERSION=4.10.3
+
+ARG PYTHON_VERSION=3.9
+
+RUN cd /tmp
+RUN    wget --quiet https://repo.continuum.io/miniconda/Miniconda3-${MINICONDA_VERSION}-Linux-x86_64.sh
+RUN    echo "${MINICONDA_MD5} *Miniconda3-${MINICONDA_VERSION}-Linux-x86_64.sh" | md5sum -c -
+RUN    /bin/bash Miniconda3-${MINICONDA_VERSION}-Linux-x86_64.sh -f -b -p $CONDA_DIR
+RUN    rm Miniconda3-${MINICONDA_VERSION}-Linux-x86_64.sh
+RUN    echo "conda ${CONDA_VERSION}" >> $CONDA_DIR/conda-meta/pinned
+RUN    conda config --system --prepend channels conda-forge
+RUN    conda config --system --set auto_update_conda false
+RUN    conda config --system --set show_channel_urls true
+RUN    if [ ! $PYTHON_VERSION = 'default' ]; then conda install --yes python=$PYTHON_VERSION; fi
+RUN    conda list python | grep '^python ' | tr -s ' ' | cut -d '.' -f 1,2 | sed 's/$/.*/' >> $CONDA_DIR/conda-meta/pinned
+RUN    conda install --quiet --yes conda
+RUN     conda install --quiet --yes pip
+RUN    conda install -n base mamba
+RUN    conda update --all --quiet --yes
+RUN    conda clean --all -f -y
+RUN    rm -rf /home/$NB_USER/.cache/yarn
     #fix-permissions $CONDA_DIR && \
     #fix-permissions /home/$NB_USER
 
 # Install Tini
-RUN conda install --quiet --yes 'tini=0.18.0' && \
-    conda list tini | grep tini | tr -s ' ' | cut -d ' ' -f 1,2 >> $CONDA_DIR/conda-meta/pinned && \
-    conda clean --all -f -y
+RUN mamba install --quiet --yes 'tini=0.18.0' && \
+    mamba list tini | grep tini | tr -s ' ' | cut -d ' ' -f 1,2 >> $CONDA_DIR/conda-meta/pinned && \
+    mamba clean --all -f -y
     #fix-permissions $CONDA_DIR && \
     #fix-permissions /home/$NB_USER
 
@@ -154,15 +158,14 @@ RUN conda install --quiet --yes 'tini=0.18.0' && \
 # Correct permissions
 # Do all this in a single RUN command to avoid duplicating all of the
 # files across image layers when the permissions change
-RUN conda install --quiet --yes \
-    'notebook=6.2.0' \
-    'nodejs=14.9.0' \
-    'jupyterhub=1.3.0' \
-    'ipywidgets=7.5.*' \
-    'jupyterlab=3.0.14' && \
-    conda clean --all -f -y && \
-    npm cache clean --force && \
-    jupyter notebook --generate-config && \
+RUN mamba install --quiet --yes     'notebook=6.2.0' 
+RUN mamba install  --yes     'nodejs=17.1.0' 
+RUN mamba install --quiet --yes     'jupyterhub=1.3.0' 
+RUN mamba install --quiet --yes     'ipywidgets=7.5.*' 
+RUN mamba install --quiet --yes     'jupyterlab=3.0.14'
+RUN mamba clean --all -f -y
+RUN npm cache clean --force
+RUN jupyter notebook --generate-config && \
     rm -rf $CONDA_DIR/share/jupyter/lab/staging && \
     rm -rf /home/$NB_USER/.cache/yarn 
     #fix-permissions $CONDA_DIR && \
@@ -423,9 +426,10 @@ RUN mkdir /etc/julia && \
 
 # R packages including IRKernel which gets installed globally.
 RUN conda install mamba -n base -c conda-forge
+# tests...
 #RUN conda install --quiet --yes mamba
 #RUN mamba install --quiet --yes 'readline=8.*'
-RUN mamba install --yes 'python=3.10.*'
+#RUN mamba install --yes 'python=3.10.*'
 RUN conda install --yes 'r-base=4.1.*'
 
     #'r-caret=6.0*' \
