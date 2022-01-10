@@ -1,8 +1,9 @@
-# TARGET jupyterlab-ubuntu-nvidia v1.2.1
-# TARGET jupyterlab-ubuntu-nvidia-scipy v1.2.1
-# TARGET jupyterlab-ubuntu-nvidia-scipy-rjulia v1.2.1
-# TARGET jupyterlab-ubuntu-nvidia-scipy-rjulia-gpu v1.2.1
+# TARGET jupyterlab-ubuntu-nvidia v1.2.3-dev
+# TARGET jupyterlab-ubuntu-nvidia-scipy v1.2.3-dev
+# TARGET jupyterlab-ubuntu-nvidia-scipy-rjulia v1.2.3-dev
+# TARGET jupyterlab-ubuntu-nvidia-scipy-rjulia-gpu v1.2.3-dev
 
+# 1.2.3-dev: Ubuntu 20.04 build
 # 1.2.1: Final build. added zlib1g-dev and screen packages
 # 1.2.1-dev: added zlib1g-dev and screen packages
 # 1.2.0: restructuring as tagged multistage build, updating hub (1.3), notebook (6.2.0), and lab (3.0.14)
@@ -10,7 +11,7 @@
 # 1.1.2: added zlib1g-dev and ncurses dev libraries (TODO: move to earlier stage)
 # 1.1.1: upgrade sudo to address root exploit https://ubuntu.com/security/notices/USN-4705-1
 # 
-FROM nvidia/cuda:10.1-base-ubuntu18.04 as jupyterlab-ubuntu-nvidia
+FROM nvidia/cuda:11.4.2-base-ubuntu20.04 as jupyterlab-ubuntu-nvidia
 # Use NVIDIA CUDA as base image and run the same installation as in the other packages.
 # The version of cudatoolkit must match those of the base image, see Dockerfile.pytorch
 
@@ -25,9 +26,9 @@ FROM nvidia/cuda:10.1-base-ubuntu18.04 as jupyterlab-ubuntu-nvidia
 # Copyright (c) Jupyter Development Team.
 # Distributed under the terms of the Modified BSD License.
 
-# Ubuntu 18.04 (bionic)
-# https://hub.docker.com/_/ubuntu/?tab=tags&name=bionic
-ARG ROOT_CONTAINER=ubuntu:bionic-20200112@sha256:bc025862c3e8ec4a8754ea4756e33da6c41cba38330d7e324abd25c8e0b93300
+# Ubuntu 20.04 (focal)
+# https://hub.docker.com/_/ubuntu/?tab=tags&name=focal
+ARG ROOT_CONTAINER=ubuntu:ubuntu:focal-20211006@sha256:7cc0576c7c0ec2384de5cbf245f41567e922aab1b075f3e8ad565f508032df17
 
 LABEL maintainer="Jupyter Project <jupyter@googlegroups.com>"
 ARG NB_USER="jovyan"
@@ -117,15 +118,15 @@ RUN mkdir /home/$NB_USER/work
     #fix-permissions /home/$NB_USER
 
 # Install conda as jovyan and check the md5 sum provided on the download site
-ENV MINICONDA_VERSION=4.7.12.1 \
-    MINICONDA_MD5=81c773ff87af5cfac79ab862942ab6b3 \
+ENV MINICONDA_VERSION=4.10.3 \
+    MINICONDA_MD5=14da4a9a44b337f7ccb8363537f65b9c \
     CONDA_VERSION=4.7.12
 
 RUN cd /tmp && \
-    wget --quiet https://repo.continuum.io/miniconda/Miniconda3-${MINICONDA_VERSION}-Linux-x86_64.sh && \
-    echo "${MINICONDA_MD5} *Miniconda3-${MINICONDA_VERSION}-Linux-x86_64.sh" | md5sum -c - && \
-    /bin/bash Miniconda3-${MINICONDA_VERSION}-Linux-x86_64.sh -f -b -p $CONDA_DIR && \
-    rm Miniconda3-${MINICONDA_VERSION}-Linux-x86_64.sh && \
+    wget --quiet https://repo.continuum.io/miniconda/Miniconda3-py38_${MINICONDA_VERSION}-Linux-x86_64.sh && \
+    echo "${MINICONDA_MD5} *Miniconda3-py38_${MINICONDA_VERSION}-Linux-x86_64.sh" | md5sum -c - && \
+    /bin/bash Miniconda3-py38_${MINICONDA_VERSION}-Linux-x86_64.sh -f -b -p $CONDA_DIR && \
+    rm Miniconda3-py38_${MINICONDA_VERSION}-Linux-x86_64.sh && \
     echo "conda ${CONDA_VERSION}" >> $CONDA_DIR/conda-meta/pinned && \
     conda config --system --prepend channels conda-forge && \
     conda config --system --set auto_update_conda false && \
@@ -154,11 +155,11 @@ RUN conda install --quiet --yes 'tini=0.18.0' && \
 # Do all this in a single RUN command to avoid duplicating all of the
 # files across image layers when the permissions change
 RUN conda install --quiet --yes \
-    'notebook=6.2.0' \
-    'nodejs=14.9.0' \
-    'jupyterhub=1.3.0' \
-    'ipywidgets=7.5.*' \
-    'jupyterlab=3.0.14' && \
+    'notebook' \
+    'nodejs' \
+    'jupyterhub' \
+    'ipywidgets' \
+    'jupyterlab' && \
     conda clean --all -f -y && \
     npm cache clean --force && \
     jupyter notebook --generate-config && \
@@ -334,18 +335,18 @@ RUN conda install --quiet --yes 'conda-forge::blas=*=openblas'
 #    'dill=0.3.*' \
     #'h5py=2.10.*' \
     #'hdf5=1.10.*' \
-RUN conda install --quiet --yes 'matplotlib-base=3.3.*' 
+RUN conda install --quiet --yes 'matplotlib-base=3.5.*' 
 #    'numba=0.48.*' \
 #    'numexpr=2.7.*' \
-RUN conda install --quiet --yes 'pandas=1.1.*'
+RUN conda install --quiet --yes 'pandas=1.3.*'
     #'patsy=0.5.*' \
 #    'protobuf=3.11.*' \
     #'scikit-image=0.16.*' \
-RUN conda install --quiet --yes 'scikit-learn=0.23.*'
-RUN conda install --quiet --yes 'scipy=1.5.*'
-RUN conda install --quiet --yes 'seaborn=0.10.*'
+RUN conda install --quiet --yes 'scikit-learn=1.0.*'
+RUN conda install --quiet --yes 'scipy=1.7.*'
+RUN conda install --quiet --yes 'seaborn=0.11.*'
 #    'sqlalchemy=1.3.*' \
-RUN conda install --quiet --yes 'statsmodels=0.12.*'
+RUN conda install --quiet --yes 'statsmodels=0.13.*'
 #    'sympy=1.5.*' \
     #'vincent=0.4.*' \
     #'xlrd' \
@@ -401,12 +402,12 @@ RUN apt-get update && \
 # install Julia packages in /opt/julia instead of $HOME
 ENV JULIA_DEPOT_PATH=/opt/julia
 ENV JULIA_PKGDIR=/opt/julia
-ENV JULIA_VERSION=1.3.1
+ENV JULIA_VERSION=1.7.1
 
 RUN mkdir /opt/julia-${JULIA_VERSION} && \
     cd /tmp && \
     wget -q https://julialang-s3.julialang.org/bin/linux/x64/`echo ${JULIA_VERSION} | cut -d. -f 1,2`/julia-${JULIA_VERSION}-linux-x86_64.tar.gz && \
-    echo "faa707c8343780a6fe5eaf13490355e8190acf8e2c189b9e7ecbddb0fa2643ad *julia-${JULIA_VERSION}-linux-x86_64.tar.gz" | sha256sum -c - && \
+    echo "44658e9c7b45e2b9b5b59239d190cca42de05c175ea86bc346c294a8fe8d9f11 *julia-${JULIA_VERSION}-linux-x86_64.tar.gz" | sha256sum -c - && \
     tar xzf julia-${JULIA_VERSION}-linux-x86_64.tar.gz -C /opt/julia-${JULIA_VERSION} --strip-components=1 && \
     rm /tmp/julia-${JULIA_VERSION}-linux-x86_64.tar.gz
 RUN ln -fs /opt/julia-*/bin/julia /usr/local/bin/julia
@@ -421,26 +422,28 @@ RUN mkdir /etc/julia && \
 
 
 # R packages including IRKernel which gets installed globally.
-RUN conda install --quiet --yes 'r-base=4.0.*'
+RUN conda install --quiet --yes -c conda-forge mamba
+#RUN conda install --quiet --yes 'r-base=4.1.*'
+RUN mamba install --quiet --yes 'r-base=4.1.*'
     #'r-caret=6.0*' \
     #'r-crayon=1.3*' \
-RUN conda install --quiet --yes 'r-devtools=2.3*'
+RUN mamba install --quiet --yes 'r-devtools=2.4*'
     #'r-forecast=8.10*' \
     #'r-hexbin=1.28*' \
-RUN conda install --quiet --yes 'r-htmltools=0.5*'
-RUN conda install --quiet --yes 'r-htmlwidgets=1.5*'
-RUN conda install --quiet --yes 'r-irkernel=1.1*'
+RUN mamba install --quiet --yes 'r-htmltools=0.5*'
+RUN mamba install --quiet --yes 'r-htmlwidgets=1.5*'
+RUN mamba install --quiet --yes 'r-irkernel=1.3*'
     #'r-nycflights13=1.0*' \
 #    'r-plyr=1.8*' \
     #'r-randomforest=4.6*' \
-RUN conda install --quiet --yes 'r-rcurl=1.98*'
+RUN mamba install --quiet --yes 'r-rcurl=1.98*'
 #    'r-reshape2=1.4*' \
-RUN conda install --quiet --yes 'r-rmarkdown=2.3*'
-RUN conda install --quiet --yes 'r-rsqlite=2.2*'
-RUN conda install --quiet --yes 'r-shiny=1.5*'
+RUN mamba install --quiet --yes 'r-rmarkdown=2.11'
+RUN mamba install --quiet --yes 'r-rsqlite=2.2*'
+RUN mamba install --quiet --yes 'r-shiny=1.7*'
     #'r-tidyverse=1.3*' \
 #    'rpy2=3.1*' \
-RUN conda clean --all -f -y
+RUN mamba clean --all -f -y
     #fix-permissions $CONDA_DIR && \
     #fix-permissions /home/$NB_USER
 
@@ -463,7 +466,7 @@ RUN julia -e 'import Pkg; Pkg.update()' && \
 
 # Update conda
 RUN conda update -n base conda -y
-
+RUN conda install --quiet --yes 'nodejs=14.15.1'
 
 # Install elasticsearch libs
 #USER root
@@ -483,22 +486,23 @@ RUN apt-get update && \
  		libedit2 \
  		lsb-release \
  		psmisc \
- 		libssl1.0.0 \
+ 		libssl1.1 \
 # and texlive for Rstudio PDF explorts
                 texlive-xetex \
                 lmodern \
+                libpq-dev \
                 texlive-fonts-recommended \
  		;
  
 # You can use rsession from rstudio's desktop package as well.
-ENV RSTUDIO_PKG=rstudio-server-1.2.5019-amd64.deb
+ENV RSTUDIO_PKG=rstudio-server-2021.09.1-372-amd64.deb
 ENV RSTUDIO_URL=http://download2.rstudio.org/server/bionic/amd64
 RUN wget -q ${RSTUDIO_URL}/${RSTUDIO_PKG}
 RUN dpkg -i ${RSTUDIO_PKG}
 RUN rm ${RSTUDIO_PKG}
 
 # Shiny
-ENV SHINY_PKG=shiny-server-1.5.12.933-amd64.deb
+ENV SHINY_PKG=shiny-server-1.5.17.973-amd64.deb
 ENV SHINY_URL=https://download3.rstudio.org/ubuntu-14.04/x86_64
 RUN wget -q ${SHINY_URL}/${SHINY_PKG}
 RUN dpkg -i ${SHINY_PKG}
@@ -510,7 +514,7 @@ RUN apt-get clean && \
 # Jupyter proxy
 # rather than RUN pip install git+https://github.com/jupyterhub/jupyter-rsession-proxy
 # use the pypi version to avoid a recent bug RE https://github.com/jupyterhub/jupyter-rsession-proxy/issues/71#issuecomment-523630103
-RUN pip install 'jupyter-rsession-proxy==1.0b6'
+RUN pip install 'jupyter-rsession-proxy'
 
 # fixup for shiny-server bookmarks (don't want to make adjustment in the jupyter-rsession-proxy where the shiny config is generated from)
 RUN chmod o+w /var/lib/shiny-server
@@ -585,8 +589,8 @@ USER root
 
 # Install Tensorflow, check compatibility here: https://www.tensorflow.org/install/gpu 
 RUN conda install --quiet --yes \
-    'tensorflow-estimator=2.1*' \
-    'tensorflow-gpu=2.1*' \
+    'tensorflow-estimator' \
+    'tensorflow-gpu' \
     'keras-gpu'
     #fix-permissions $CONDA_DIR && \
     #fix-permissions /home/$NB_USER
@@ -599,7 +603,7 @@ RUN conda install --quiet --yes \
 RUN conda install --quiet --yes \
      pytorch \ 
      torchvision \
-     cudatoolkit=10.1 -c pytorch
+     cudatoolkit -c pytorch
 #    pip install torch_nightly -f https://download.pytorch.org/whl/nightly/cu90/torch_nightly.html && \
 
 # Clean installation

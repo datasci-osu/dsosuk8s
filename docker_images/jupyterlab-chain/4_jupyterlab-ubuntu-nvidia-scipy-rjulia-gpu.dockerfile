@@ -12,8 +12,8 @@ USER root
 
 # Install Tensorflow, check compatibility here: https://www.tensorflow.org/install/gpu 
 RUN conda install --quiet --yes \
-    'tensorflow-estimator=2.1*' \
-    'tensorflow-gpu=2.1*' \
+    'tensorflow-estimator' \
+    'tensorflow-gpu' \
     'keras-gpu'
     #fix-permissions $CONDA_DIR && \
     #fix-permissions /home/$NB_USER
@@ -26,7 +26,7 @@ RUN conda install --quiet --yes \
 RUN conda install --quiet --yes \
      pytorch \ 
      torchvision \
-     cudatoolkit=10.1 -c pytorch
+     cudatoolkit -c pytorch
 #    pip install torch_nightly -f https://download.pytorch.org/whl/nightly/cu90/torch_nightly.html && \
 
 # Clean installation

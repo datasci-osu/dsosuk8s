@@ -1,4 +1,4 @@
-FROM nvidia/cuda:10.1-base-ubuntu18.04 as jupyterlab-ubuntu-nvidia
+FROM nvidia/cuda:11.4.2-base-ubuntu20.04 as jupyterlab-ubuntu-nvidia
 # Use NVIDIA CUDA as base image and run the same installation as in the other packages.
 # The version of cudatoolkit must match those of the base image, see Dockerfile.pytorch
 
@@ -13,9 +13,9 @@ FROM nvidia/cuda:10.1-base-ubuntu18.04 as jupyterlab-ubuntu-nvidia
 # Copyright (c) Jupyter Development Team.
 # Distributed under the terms of the Modified BSD License.
 
-# Ubuntu 18.04 (bionic)
-# https://hub.docker.com/_/ubuntu/?tab=tags&name=bionic
-ARG ROOT_CONTAINER=ubuntu:bionic-20200112@sha256:bc025862c3e8ec4a8754ea4756e33da6c41cba38330d7e324abd25c8e0b93300
+# Ubuntu 20.04 (focal)
+# https://hub.docker.com/_/ubuntu/?tab=tags&name=focal
+ARG ROOT_CONTAINER=ubuntu:ubuntu:focal-20211006@sha256:7cc0576c7c0ec2384de5cbf245f41567e922aab1b075f3e8ad565f508032df17
 
 LABEL maintainer="Jupyter Project <jupyter@googlegroups.com>"
 ARG NB_USER="jovyan"
@@ -105,15 +105,15 @@ RUN mkdir /home/$NB_USER/work
     #fix-permissions /home/$NB_USER
 
 # Install conda as jovyan and check the md5 sum provided on the download site
-ENV MINICONDA_VERSION=4.7.12.1 \
-    MINICONDA_MD5=81c773ff87af5cfac79ab862942ab6b3 \
+ENV MINICONDA_VERSION=4.10.3 \
+    MINICONDA_MD5=14da4a9a44b337f7ccb8363537f65b9c \
     CONDA_VERSION=4.7.12
 
 RUN cd /tmp && \
-    wget --quiet https://repo.continuum.io/miniconda/Miniconda3-${MINICONDA_VERSION}-Linux-x86_64.sh && \
-    echo "${MINICONDA_MD5} *Miniconda3-${MINICONDA_VERSION}-Linux-x86_64.sh" | md5sum -c - && \
-    /bin/bash Miniconda3-${MINICONDA_VERSION}-Linux-x86_64.sh -f -b -p $CONDA_DIR && \
-    rm Miniconda3-${MINICONDA_VERSION}-Linux-x86_64.sh && \
+    wget --quiet https://repo.continuum.io/miniconda/Miniconda3-py38_${MINICONDA_VERSION}-Linux-x86_64.sh && \
+    echo "${MINICONDA_MD5} *Miniconda3-py38_${MINICONDA_VERSION}-Linux-x86_64.sh" | md5sum -c - && \
+    /bin/bash Miniconda3-py38_${MINICONDA_VERSION}-Linux-x86_64.sh -f -b -p $CONDA_DIR && \
+    rm Miniconda3-py38_${MINICONDA_VERSION}-Linux-x86_64.sh && \
     echo "conda ${CONDA_VERSION}" >> $CONDA_DIR/conda-meta/pinned && \
     conda config --system --prepend channels conda-forge && \
     conda config --system --set auto_update_conda false && \
@@ -142,11 +142,11 @@ RUN conda install --quiet --yes 'tini=0.18.0' && \
 # Do all this in a single RUN command to avoid duplicating all of the
 # files across image layers when the permissions change
 RUN conda install --quiet --yes \
-    'notebook=6.2.0' \
-    'nodejs=14.9.0' \
-    'jupyterhub=1.3.0' \
-    'ipywidgets=7.5.*' \
-    'jupyterlab=3.0.14' && \
+    'notebook' \
+    'nodejs' \
+    'jupyterhub' \
+    'ipywidgets' \
+    'jupyterlab' && \
     conda clean --all -f -y && \
     npm cache clean --force && \
     jupyter notebook --generate-config && \

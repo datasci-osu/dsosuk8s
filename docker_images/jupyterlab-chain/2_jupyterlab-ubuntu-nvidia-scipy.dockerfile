@@ -28,18 +28,18 @@ RUN conda install --quiet --yes 'conda-forge::blas=*=openblas'
 #    'dill=0.3.*' \
     #'h5py=2.10.*' \
     #'hdf5=1.10.*' \
-RUN conda install --quiet --yes 'matplotlib-base=3.3.*' 
+RUN conda install --quiet --yes 'matplotlib-base=3.5.*' 
 #    'numba=0.48.*' \
 #    'numexpr=2.7.*' \
-RUN conda install --quiet --yes 'pandas=1.1.*'
+RUN conda install --quiet --yes 'pandas=1.3.*'
     #'patsy=0.5.*' \
 #    'protobuf=3.11.*' \
     #'scikit-image=0.16.*' \
-RUN conda install --quiet --yes 'scikit-learn=0.23.*'
-RUN conda install --quiet --yes 'scipy=1.5.*'
-RUN conda install --quiet --yes 'seaborn=0.10.*'
+RUN conda install --quiet --yes 'scikit-learn=1.0.*'
+RUN conda install --quiet --yes 'scipy=1.7.*'
+RUN conda install --quiet --yes 'seaborn=0.11.*'
 #    'sqlalchemy=1.3.*' \
-RUN conda install --quiet --yes 'statsmodels=0.12.*'
+RUN conda install --quiet --yes 'statsmodels=0.13.*'
 #    'sympy=1.5.*' \
     #'vincent=0.4.*' \
     #'xlrd' \

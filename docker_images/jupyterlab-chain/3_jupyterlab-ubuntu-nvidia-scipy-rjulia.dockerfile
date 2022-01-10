@@ -26,12 +26,12 @@ RUN apt-get update && \
 # install Julia packages in /opt/julia instead of $HOME
 ENV JULIA_DEPOT_PATH=/opt/julia
 ENV JULIA_PKGDIR=/opt/julia
-ENV JULIA_VERSION=1.3.1
+ENV JULIA_VERSION=1.7.1
 
 RUN mkdir /opt/julia-${JULIA_VERSION} && \
     cd /tmp && \
     wget -q https://julialang-s3.julialang.org/bin/linux/x64/`echo ${JULIA_VERSION} | cut -d. -f 1,2`/julia-${JULIA_VERSION}-linux-x86_64.tar.gz && \
-    echo "faa707c8343780a6fe5eaf13490355e8190acf8e2c189b9e7ecbddb0fa2643ad *julia-${JULIA_VERSION}-linux-x86_64.tar.gz" | sha256sum -c - && \
+    echo "44658e9c7b45e2b9b5b59239d190cca42de05c175ea86bc346c294a8fe8d9f11 *julia-${JULIA_VERSION}-linux-x86_64.tar.gz" | sha256sum -c - && \
     tar xzf julia-${JULIA_VERSION}-linux-x86_64.tar.gz -C /opt/julia-${JULIA_VERSION} --strip-components=1 && \
     rm /tmp/julia-${JULIA_VERSION}-linux-x86_64.tar.gz
 RUN ln -fs /opt/julia-*/bin/julia /usr/local/bin/julia
@@ -46,26 +46,28 @@ RUN mkdir /etc/julia && \
 
 
 # R packages including IRKernel which gets installed globally.
-RUN conda install --quiet --yes 'r-base=4.0.*'
+RUN conda install --quiet --yes -c conda-forge mamba
+#RUN conda install --quiet --yes 'r-base=4.1.*'
+RUN mamba install --quiet --yes 'r-base=4.1.*'
     #'r-caret=6.0*' \
     #'r-crayon=1.3*' \
-RUN conda install --quiet --yes 'r-devtools=2.3*'
+RUN mamba install --quiet --yes 'r-devtools=2.4*'
     #'r-forecast=8.10*' \
     #'r-hexbin=1.28*' \
-RUN conda install --quiet --yes 'r-htmltools=0.5*'
-RUN conda install --quiet --yes 'r-htmlwidgets=1.5*'
-RUN conda install --quiet --yes 'r-irkernel=1.1*'
+RUN mamba install --quiet --yes 'r-htmltools=0.5*'
+RUN mamba install --quiet --yes 'r-htmlwidgets=1.5*'
+RUN mamba install --quiet --yes 'r-irkernel=1.3*'
     #'r-nycflights13=1.0*' \
 #    'r-plyr=1.8*' \
     #'r-randomforest=4.6*' \
-RUN conda install --quiet --yes 'r-rcurl=1.98*'
+RUN mamba install --quiet --yes 'r-rcurl=1.98*'
 #    'r-reshape2=1.4*' \
-RUN conda install --quiet --yes 'r-rmarkdown=2.3*'
-RUN conda install --quiet --yes 'r-rsqlite=2.2*'
-RUN conda install --quiet --yes 'r-shiny=1.5*'
+RUN mamba install --quiet --yes 'r-rmarkdown=2.11'
+RUN mamba install --quiet --yes 'r-rsqlite=2.2*'
+RUN mamba install --quiet --yes 'r-shiny=1.7*'
     #'r-tidyverse=1.3*' \
 #    'rpy2=3.1*' \
-RUN conda clean --all -f -y
+RUN mamba clean --all -f -y
     #fix-permissions $CONDA_DIR && \
     #fix-permissions /home/$NB_USER
 
@@ -88,7 +90,7 @@ RUN julia -e 'import Pkg; Pkg.update()' && \
 
 # Update conda
 RUN conda update -n base conda -y
-
+RUN conda install --quiet --yes 'nodejs=14.15.1'
 
 # Install elasticsearch libs
 #USER root
@@ -108,22 +110,23 @@ RUN apt-get update && \
  		libedit2 \
  		lsb-release \
  		psmisc \
- 		libssl1.0.0 \
+ 		libssl1.1 \
 # and texlive for Rstudio PDF explorts
                 texlive-xetex \
                 lmodern \
+                libpq-dev \
                 texlive-fonts-recommended \
  		;
  
 # You can use rsession from rstudio's desktop package as well.
-ENV RSTUDIO_PKG=rstudio-server-1.2.5019-amd64.deb
+ENV RSTUDIO_PKG=rstudio-server-2021.09.1-372-amd64.deb
 ENV RSTUDIO_URL=http://download2.rstudio.org/server/bionic/amd64
 RUN wget -q ${RSTUDIO_URL}/${RSTUDIO_PKG}
 RUN dpkg -i ${RSTUDIO_PKG}
 RUN rm ${RSTUDIO_PKG}
 
 # Shiny
-ENV SHINY_PKG=shiny-server-1.5.12.933-amd64.deb
+ENV SHINY_PKG=shiny-server-1.5.17.973-amd64.deb
 ENV SHINY_URL=https://download3.rstudio.org/ubuntu-14.04/x86_64
 RUN wget -q ${SHINY_URL}/${SHINY_PKG}
 RUN dpkg -i ${SHINY_PKG}
@@ -135,7 +138,7 @@ RUN apt-get clean && \
 # Jupyter proxy
 # rather than RUN pip install git+https://github.com/jupyterhub/jupyter-rsession-proxy
 # use the pypi version to avoid a recent bug RE https://github.com/jupyterhub/jupyter-rsession-proxy/issues/71#issuecomment-523630103
-RUN pip install 'jupyter-rsession-proxy==1.0b6'
+RUN pip install 'jupyter-rsession-proxy'
 
 # fixup for shiny-server bookmarks (don't want to make adjustment in the jupyter-rsession-proxy where the shiny config is generated from)
 RUN chmod o+w /var/lib/shiny-server
