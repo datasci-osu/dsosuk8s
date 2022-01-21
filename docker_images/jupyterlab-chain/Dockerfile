@@ -1,8 +1,11 @@
-# TARGET jupyterlab-ubuntu-nvidia v1.2.3-dev
-# TARGET jupyterlab-ubuntu-nvidia-scipy v1.2.3-dev
-# TARGET jupyterlab-ubuntu-nvidia-scipy-rjulia v1.2.3-dev
-# TARGET jupyterlab-ubuntu-nvidia-scipy-rjulia-gpu v1.2.3-dev
+# TARGET jupyterlab-ubuntu-nvidia v1.3.2-dev
+# TARGET jupyterlab-ubuntu-nvidia-scipy v1.3.2-dev
+# TARGET jupyterlab-ubuntu-nvidia-scipy-rjulia v1.3.2-dev
+# TARGET jupyterlab-ubuntu-nvidia-scipy-rjulia-gpu v1.3.2-dev
 
+# 1.3.2-dev: Added zlib via conda 
+# 1.3.1-dev: Added package default-jre and default-jdk
+# 1.3.0-dev: Ubuntu 20.04 build, R4.1,and xml-core added
 # 1.2.3-dev: Ubuntu 20.04 build
 # 1.2.1: Final build. added zlib1g-dev and screen packages
 # 1.2.1-dev: added zlib1g-dev and screen packages
@@ -50,6 +53,9 @@ RUN apt-get update \
     fonts-liberation \
     run-one \
     zlib1g-dev \
+    default-jre \
+    default-jdk \
+    libxml2-dev \
     screen \
  && apt-get clean && rm -rf /var/lib/apt/lists/*
 
@@ -347,6 +353,7 @@ RUN conda install --quiet --yes 'scipy=1.7.*'
 RUN conda install --quiet --yes 'seaborn=0.11.*'
 #    'sqlalchemy=1.3.*' \
 RUN conda install --quiet --yes 'statsmodels=0.13.*'
+RUN conda install --quiet --yes 'zlib'
 #    'sympy=1.5.*' \
     #'vincent=0.4.*' \
     #'xlrd' \
@@ -446,7 +453,10 @@ RUN mamba install --quiet --yes 'r-shiny=1.7*'
 RUN mamba clean --all -f -y
     #fix-permissions $CONDA_DIR && \
     #fix-permissions /home/$NB_USER
-
+RUN cp /etc/apt/sources.list /etc/apt/sources.list~
+RUN sed -Ei 's/^# deb-src /deb-src /' /etc/apt/sources.list
+RUN apt-get update -y
+RUN apt-get build-dep r-base -y
 # Add Julia packages. Only add HDF5 if this is not a test-only build since
 # it takes roughly half the entire build time of all of the images on Travis
 # to add this one package and often causes Travis to timeout.
@@ -548,8 +558,6 @@ RUN apt-get update \
 #    gnuplot \
     subversion \
     vim \
-    zlib1g-dev \
-    zlib1g \
     libncurses5-dev \
     libncursesw5-dev \ 
     libbz2-dev \

@@ -1,8 +1,11 @@
-# TARGET jupyterlab-ubuntu-nvidia v1.2.3-dev
-# TARGET jupyterlab-ubuntu-nvidia-scipy v1.2.3-dev
-# TARGET jupyterlab-ubuntu-nvidia-scipy-rjulia v1.2.3-dev
-# TARGET jupyterlab-ubuntu-nvidia-scipy-rjulia-gpu v1.2.3-dev
+# TARGET jupyterlab-ubuntu-nvidia v1.3.2-dev
+# TARGET jupyterlab-ubuntu-nvidia-scipy v1.3.2-dev
+# TARGET jupyterlab-ubuntu-nvidia-scipy-rjulia v1.3.2-dev
+# TARGET jupyterlab-ubuntu-nvidia-scipy-rjulia-gpu v1.3.2-dev
 
+# 1.3.2-dev: Added zlib via conda 
+# 1.3.1-dev: Added package default-jre and default-jdk
+# 1.3.0-dev: Ubuntu 20.04 build, R4.1,and xml-core added
 # 1.2.3-dev: Ubuntu 20.04 build
 # 1.2.1: Final build. added zlib1g-dev and screen packages
 # 1.2.1-dev: added zlib1g-dev and screen packages

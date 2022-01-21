@@ -10,28 +10,29 @@ if(!dir.exists(Sys.getenv("R_LIBS_USER"))) {
 Sys.setenv(TAR = "/bin/tar")
 
 # we're going to put custom functions into base, so they don't show up in the global environment but are still accessible
-base <- getNamespace("base")
-
-# set hub.install.packages to install into R_LIBS_SITE for everyone
-base$hub.install.packages <- function(...) {
-  install.packages(..., lib = Sys.getenv("R_LIBS_SITE"))
-}
+# note that this done differently in R 4.1+: https://stackoverflow.com/a/68823803
+assign("hub.install.packages", 
+       function(...) {
+         install.packages(..., lib = Sys.getenv("R_LIBS_SITE"))
+       },
+       envir = globalenv())
 
 # for devtools::install_github
-base$hub.install_github <- function(...) {
-  withr::with_libpaths(Sys.getenv("R_LIBS_SITE"), 
-                       devtools::install_github(...))
-}
+assign("hub.install_github", 
+       function(...) {
+         withr::with_libpaths(Sys.getenv("R_LIBS_SITE"),
+                              devtools::install_github(...))
+       },
+       envir = globalenv())
 
 # for bioconductor installs
-base$hub.install_bioconductor <- function(...) {
-  withr::with_libpaths(Sys.getenv("R_LIBS_SITE"), {
-                         if (!requireNamespace("BiocManager", quietly = TRUE)) {
-                           install.packages("BiocManager")
-                         }
-                         BiocManager::install(...)}
-                       )
-}
-
-# done with the base env, we can remove it from the global environment
-rm(base)
+assign("hub.install_bioconductor", 
+       function(...) {
+         withr::with_libpaths(Sys.getenv("R_LIBS_SITE"), {
+                              if (!requireNamespace("BiocManager", quietly = TRUE)) {
+                                install.packages("BiocManager")
+                              }
+                              BiocManager::install(...)}
+                             )
+       },
+       envir = globalenv())

@@ -37,6 +37,9 @@ RUN apt-get update \
     fonts-liberation \
     run-one \
     zlib1g-dev \
+    default-jre \
+    default-jdk \
+    libxml2-dev \
     screen \
  && apt-get clean && rm -rf /var/lib/apt/lists/*
 

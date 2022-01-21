@@ -40,6 +40,7 @@ RUN conda install --quiet --yes 'scipy=1.7.*'
 RUN conda install --quiet --yes 'seaborn=0.11.*'
 #    'sqlalchemy=1.3.*' \
 RUN conda install --quiet --yes 'statsmodels=0.13.*'
+RUN conda install --quiet --yes 'zlib'
 #    'sympy=1.5.*' \
     #'vincent=0.4.*' \
     #'xlrd' \

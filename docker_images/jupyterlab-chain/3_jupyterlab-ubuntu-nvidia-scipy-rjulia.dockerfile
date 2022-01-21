@@ -70,7 +70,11 @@ RUN mamba install --quiet --yes 'r-shiny=1.7*'
 RUN mamba clean --all -f -y
     #fix-permissions $CONDA_DIR && \
     #fix-permissions /home/$NB_USER
-
+# Fix to get R - recognize zlib
+RUN cp /etc/apt/sources.list /etc/apt/sources.list~
+RUN sed -Ei 's/^# deb-src /deb-src /' /etc/apt/sources.list
+RUN apt-get update -y
+RUN apt-get build-dep r-base -y
 # Add Julia packages. Only add HDF5 if this is not a test-only build since
 # it takes roughly half the entire build time of all of the images on Travis
 # to add this one package and often causes Travis to timeout.
@@ -172,8 +176,6 @@ RUN apt-get update \
 #    gnuplot \
     subversion \
     vim \
-    zlib1g-dev \
-    zlib1g \
     libncurses5-dev \
     libncursesw5-dev \ 
     libbz2-dev \

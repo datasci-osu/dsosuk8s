@@ -15,6 +15,9 @@ maintainers:
 name: ds-jupyterlab
 version: 1.5.1
 changeLog:
+  v1.6.0:
+    minor:
+    - Update autosourced_by_rprofiles.R to work with R 4.1:w
   v1.5.1:
     minor:
     - new deployment strategy via helm plugin
