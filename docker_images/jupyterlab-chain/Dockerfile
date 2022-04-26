@@ -1,8 +1,10 @@
-# TARGET jupyterlab-ubuntu-nvidia v1.3.2
-# TARGET jupyterlab-ubuntu-nvidia-scipy v1.3.2
-# TARGET jupyterlab-ubuntu-nvidia-scipy-rjulia v1.3.2
-# TARGET jupyterlab-ubuntu-nvidia-scipy-rjulia-gpu v1.3.2
+# TARGET jupyterlab-ubuntu-nvidia v1.3.3
+# TARGET jupyterlab-ubuntu-nvidia v1.3.3
+# TARGET jupyterlab-ubuntu-nvidia-scipy v1.3.3
+# TARGET jupyterlab-ubuntu-nvidia-scipy-rjulia v1.3.3
+# TARGET jupyterlab-ubuntu-nvidia-scipy-rjulia-gpu v1.3.3
 
+# 1.3.3: Upgrade jupyterHub to version 1.4.0, JupyterLab to version 3.2.7
 # 1.3.2: Final build Ubunu 20.04 build 
 # 1.3.2-dev: Added zlib via conda 
 # 1.3.1-dev: Added package default-jre and default-jdk
@@ -163,9 +165,9 @@ RUN conda install --quiet --yes 'tini=0.18.0' && \
 RUN conda install --quiet --yes \
     'notebook' \
     'nodejs' \
-    'jupyterhub' \
+    'jupyterhub=1.5.0' \
     'ipywidgets' \
-    'jupyterlab' && \
+    'jupyterlab=3.2.9' && \
     conda clean --all -f -y && \
     npm cache clean --force && \
     jupyter notebook --generate-config && \
