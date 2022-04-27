@@ -4,7 +4,7 @@
 # TARGET jupyterlab-ubuntu-nvidia-scipy-rjulia v1.3.3
 # TARGET jupyterlab-ubuntu-nvidia-scipy-rjulia-gpu v1.3.3
 
-# 1.3.3: Upgrade jupyterHub to version 1.4.0, JupyterLab to version 3.2.7
+# 1.3.3: Upgrade jupyterHub to version 1.5.0, JupyterLab to version 3.2.9
 # 1.3.2: Final build Ubunu 20.04 build 
 # 1.3.2-dev: Added zlib via conda 
 # 1.3.1-dev: Added package default-jre and default-jdk
