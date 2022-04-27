@@ -1,9 +1,19 @@
-FROM ubuntu:18.04 as jupyterlab-k8s-hub
-# forked from https://github.com/jupyterhub/zero-to-jupyterhub-k8s/blob/master/images/hub/Dockerfile
+FROM ubuntu:20.04 as jupyterlab-k8s-hub
+#TAG: v1.5.8
+#IMAGE: cjkeist/jupyterlab-k8s-hub
 
-ARG JUPYTERHUB_VERSION=1.3.*
+# VULN_SCAN_TIME=2021-08-04_01:01:30
 
-RUN apt-get update && \
+ENV DEBIAN_FRONTEND=noninteractive \
+    LANG=C.UTF-8
+
+# psycopg2-binary in requirements.txt is not compiled for linux/arm64
+# TODO: Use build stages to compile psycopg2-binary separately instead of
+# bloating the image size
+RUN EXTRA_APT_PACKAGES=; \
+    if [ `uname -m` != 'x86_64' ]; then EXTRA_APT_PACKAGES=libpq-dev; fi; \
+    apt-get update && \
+    apt-get upgrade -y && \
     apt-get install -y --no-install-recommends \
       git \
       vim \
@@ -19,22 +29,13 @@ RUN apt-get update && \
       sqlite3 \
       curl \
       dnsutils \
-      # libc-bin explicitly added and pinned 2020-06-10 for a CVE found with trivy
-      # ref: https://github.com/jupyterhub/zero-to-jupyterhub-k8s/issues/1712#issuecomment-656425028
-      ### libc-bin=2.27-3ubuntu1.2 \
-      libc-bin \
-      $(bash -c 'if [[ $JUPYTERHUB_VERSION == "git"* ]]; then \
-        # workaround for https://bugs.launchpad.net/ubuntu/+source/nodejs/+bug/1794589
-        echo nodejs=8.10.0~dfsg-2ubuntu0.2 nodejs-dev=8.10.0~dfsg-2ubuntu0.2 npm; \
-      fi') \
+      $EXTRA_APT_PACKAGES \
       && \
-    apt-get purge && apt-get clean
+    rm -rf /var/lib/apt/lists/*
 
 ARG NB_USER=jovyan
 ARG NB_UID=1000
 ARG HOME=/home/jovyan
-
-ENV LANG C.UTF-8
 
 RUN adduser --disabled-password \
     --gecos "Default user" \
@@ -43,29 +44,37 @@ RUN adduser --disabled-password \
     --force-badname \
     ${NB_USER}
 
-RUN python3 -m pip install --upgrade --no-cache setuptools pip
 COPY requirements.txt /tmp/requirements.txt
+RUN pip3 install --upgrade --no-cache-dir \
+        setuptools \
+        pip
+RUN PYCURL_SSL_LIBRARY=openssl \
+    pip install --no-cache-dir \
+        -r /tmp/requirements.txt
 
-RUN PYCURL_SSL_LIBRARY=openssl pip3 install --no-cache-dir \
-         -r /tmp/requirements.txt \
-         $(bash -c 'if [[ $JUPYTERHUB_VERSION == "git"* ]]; then \
-            echo ${JUPYTERHUB_VERSION}; \
-          else \
-            echo jupyterhub==${JUPYTERHUB_VERSION}; \
-          fi')
+# Support overriding a package or two through passed docker --build-args.
+# ARG PIP_OVERRIDES="jupyterhub==1.3.0 git+https://github.com/consideratio/kubespawner.git"
+ARG PIP_OVERRIDES=
+RUN if test -n "$PIP_OVERRIDES"; then \
+        pip install --no-cache-dir $PIP_OVERRIDES; \
+    fi
 
 WORKDIR /srv/jupyterhub
 
 # So we can actually write a db file here
-# SHAWN - this doesnt matter, gets overriden in chart
 RUN chown ${NB_USER}:${NB_USER} /srv/jupyterhub
 
 # JupyterHub API port
 EXPOSE 8081
 
-# SHAWN - this doesn't matter, gets overriden in chart
+# when building the dependencies image
+# add pip-tools necessary for computing dependencies
+# this is not done in production builds by chartpress
+ARG PIP_TOOLS=
+RUN test -z "$PIP_TOOLS" || pip install --no-cache pip-tools==$PIP_TOOLS
+
 USER ${NB_USER}
-CMD ["jupyterhub", "--config", "/etc/jupyterhub/jupyterhub_config.py"]
+CMD ["jupyterhub", "--config", "/usr/local/etc/jupyterhub/jupyterhub_config.py"]
 
 ########################
 ### End z2jh base
@@ -106,9 +115,10 @@ WORKDIR /root
 RUN pip3 install jupyterhub-ltiauthenticator
 RUN pip3 install git+https://github.com/oneilsh/ltiauthenticator.git@multi-key
 
-# TARGET jupyterlab-k8s-hub v1.5.7
+# TARGET jupyterlab-k8s-hub v1.5.8
 
 # changelog
+# 1.5.8; 11/29/21 - Upgrade to version 1.5 for jupyterhub
 # 1.5.7; 11/29/21 - fixing hub version
 # 1.5.6; 6/9/21 - another dependabot update, to cryptography==3.3.2
 # 1.5.5; 6/9/21 - updated libs due to github dependabot alerts (rsa, PyYAML, jinja2, cryptography; urllib3 cannot be updated [conflict] but is a denial of service risk only, https://cve.mitre.org/cgi-bin/cvename.cgi?name=CVE-2021-33503)

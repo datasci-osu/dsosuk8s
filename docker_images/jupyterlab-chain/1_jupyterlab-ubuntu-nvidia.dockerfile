@@ -147,9 +147,9 @@ RUN conda install --quiet --yes 'tini=0.18.0' && \
 RUN conda install --quiet --yes \
     'notebook' \
     'nodejs' \
-    'jupyterhub' \
+    'jupyterhub=2.2.0' \
     'ipywidgets' \
-    'jupyterlab' && \
+    'jupyterlab=3.2.9' && \
     conda clean --all -f -y && \
     npm cache clean --force && \
     jupyter notebook --generate-config && \
