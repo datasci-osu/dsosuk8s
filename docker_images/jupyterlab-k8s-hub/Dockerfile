@@ -1,6 +1,6 @@
 FROM ubuntu:20.04 as jupyterlab-k8s-hub
-#TAG: v1.5.8
 #IMAGE: cjkeist/jupyterlab-k8s-hub
+#TAG: v1.5.8
 
 # VULN_SCAN_TIME=2021-08-04_01:01:30
 
@@ -93,7 +93,7 @@ RUN apt-get update \
     vim \
  && apt-get clean && rm -rf /var/lib/apt/lists/*
 
-
+RUN pip install kubernetes
 # The master has a bunch of bugfixes that need to be pulled
 #RUN pip3 install jupyterhub-nativeauthenticator
 
