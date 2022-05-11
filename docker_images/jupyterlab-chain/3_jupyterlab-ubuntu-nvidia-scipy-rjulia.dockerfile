@@ -26,12 +26,12 @@ RUN apt-get update && \
 # install Julia packages in /opt/julia instead of $HOME
 ENV JULIA_DEPOT_PATH=/opt/julia
 ENV JULIA_PKGDIR=/opt/julia
-ENV JULIA_VERSION=1.7.1
+ENV JULIA_VERSION=1.7.2
 
 RUN mkdir /opt/julia-${JULIA_VERSION} && \
     cd /tmp && \
     wget -q https://julialang-s3.julialang.org/bin/linux/x64/`echo ${JULIA_VERSION} | cut -d. -f 1,2`/julia-${JULIA_VERSION}-linux-x86_64.tar.gz && \
-    echo "44658e9c7b45e2b9b5b59239d190cca42de05c175ea86bc346c294a8fe8d9f11 *julia-${JULIA_VERSION}-linux-x86_64.tar.gz" | sha256sum -c - && \
+    echo "a75244724f3b2de0e7249c861fbf64078257c16fb4203be78f1cf4dd5973ba95 *julia-${JULIA_VERSION}-linux-x86_64.tar.gz" | sha256sum -c - && \
     tar xzf julia-${JULIA_VERSION}-linux-x86_64.tar.gz -C /opt/julia-${JULIA_VERSION} --strip-components=1 && \
     rm /tmp/julia-${JULIA_VERSION}-linux-x86_64.tar.gz
 RUN ln -fs /opt/julia-*/bin/julia /usr/local/bin/julia
@@ -62,7 +62,7 @@ RUN mamba install --quiet --yes 'r-irkernel=1.3*'
     #'r-randomforest=4.6*' \
 RUN mamba install --quiet --yes 'r-rcurl=1.98*'
 #    'r-reshape2=1.4*' \
-RUN mamba install --quiet --yes 'r-rmarkdown=2.11'
+RUN mamba install --quiet --yes 'r-rmarkdown=2.14'
 RUN mamba install --quiet --yes 'r-rsqlite=2.2*'
 RUN mamba install --quiet --yes 'r-shiny=1.7*'
     #'r-tidyverse=1.3*' \
@@ -130,8 +130,8 @@ RUN dpkg -i ${RSTUDIO_PKG}
 RUN rm ${RSTUDIO_PKG}
 
 # Shiny
-ENV SHINY_PKG=shiny-server-1.5.17.973-amd64.deb
-ENV SHINY_URL=https://download3.rstudio.org/ubuntu-14.04/x86_64
+ENV SHINY_PKG=shiny-server-1.5.18.987-amd64.deb
+ENV SHINY_URL=https://download3.rstudio.org/ubuntu-18.04/x86_64
 RUN wget -q ${SHINY_URL}/${SHINY_PKG}
 RUN dpkg -i ${SHINY_PKG}
 RUN rm ${SHINY_PKG}

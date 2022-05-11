@@ -1,4 +1,4 @@
-FROM nvidia/cuda:11.4.2-base-ubuntu20.04 as jupyterlab-ubuntu-nvidia
+FROM nvidia/cuda:11.6.2-base-ubuntu20.04 as jupyterlab-ubuntu-nvidia
 # Use NVIDIA CUDA as base image and run the same installation as in the other packages.
 # The version of cudatoolkit must match those of the base image, see Dockerfile.pytorch
 
@@ -13,7 +13,7 @@ FROM nvidia/cuda:11.4.2-base-ubuntu20.04 as jupyterlab-ubuntu-nvidia
 # Copyright (c) Jupyter Development Team.
 # Distributed under the terms of the Modified BSD License.
 
-# Ubuntu 20.04 (focal)
+# Ubuntu 22.04 (Jammy Jellyfish)
 # https://hub.docker.com/_/ubuntu/?tab=tags&name=focal
 ARG ROOT_CONTAINER=ubuntu:ubuntu:focal-20211006@sha256:7cc0576c7c0ec2384de5cbf245f41567e922aab1b075f3e8ad565f508032df17
 
@@ -40,6 +40,7 @@ RUN apt-get update \
     default-jre \
     default-jdk \
     libxml2-dev \
+    dnsutils \
     screen \
  && apt-get clean && rm -rf /var/lib/apt/lists/*
 
@@ -108,9 +109,9 @@ RUN mkdir /home/$NB_USER/work
     #fix-permissions /home/$NB_USER
 
 # Install conda as jovyan and check the md5 sum provided on the download site
-ENV MINICONDA_VERSION=4.10.3 \
-    MINICONDA_MD5=14da4a9a44b337f7ccb8363537f65b9c \
-    CONDA_VERSION=4.7.12
+ENV MINICONDA_VERSION=4.11.0 \
+    MINICONDA_MD5=252d3b0c863333639f99fbc465ee1d61 \
+    CONDA_VERSION=4.12.0
 
 RUN cd /tmp && \
     wget --quiet https://repo.continuum.io/miniconda/Miniconda3-py38_${MINICONDA_VERSION}-Linux-x86_64.sh && \
@@ -149,7 +150,7 @@ RUN conda install --quiet --yes \
     'nodejs' \
     'jupyterhub=2.2.0' \
     'ipywidgets' \
-    'jupyterlab=3.2.9' && \
+    'jupyterlab=3.3.4' && \
     conda clean --all -f -y && \
     npm cache clean --force && \
     jupyter notebook --generate-config && \
@@ -189,6 +190,7 @@ LABEL maintainer="Jupyter Project <jupyter@googlegroups.com>"
 USER root
 
 # Install all OS dependencies for fully functional notebook server
+RUN apt-key adv --keyserver keyserver.ubuntu.com --recv-keys A4B469963BF863CC
 RUN apt-get update && apt-get install -yq --no-install-recommends \
     build-essential \
 #    emacs \

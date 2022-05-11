@@ -1,9 +1,9 @@
-# TARGET jupyterlab-ubuntu-nvidia v1.3.4
-# TARGET jupyterlab-ubuntu-nvidia-scipy v1.3.4
-# TARGET jupyterlab-ubuntu-nvidia-scipy-rjulia v1.3.4
-# TARGET jupyterlab-ubuntu-nvidia-scipy-rjulia-gpu v1.3.4
+# TARGET jupyterlab-ubuntu-nvidia v1.3.4-dev
+# TARGET jupyterlab-ubuntu-nvidia-scipy v1.3.4-dev
+# TARGET jupyterlab-ubuntu-nvidia-scipy-rjulia v1.3.4-dev
+# TARGET jupyterlab-ubuntu-nvidia-scipy-rjulia-gpu v1.3.4-dev
 
-# 1.3.4: Setting juyterhub and jupyterlab to versions. 
+# 1.3.4-dev: Setting versions juyterhub 2.2.0 and jupyterlab 3.3.4. 
 # 1.3.2-dev: Added zlib via conda 
 # 1.3.1-dev: Added package default-jre and default-jdk
 # 1.3.0-dev: Ubuntu 20.04 build, R4.1,and xml-core added
@@ -14,7 +14,7 @@
 # 1.1.2: added zlib1g-dev and ncurses dev libraries (TODO: move to earlier stage)
 # 1.1.1: upgrade sudo to address root exploit https://ubuntu.com/security/notices/USN-4705-1
 # 
-FROM nvidia/cuda:11.4.2-base-ubuntu20.04 as jupyterlab-ubuntu-nvidia
+FROM nvidia/cuda:11.6.2-base-ubuntu20.04 as jupyterlab-ubuntu-nvidia
 # Use NVIDIA CUDA as base image and run the same installation as in the other packages.
 # The version of cudatoolkit must match those of the base image, see Dockerfile.pytorch
 
@@ -29,7 +29,7 @@ FROM nvidia/cuda:11.4.2-base-ubuntu20.04 as jupyterlab-ubuntu-nvidia
 # Copyright (c) Jupyter Development Team.
 # Distributed under the terms of the Modified BSD License.
 
-# Ubuntu 20.04 (focal)
+# Ubuntu 22.04 (Jammy Jellyfish)
 # https://hub.docker.com/_/ubuntu/?tab=tags&name=focal
 ARG ROOT_CONTAINER=ubuntu:ubuntu:focal-20211006@sha256:7cc0576c7c0ec2384de5cbf245f41567e922aab1b075f3e8ad565f508032df17
 
@@ -56,6 +56,7 @@ RUN apt-get update \
     default-jre \
     default-jdk \
     libxml2-dev \
+    dnsutils \
     screen \
  && apt-get clean && rm -rf /var/lib/apt/lists/*
 
@@ -124,9 +125,9 @@ RUN mkdir /home/$NB_USER/work
     #fix-permissions /home/$NB_USER
 
 # Install conda as jovyan and check the md5 sum provided on the download site
-ENV MINICONDA_VERSION=4.10.3 \
-    MINICONDA_MD5=14da4a9a44b337f7ccb8363537f65b9c \
-    CONDA_VERSION=4.7.12
+ENV MINICONDA_VERSION=4.11.0 \
+    MINICONDA_MD5=252d3b0c863333639f99fbc465ee1d61 \
+    CONDA_VERSION=4.12.0
 
 RUN cd /tmp && \
     wget --quiet https://repo.continuum.io/miniconda/Miniconda3-py38_${MINICONDA_VERSION}-Linux-x86_64.sh && \
@@ -165,7 +166,7 @@ RUN conda install --quiet --yes \
     'nodejs' \
     'jupyterhub=2.2.0' \
     'ipywidgets' \
-    'jupyterlab=3.2.9' && \
+    'jupyterlab=3.3.4' && \
     conda clean --all -f -y && \
     npm cache clean --force && \
     jupyter notebook --generate-config && \
@@ -205,6 +206,7 @@ LABEL maintainer="Jupyter Project <jupyter@googlegroups.com>"
 USER root
 
 # Install all OS dependencies for fully functional notebook server
+RUN apt-key adv --keyserver keyserver.ubuntu.com --recv-keys A4B469963BF863CC
 RUN apt-get update && apt-get install -yq --no-install-recommends \
     build-essential \
 #    emacs \
@@ -344,12 +346,12 @@ RUN conda install --quiet --yes 'conda-forge::blas=*=openblas'
 RUN conda install --quiet --yes 'matplotlib-base=3.5.*' 
 #    'numba=0.48.*' \
 #    'numexpr=2.7.*' \
-RUN conda install --quiet --yes 'pandas=1.3.*'
+RUN conda install --quiet --yes 'pandas=1.4.*'
     #'patsy=0.5.*' \
 #    'protobuf=3.11.*' \
     #'scikit-image=0.16.*' \
 RUN conda install --quiet --yes 'scikit-learn=1.0.*'
-RUN conda install --quiet --yes 'scipy=1.7.*'
+RUN conda install --quiet --yes 'scipy=1.8.*'
 RUN conda install --quiet --yes 'seaborn=0.11.*'
 #    'sqlalchemy=1.3.*' \
 RUN conda install --quiet --yes 'statsmodels=0.13.*'
@@ -409,12 +411,12 @@ RUN apt-get update && \
 # install Julia packages in /opt/julia instead of $HOME
 ENV JULIA_DEPOT_PATH=/opt/julia
 ENV JULIA_PKGDIR=/opt/julia
-ENV JULIA_VERSION=1.7.1
+ENV JULIA_VERSION=1.7.2
 
 RUN mkdir /opt/julia-${JULIA_VERSION} && \
     cd /tmp && \
     wget -q https://julialang-s3.julialang.org/bin/linux/x64/`echo ${JULIA_VERSION} | cut -d. -f 1,2`/julia-${JULIA_VERSION}-linux-x86_64.tar.gz && \
-    echo "44658e9c7b45e2b9b5b59239d190cca42de05c175ea86bc346c294a8fe8d9f11 *julia-${JULIA_VERSION}-linux-x86_64.tar.gz" | sha256sum -c - && \
+    echo "a75244724f3b2de0e7249c861fbf64078257c16fb4203be78f1cf4dd5973ba95 *julia-${JULIA_VERSION}-linux-x86_64.tar.gz" | sha256sum -c - && \
     tar xzf julia-${JULIA_VERSION}-linux-x86_64.tar.gz -C /opt/julia-${JULIA_VERSION} --strip-components=1 && \
     rm /tmp/julia-${JULIA_VERSION}-linux-x86_64.tar.gz
 RUN ln -fs /opt/julia-*/bin/julia /usr/local/bin/julia
@@ -445,7 +447,7 @@ RUN mamba install --quiet --yes 'r-irkernel=1.3*'
     #'r-randomforest=4.6*' \
 RUN mamba install --quiet --yes 'r-rcurl=1.98*'
 #    'r-reshape2=1.4*' \
-RUN mamba install --quiet --yes 'r-rmarkdown=2.11'
+RUN mamba install --quiet --yes 'r-rmarkdown=2.14'
 RUN mamba install --quiet --yes 'r-rsqlite=2.2*'
 RUN mamba install --quiet --yes 'r-shiny=1.7*'
     #'r-tidyverse=1.3*' \
@@ -513,8 +515,8 @@ RUN dpkg -i ${RSTUDIO_PKG}
 RUN rm ${RSTUDIO_PKG}
 
 # Shiny
-ENV SHINY_PKG=shiny-server-1.5.17.973-amd64.deb
-ENV SHINY_URL=https://download3.rstudio.org/ubuntu-14.04/x86_64
+ENV SHINY_PKG=shiny-server-1.5.18.987-amd64.deb
+ENV SHINY_URL=https://download3.rstudio.org/ubuntu-18.04/x86_64
 RUN wget -q ${SHINY_URL}/${SHINY_PKG}
 RUN dpkg -i ${SHINY_PKG}
 RUN rm ${SHINY_PKG}

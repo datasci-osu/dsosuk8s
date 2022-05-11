@@ -26,7 +26,7 @@ echo -e "\e[33mChecking build $TARGETDIR, looking for tag $IMAGENAME:$TAG.\e[0m"
 
 if ! grep -q "$TAG" <(docker image ls); then
   echo -e "\e[32mBuilding $IMAGENAME:$TAG.\e[0m"
-  docker build -t $IMAGENAME:$TAG -f $TARGETDIR/Dockerfile $TARGETDIR
+  docker build --network=host -t $IMAGENAME:$TAG -f $TARGETDIR/Dockerfile $TARGETDIR
   for CUSTOMTAG in $(grep '^#TAG' $TARGETDIR/Dockerfile | awk '{print $2}'); do
     echo "Tagging: tag $IMAGENAME:$TAG $IMAGENAME:$CUSTOMTAG"
     docker tag $IMAGENAME:$TAG $IMAGENAME:$CUSTOMTAG

@@ -1,8 +1,8 @@
 FROM ubuntu:20.04 as jupyterlab-k8s-hub
 #IMAGE: cjkeist/jupyterlab-k8s-hub
-#TAG: v1.5.8
+#TAG: v1.6.0
 
-# VULN_SCAN_TIME=2021-08-04_01:01:30
+# VULN_SCAN_TIME=2022-04-25_01:47:25
 
 ENV DEBIAN_FRONTEND=noninteractive \
     LANG=C.UTF-8
@@ -118,6 +118,7 @@ RUN pip3 install git+https://github.com/oneilsh/ltiauthenticator.git@multi-key
 # TARGET jupyterlab-k8s-hub v1.5.8
 
 # changelog
+# 1.6.0; 05/04/22 - Upgrade to version 2.2.0 for jupyterhub
 # 1.5.8; 11/29/21 - Upgrade to version 1.5 for jupyterhub
 # 1.5.7; 11/29/21 - fixing hub version
 # 1.5.6; 6/9/21 - another dependabot update, to cryptography==3.3.2

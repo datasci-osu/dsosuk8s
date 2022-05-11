@@ -4,55 +4,74 @@
 #
 #    ./dependencies freeze --upgrade
 #
-alembic==1.6.5
+aiohttp==3.8.1
+    # via kubernetes-asyncio
+aiosignal==1.2.0
+    # via aiohttp
+alembic==1.7.6
     # via jupyterhub
 async-generator==1.10
+    # via jupyterhub
+async-timeout==4.0.2
+    # via aiohttp
+attrs==21.4.0
     # via
-    #   jupyterhub
-    #   jupyterhub-kubespawner
-attrs==21.2.0
-    # via jsonschema
+    #   aiohttp
+    #   jsonschema
 bcrypt==3.2.0
     # via
     #   jupyterhub-firstuseauthenticator
     #   jupyterhub-nativeauthenticator
-cachetools==4.2.2
-    # via google-auth
-certifi==2021.5.30
+certifi==2021.10.8
     # via
-    #   kubernetes
+    #   kubernetes-asyncio
     #   requests
 certipy==0.1.3
     # via jupyterhub
-cffi==1.14.5
+cffi==1.15.0
     # via
     #   bcrypt
     #   cryptography
-chardet==4.0.0
-    # via requests
-cryptography==3.4.7
-    # via pyopenssl
-entrypoints==0.3
+charset-normalizer==2.0.12
+    # via
+    #   aiohttp
+    #   requests
+cryptography==36.0.1
+    # via
+    #   josepy
+    #   jwcrypto
+    #   pyopenssl
+deprecated==1.2.13
+    # via jwcrypto
+entrypoints==0.4
     # via jupyterhub
 escapism==1.0.1
-    # via jupyterhub-kubespawner
-google-auth==1.31.0
-    # via kubernetes
-greenlet==1.1.0
+    # via
+    #   jupyterhub-kubespawner
+    #   jupyterhub-ltiauthenticator
+frozenlist==1.3.0
+    # via
+    #   aiohttp
+    #   aiosignal
+future==0.18.2
+    # via pyjwkest
+greenlet==1.1.2
     # via sqlalchemy
-idna==2.10
-    # via requests
-ipython-genutils==0.2.0
-    # via traitlets
-jinja2==3.0.1
+idna==3.3
+    # via
+    #   requests
+    #   yarl
+jinja2==3.0.3
     # via
     #   jupyterhub
     #   jupyterhub-kubespawner
-jsonschema==3.2.0
+josepy==1.12.0
+    # via jupyterhub-ltiauthenticator
+jsonschema==4.4.0
     # via jupyter-telemetry
 jupyter-telemetry==0.1.0
     # via jupyterhub
-jupyterhub==1.5.0
+jupyterhub==2.2.0
     # via
     #   -r requirements.in
     #   jupyterhub-firstuseauthenticator
@@ -66,35 +85,43 @@ jupyterhub-firstuseauthenticator==1.0.0
     # via -r requirements.in
 jupyterhub-hmacauthenticator==1.0
     # via -r requirements.in
-jupyterhub-idle-culler==1.1
+jupyterhub-idle-culler==1.2.1
     # via -r requirements.in
-jupyterhub-kubespawner==1.1.0
+jupyterhub-kubespawner==4.0.0
     # via -r requirements.in
 jupyterhub-ldapauthenticator==1.3.2
     # via -r requirements.in
-jupyterhub-ltiauthenticator==1.0.0
+jupyterhub-ltiauthenticator==1.3.0
     # via -r requirements.in
-jupyterhub-nativeauthenticator==0.0.7
+jupyterhub-nativeauthenticator==1.0.5
     # via -r requirements.in
 jupyterhub-tmpauthenticator==0.6
     # via -r requirements.in
-kubernetes==17.17.0
+jwcrypto==1.0
+    # via jupyterhub-ltiauthenticator
+kubernetes-asyncio==21.7.1
     # via jupyterhub-kubespawner
-ldap3==2.9
+ldap3==2.9.1
     # via jupyterhub-ldapauthenticator
-mako==1.1.4
+mako==1.1.6
     # via alembic
-markupsafe==2.0.1
+markupsafe==2.1.0
     # via
     #   jinja2
     #   mako
+multidict==6.0.2
+    # via
+    #   aiohttp
+    #   yarl
 mwoauth==0.3.7
     # via -r requirements.in
 nullauthenticator==1.0.0
     # via -r requirements.in
 oauthenticator==14.2.0
-    # via -r requirements.in
-oauthlib==3.1.1
+    # via
+    #   -r requirements.in
+    #   jupyterhub-ltiauthenticator
+oauthlib==3.2.0
     # via
     #   jupyterhub
     #   jupyterhub-ltiauthenticator
@@ -102,83 +129,84 @@ oauthlib==3.1.1
     #   requests-oauthlib
 onetimepass==1.0.1
     # via jupyterhub-nativeauthenticator
+packaging==21.3
+    # via jupyterhub
 pamela==1.0.0
     # via jupyterhub
-prometheus-client==0.11.0
+pem==21.2.0
+    # via jupyterhub-ltiauthenticator
+prometheus-client==0.13.1
     # via jupyterhub
-psycopg2-binary==2.9.1
+psycopg2-binary==2.9.3
     # via -r requirements.in
-py-spy==0.3.8
+py-spy==0.3.11
     # via -r requirements.in
 pyasn1==0.4.8
-    # via
-    #   ldap3
-    #   pyasn1-modules
-    #   rsa
-pyasn1-modules==0.2.8
-    # via google-auth
-pycparser==2.20
+    # via ldap3
+pycparser==2.21
     # via cffi
-pycurl==7.44.1
+pycryptodome==3.14.1
+    # via jupyterhub-ltiauthenticator
+pycryptodomex==3.14.1
+    # via pyjwkest
+pycurl==7.45.1
     # via -r requirements.in
+pyjwkest==1.4.2
+    # via jupyterhub-ltiauthenticator
 pyjwt==1.7.1
     # via
     #   -r requirements.in
+    #   jupyterhub-ltiauthenticator
     #   mwoauth
 pymysql==1.0.2
     # via -r requirements.in
-pyopenssl==20.0.1
-    # via certipy
-pyrsistent==0.17.3
-    # via jsonschema
-python-dateutil==2.8.1
+pyopenssl==22.0.0
     # via
-    #   alembic
+    #   certipy
+    #   josepy
+pyparsing==3.0.7
+    # via packaging
+pyrsistent==0.18.1
+    # via jsonschema
+python-dateutil==2.8.2
+    # via
     #   jupyterhub
     #   jupyterhub-idle-culler
-    #   kubernetes
-python-editor==1.0.4
-    # via alembic
-python-json-logger==2.0.1
+    #   kubernetes-asyncio
+python-json-logger==2.0.2
     # via jupyter-telemetry
-python-slugify==5.0.2
+python-slugify==6.1.1
     # via jupyterhub-kubespawner
-pyyaml==5.4.1
+pyyaml==6.0
     # via
     #   jupyterhub-kubespawner
-    #   kubernetes
-requests==2.25.1
+    #   kubernetes-asyncio
+requests==2.27.1
     # via
     #   jupyterhub
-    #   kubernetes
     #   mwoauth
+    #   pyjwkest
     #   requests-oauthlib
-requests-oauthlib==1.3.0
-    # via
-    #   kubernetes
-    #   mwoauth
-rsa==4.7.2
-    # via google-auth
-ruamel.yaml==0.17.9
+requests-oauthlib==1.3.1
+    # via mwoauth
+ruamel-yaml==0.17.21
     # via jupyter-telemetry
-ruamel.yaml.clib==0.2.2
-    # via ruamel.yaml
+ruamel-yaml-clib==0.2.6
+    # via ruamel-yaml
 six==1.16.0
     # via
     #   bcrypt
-    #   google-auth
-    #   jsonschema
-    #   kubernetes
+    #   kubernetes-asyncio
     #   mwoauth
     #   onetimepass
-    #   pyopenssl
+    #   pyjwkest
     #   python-dateutil
-sqlalchemy==1.4.18
+sqlalchemy==1.4.32
     # via
     #   alembic
     #   jupyterhub
     #   sqlalchemy-cockroachdb
-sqlalchemy-cockroachdb==1.4.0
+sqlalchemy-cockroachdb==1.4.3
     # via -r requirements.in
 statsd==3.3.0
     # via -r requirements.in
@@ -189,18 +217,20 @@ tornado==6.1
     #   jupyterhub
     #   jupyterhub-idle-culler
     #   jupyterhub-ldapauthenticator
-traitlets==5.0.5
+traitlets==5.1.1
     # via
     #   jupyter-telemetry
     #   jupyterhub
     #   jupyterhub-ldapauthenticator
-urllib3==1.26.5
+urllib3==1.26.8
     # via
     #   jupyterhub-kubespawner
-    #   kubernetes
+    #   kubernetes-asyncio
     #   requests
-websocket-client==1.1.0
-    # via kubernetes
+wrapt==1.14.0
+    # via deprecated
+yarl==1.7.2
+    # via aiohttp
 
 # The following packages are considered to be unsafe in a requirements file:
 # setuptools

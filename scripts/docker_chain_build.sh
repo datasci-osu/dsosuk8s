@@ -19,5 +19,5 @@ if [ $# != 1 ]; then
 fi
 
 DOCKERPATH=$1
-cat ${DOCKERPATH}/Dockerfile | grep TARGET | awk -v dockerpath=${DOCKERPATH} '{print "sudo docker build --target " $3 " -t " $3 ":" $4 " " dockerpath}' | bash 
+cat ${DOCKERPATH}/Dockerfile | grep TARGET | awk -v dockerpath=${DOCKERPATH} '{print "sudo docker build --network=host --target " $3 " -t " $3 ":" $4 " " dockerpath}' | bash 
 
