@@ -1,35 +1,35 @@
 {{- if .Values.ingress.enabled -}}
-## FUTURE: When k8s 1.20 is released or when we can assume k8s 1.14, switch from
-##         apiVersion: extensions/v1beta1 to using apiVersion:
-##         networking.k8s.io/v1beta1.
-##
-## ref: https://kubernetes.io/blog/2019/07/18/api-deprecations-in-1-16/
-##
-apiVersion: extensions/v1beta1
+apiVersion: networking.k8s.io/v1
 kind: Ingress
 metadata:
-  name: jupyterhub
+  name: {{ include "jupyterhub.ingress.fullname" . }}
   labels:
     {{- include "jupyterhub.labels" . | nindent 4 }}
-  {{- if .Values.ingress.annotations }}
+  {{- with .Values.ingress.annotations }}
   annotations:
-    {{- range $key, $value := .Values.ingress.annotations }}
-    {{ $key }}: {{ $value | quote }}
-    {{- end }}
+    {{- . | toYaml | nindent 4 }}
   {{- end }}
 spec:
+  {{- with .Values.ingress.ingressClassName }}
+  ingressClassName: "{{ . }}"
+  {{- end }}
   rules:
-    {{- range $host := .Values.ingress.hosts }}
-    - host: {{ $host | quote }}
-      http:
+    {{- range $host := .Values.ingress.hosts | default (list "") }}
+    - http:
         paths:
-          - path: {{ $.Values.hub.baseUrl }}{{ $.Values.ingress.pathSuffix }}
+          - path: {{ $.Values.hub.baseUrl | trimSuffix "/" }}/{{ $.Values.ingress.pathSuffix }}
+            pathType: {{ $.Values.ingress.pathType }}
             backend:
-              serviceName: proxy-public
-              servicePort: 80
+              service:
+                name: {{ include "jupyterhub.proxy-public.fullname" $ }}
+                port:
+                  name: http
+      {{- if $host }}
+      host: {{ $host | quote }}
+      {{- end }}
     {{- end }}
-  {{- if .Values.ingress.tls }}
+  {{- with .Values.ingress.tls }}
   tls:
-    {{- .Values.ingress.tls | toYaml | trimSuffix "\n" | nindent 4 }}
+    {{- . | toYaml | nindent 4 }}
   {{- end }}
 {{- end }}

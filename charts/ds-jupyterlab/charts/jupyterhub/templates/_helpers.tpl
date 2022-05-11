@@ -45,7 +45,6 @@
   ## Declared helpers
   - appLabel          |
   - componentLabel    |
-  - nameField         | uses componentLabel
   - commonLabels      | uses appLabel
   - labels            | uses commonLabels
   - matchLabels       | uses labels
@@ -58,13 +57,12 @@
   apiVersion: apps/v1
   kind: Deployment
   metadata:
-    name: {{ include "jupyterhub.nameField" . }}
+    name: {{ include "jupyterhub.autohttps.fullname" . }}
     labels:
       {{- include "jupyterhub.labels" . | nindent 4 }}
   spec:
     selector:
       matchLabels:
-        {{- $_ := merge (dict "appLabel" "kube-lego") . }}
         {{- include "jupyterhub.matchLabels" $_ | nindent 6 }}
     template:
       metadata:
@@ -94,7 +92,7 @@
 
 {{- /*
   jupyterhub.componentLabel:
-    Used by "jupyterhub.labels" and "jupyterhub.nameField".
+    Used by "jupyterhub.labels".
 
     NOTE: The component label is determined by either...
     - 1: The provided scope's .componentLabel
@@ -108,22 +106,6 @@
 {{- $component := .componentLabel | default $parent | default $file -}}
 {{- $component := print (.componentPrefix | default "") $component (.componentSuffix | default "") -}}
 {{ $component }}
-{{- end }}
-
-
-{{- /*
-  jupyterhub.nameField:
-    Populates the name field's value.
-    NOTE: some name fields are limited to 63 characters by the DNS naming spec.
-
-  TODO:
-  - [ ] Set all name fields using this helper.
-  - [ ] Optionally prefix the release name based on some setting in
-        .Values to allow for multiple deployments within a single namespace.
-*/}}
-{{- define "jupyterhub.nameField" -}}
-{{- $name := print (.namePrefix | default "") (include "jupyterhub.componentLabel" .) (.nameSuffix | default "") -}}
-{{ printf "%s-%s" .Release.Name $name | trunc 63 | trimSuffix "-" }}
 {{- end }}
 
 
@@ -163,7 +145,7 @@ component: {{ include "jupyterhub.componentLabel" . }}
 
 
 {{- /*
-  jupyterhub.dockersingleuserconfigjson:
+  jupyterhub.dockerconfigjson:
     Creates a base64 encoded docker registry json blob for use in a image pull
     secret, just like the `kubectl create secret docker-registry` command does
     for the generated secrets data.dockerconfigjson field. The output is
@@ -172,12 +154,12 @@ component: {{ include "jupyterhub.componentLabel" . }}
 
     - https://kubernetes.io/docs/concepts/containers/images/#specifying-imagepullsecrets-on-a-pod
 */}}
-{{- define "jupyterhub.dockersingleuserconfigjson" -}}
-{{ include "jupyterhub.dockersingleuserconfigjson.yaml" . | b64enc }}
+{{- define "jupyterhub.dockerconfigjson" -}}
+{{ include "jupyterhub.dockerconfigjson.yaml" . | b64enc }}
 {{- end }}
 
-{{- define "jupyterhub.dockersingleuserconfigjson.yaml" -}}
-{{- with .Values.singleuser.imagePullSecret -}}
+{{- define "jupyterhub.dockerconfigjson.yaml" -}}
+{{- with .Values.imagePullSecret -}}
 {
   "auths": {
     {{ .registry | default "https://index.docker.io/v1/" | quote }}: {
@@ -194,41 +176,62 @@ component: {{ include "jupyterhub.componentLabel" . }}
 {{- end }}
 
 {{- /*
-  jupyterhub.dockerhubconfigjson:
-    Creates a base64 encoded docker registry json blob for use in a image pull
-    secret, just like the `kubectl create secret docker-registry` command does
-    for the generated secrets data.dockerhubconfigjson field. The output is
-    verified to be exactly the same even if you have a password spanning
-    multiple lines as you may need to use a private GCR registry.
-
-    - https://kubernetes.io/docs/concepts/containers/images/#specifying-imagepullsecrets-on-a-pod
+  jupyterhub.imagePullSecrets
+    Augments passed .pullSecrets with $.Values.imagePullSecrets
 */}}
-{{- define "jupyterhub.dockerhubconfigjson" -}}
-{{ include "jupyterhub.dockerhubconfigjson.yaml" . | b64enc }}
-{{- end }}
+{{- define "jupyterhub.imagePullSecrets" -}}
+    {{- /*
+        We have implemented a trick to allow a parent chart depending on this
+        chart to call this named templates.
 
-{{- define "jupyterhub.dockerhubconfigjson.yaml" -}}
-{{- with .Values.hub.imagePullSecret -}}
-{
-  "auths": {
-    {{ .registry | default "https://index.docker.io/v1/" | quote }}: {
-      "username": {{ .username | quote }},
-      "password": {{ .password | quote }},
-      {{- if .email }}
-      "email": {{ .email | quote }},
-      {{- end }}
-      "auth": {{ (print .username ":" .password) | b64enc | quote }}
-    }
-  }
-}
-{{- end }}
+        Caveats and notes:
+
+            1. While parent charts can reference these, grandparent charts can't.
+            2. Parent charts must not use an alias for this chart.
+            3. There is no failsafe workaround to above due to
+                https://github.com/helm/helm/issues/9214.
+            4. .Chart is of its own type (*chart.Metadata) and needs to be casted
+                using "toYaml | fromYaml" in order to be able to use normal helm
+                template functions on it.
+    */}}
+    {{- $jupyterhub_values := .root.Values }}
+    {{- if ne .root.Chart.Name "jupyterhub" }}
+        {{- if .root.Values.jupyterhub }}
+            {{- $jupyterhub_values = .root.Values.jupyterhub }}
+        {{- end }}
+    {{- end }}
+
+    {{- /* Populate $_.list with all relevant entries */}}
+    {{- $_ := dict "list" (concat .image.pullSecrets $jupyterhub_values.imagePullSecrets | uniq) }}
+    {{- if and $jupyterhub_values.imagePullSecret.create $jupyterhub_values.imagePullSecret.automaticReferenceInjection }}
+        {{- $__ := set $_ "list" (append $_.list (include "jupyterhub.image-pull-secret.fullname" .root) | uniq) }}
+    {{- end }}
+
+    {{- /* Decide if something should be written */}}
+    {{- if not (eq ($_.list | toJson) "[]") }}
+
+        {{- /* Process the $_.list where strings become dicts with a name key and the
+        strings become the name keys' values into $_.res */}}
+        {{- $_ := set $_ "res" list }}
+        {{- range $_.list }}
+            {{- if eq (typeOf .) "string" }}
+                {{- $__ := set $_ "res" (append $_.res (dict "name" .)) }}
+            {{- else }}
+                {{- $__ := set $_ "res" (append $_.res .) }}
+            {{- end }}
+        {{- end }}
+
+        {{- /* Write the results */}}
+        {{- $_.res | toJson }}
+
+    {{- end }}
 {{- end }}
 
 {{- /*
-  jupyterhub.resources:
+  jupyterhub.singleuser.resources:
     The resource request of a singleuser.
 */}}
-{{- define "jupyterhub.resources" -}}
+{{- define "jupyterhub.singleuser.resources" -}}
 {{- $r1 := .Values.singleuser.cpu.guarantee -}}
 {{- $r2 := .Values.singleuser.memory.guarantee -}}
 {{- $r3 := .Values.singleuser.extraResource.guarantees -}}
@@ -266,4 +269,134 @@ limits:
   {{- end }}
   {{- end }}
 {{- end }}
+{{- end }}
+
+{{- /*
+  jupyterhub.extraEnv:
+    Output YAML formatted EnvVar entries for use in a containers env field.
+*/}}
+{{- define "jupyterhub.extraEnv" -}}
+{{- include "jupyterhub.extraEnv.withTrailingNewLine" . | trimSuffix "\n" }}
+{{- end }}
+
+{{- define "jupyterhub.extraEnv.withTrailingNewLine" -}}
+{{- if . }}
+{{- /* If extraEnv is a list, we inject it as it is. */}}
+{{- if eq (typeOf .) "[]interface {}" }}
+{{- . | toYaml }}
+
+{{- /* If extraEnv is a map, we differentiate two cases: */}}
+{{- else if eq (typeOf .) "map[string]interface {}" }}
+{{- range $key, $value := . }}
+{{- /*
+    - If extraEnv.someKey has a map value, then we add the value as a YAML
+      parsed list element and use the key as the name value unless its
+      explicitly set.
+*/}}
+{{- if eq (typeOf $value) "map[string]interface {}" }}
+{{- merge (dict) $value (dict "name" $key) | list | toYaml | println }}
+{{- /*
+    - If extraEnv.someKey has a string value, then we use the key as the
+      environment variable name for the value.
+*/}}
+{{- else if eq (typeOf $value) "string" -}}
+- name: {{ $key | quote }}
+  value: {{ $value | quote | println }}
+{{- else }}
+{{- printf "?.extraEnv.%s had an unexpected type (%s)" $key (typeOf $value) | fail }}
+{{- end }}
+{{- end }} {{- /* end of range */}}
+{{- end }}
+{{- end }} {{- /* end of: if . */}}
+{{- end }} {{- /* end of definition */}}
+
+{{- /*
+  jupyterhub.extraFiles.data:
+    Renders content for a k8s Secret's data field, coming from extraFiles with
+    binaryData entries.
+*/}}
+{{- define "jupyterhub.extraFiles.data.withNewLineSuffix" -}}
+    {{- range $file_key, $file_details := . }}
+        {{- include "jupyterhub.extraFiles.validate-file" (list $file_key $file_details) }}
+        {{- if $file_details.binaryData }}
+            {{- $file_key | quote }}: {{ $file_details.binaryData | nospace | quote }}{{ println }}
+        {{- end }}
+    {{- end }}
+{{- end }}
+{{- define "jupyterhub.extraFiles.data" -}}
+    {{- include "jupyterhub.extraFiles.data.withNewLineSuffix" . | trimSuffix "\n" }}
+{{- end }}
+
+{{- /*
+  jupyterhub.extraFiles.stringData:
+    Renders content for a k8s Secret's stringData field, coming from extraFiles
+    with either data or stringData entries.
+*/}}
+{{- define "jupyterhub.extraFiles.stringData.withNewLineSuffix" -}}
+    {{- range $file_key, $file_details := . }}
+        {{- include "jupyterhub.extraFiles.validate-file" (list $file_key $file_details) }}
+        {{- $file_name := $file_details.mountPath | base }}
+        {{- if $file_details.stringData }}
+            {{- $file_key | quote }}: |
+              {{- $file_details.stringData | trimSuffix "\n" | nindent 2 }}{{ println }}
+        {{- end }}
+        {{- if $file_details.data }}
+            {{- $file_key | quote }}: |
+              {{- if or (eq (ext $file_name) ".yaml") (eq (ext $file_name) ".yml") }}
+              {{- $file_details.data | toYaml | nindent 2 }}{{ println }}
+              {{- else if eq (ext $file_name) ".json" }}
+              {{- $file_details.data | toJson | nindent 2 }}{{ println }}
+              {{- else if eq (ext $file_name) ".toml" }}
+              {{- $file_details.data | toToml | trimSuffix "\n" | nindent 2 }}{{ println }}
+              {{- else }}
+              {{- print "\n\nextraFiles entries with 'data' (" $file_key " > " $file_details.mountPath ") needs to have a filename extension of .yaml, .yml, .json, or .toml!" | fail }}
+              {{- end }}
+        {{- end }}
+    {{- end }}
+{{- end }}
+{{- define "jupyterhub.extraFiles.stringData" -}}
+    {{- include "jupyterhub.extraFiles.stringData.withNewLineSuffix" . | trimSuffix "\n" }}
+{{- end }}
+
+{{- define "jupyterhub.extraFiles.validate-file" -}}
+    {{- $file_key := index . 0 }}
+    {{- $file_details := index . 1 }}
+
+    {{- /* Use of mountPath. */}}
+    {{- if not ($file_details.mountPath) }}
+        {{- print "\n\nextraFiles entries (" $file_key ") must contain the field 'mountPath'." | fail }}
+    {{- end }}
+
+    {{- /* Use one of stringData, binaryData, data. */}}
+    {{- $field_count := 0 }}
+    {{- if $file_details.data }}
+        {{- $field_count = add1 $field_count }}
+    {{- end }}
+    {{- if $file_details.stringData }}
+        {{- $field_count = add1 $field_count }}
+    {{- end }}
+    {{- if $file_details.binaryData }}
+        {{- $field_count = add1 $field_count }}
+    {{- end }}
+    {{- if ne $field_count 1 }}
+        {{- print "\n\nextraFiles entries (" $file_key ") must only contain one of the fields: 'data', 'stringData', and 'binaryData'." | fail }}
+    {{- end }}
+{{- end }}
+
+{{- /*
+  jupyterhub.chart-version-to-git-ref:
+    Renders a valid git reference from a chartpress generated version string.
+    In practice, either a git tag or a git commit hash will be returned.
+
+    - The version string will follow a chartpress pattern, see
+      https://github.com/jupyterhub/chartpress#examples-chart-versions-and-image-tags.
+
+    - The regexReplaceAll function is a sprig library function, see
+      http://masterminds.github.io/sprig/strings.html.
+
+    - The regular expression is in golang syntax, but \d had to become \\d for
+      example.
+*/}}
+{{- define "jupyterhub.chart-version-to-git-ref" -}}
+{{- regexReplaceAll ".*[.-]n\\d+[.]h(.*)" . "${1}" }}
 {{- end }}

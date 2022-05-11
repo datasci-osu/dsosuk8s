@@ -4,127 +4,148 @@
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: autohttps
+  name: {{ include "jupyterhub.autohttps.fullname" . }}
   labels:
-      {{- /*
-        NOTE: The deployment's own app label does not have to deviate like it's
-        pod need to.
-      */}}
     {{- include "jupyterhub.labels" . | nindent 4 }}
 spec:
   replicas: 1
   selector:
     matchLabels:
-      {{- /*
-        NOTE: A dynamically created service in the kube-lego project have
-        hardcoded the selection of a pod based on the `app: kube-lego` label.
-        For the details, see:
-        - https://github.com/jetstack/kube-lego/blob/d0c664295772bc5b4bfb95e495c6e0ebe8327319/pkg/service/service.go#L115-L117
-        - https://github.com/jetstack/kube-lego/blob/56fa724cdbc31a241d4bdd875461afcabfbc25d6/pkg/kubelego_const/consts.go#L29
-      */}}
-      {{- $_ := merge (dict "appLabel" "kube-lego") . }}
-      {{- include "jupyterhub.matchLabels" $_ | nindent 6 }}
+      {{- include "jupyterhub.matchLabels" . | nindent 6 }}
   template:
     metadata:
       labels:
-        {{- /* Changes here will cause the Deployment to restart the pods. */}}
-        {{- $_ := merge (dict "appLabel" "kube-lego") . }}
-        {{- include "jupyterhub.matchLabels" $_ | nindent 8 }}
+        {{- include "jupyterhub.matchLabels" . | nindent 8 }}
         hub.jupyter.org/network-access-proxy-http: "true"
+        {{- with .Values.proxy.traefik.labels }}
+        {{- . | toYaml | nindent 8 }}
+        {{- end }}
+      annotations:
+        # Only force a restart through a change to this checksum when the static
+        # configuration is changed, as the dynamic can be updated after start.
+        # Any disruptions to this deployment impacts everything, it is the
+        # entrypoint of all network traffic.
+        checksum/static-config: {{ include "jupyterhub.traefik.yaml" . | fromYaml | merge .Values.proxy.traefik.extraStaticConfig | toYaml | sha256sum }}
     spec:
       {{- if .Values.rbac.enabled }}
-      serviceAccountName: autohttps
+      serviceAccountName: {{ include "jupyterhub.autohttps.fullname" . }}
       {{- end }}
       {{- if .Values.scheduling.podPriority.enabled }}
-      priorityClassName: {{ .Release.Name }}-default-priority
+      priorityClassName: {{ include "jupyterhub.priority.fullname" . }}
       {{- end }}
-      terminationGracePeriodSeconds: 60
-      nodeSelector: {{ toJson .Values.proxy.nodeSelector }}
+      {{- with .Values.proxy.traefik.nodeSelector }}
+      nodeSelector:
+        {{- . | toYaml | nindent 8 }}
+      {{- end }}
+      {{- with concat .Values.scheduling.corePods.tolerations .Values.proxy.traefik.tolerations }}
+      tolerations:
+        {{- . | toYaml | nindent 8 }}
+      {{- end }}
       {{- include "jupyterhub.coreAffinity" . | nindent 6 }}
-      containers:
-        - name: nginx
-          image: "{{ .Values.proxy.nginx.image.name }}:{{ .Values.proxy.nginx.image.tag }}"
-          {{- with .Values.proxy.nginx.image.pullPolicy }}
+      volumes:
+        - name: certificates
+          emptyDir: {}
+        - name: traefik-config
+          configMap:
+            name: {{ include "jupyterhub.autohttps.fullname" . }}
+        {{- with .Values.proxy.traefik.extraVolumes }}
+        {{- . | toYaml | nindent 8 }}
+        {{- end }}
+      {{- with include "jupyterhub.imagePullSecrets" (dict "root" . "image" .Values.proxy.traefik.image) }}
+      imagePullSecrets: {{ . }}
+      {{- end }}
+      initContainers:
+        - name: load-acme
+          image: "{{ .Values.proxy.secretSync.image.name }}:{{ .Values.proxy.secretSync.image.tag }}"
+          {{- with .Values.proxy.secretSync.image.pullPolicy }}
           imagePullPolicy: {{ . }}
           {{- end }}
-          resources:
-            {{- .Values.proxy.nginx.resources | toYaml | trimSuffix "\n" | nindent 12 }}
           args:
-            - /nginx-ingress-controller
-            - --default-backend-service={{ .Release.Namespace }}/proxy-http
-            - --configmap={{ .Release.Namespace }}/nginx-proxy-config
-            - --ingress-class=jupyterhub-proxy-tls
-            - --watch-namespace={{ .Release.Namespace }}
-            {{- if .Values.debug.enabled }}
-            - --v=3
-            {{- end }}
+            - load
+            - {{ include "jupyterhub.proxy-public-tls.fullname" . }}
+            - acme.json
+            - /etc/acme/acme.json
           env:
-            - name: POD_NAME
-              valueFrom:
-                fieldRef:
-                  fieldPath: metadata.name
-            - name: POD_NAMESPACE
-              valueFrom:
-                fieldRef:
-                  fieldPath: metadata.namespace
-          livenessProbe:
-            httpGet:
-              path: /healthz
-              port: 10254
-              scheme: HTTP
-            initialDelaySeconds: 10
-            timeoutSeconds: 1
-          readinessProbe:
-            httpGet:
-              path: /healthz
-              port: 10254
-              scheme: HTTP
+            # We need this to get logs immediately
+            - name: PYTHONUNBUFFERED
+              value: "True"
+            {{- with .Values.proxy.traefik.extraEnv }}
+            {{- include "jupyterhub.extraEnv" . | nindent 12 }}
+            {{- end }}
+          volumeMounts:
+            - name: certificates
+              mountPath: /etc/acme
+          {{- with .Values.proxy.secretSync.containerSecurityContext }}
+          securityContext:
+            {{- . | toYaml | nindent 12 }}
+          {{- end }}
+      {{- with .Values.proxy.traefik.extraInitContainers }}
+        {{- . | toYaml | nindent 8 }}
+      {{- end }}
+      containers:
+        - name: traefik
+          image: "{{ .Values.proxy.traefik.image.name }}:{{ .Values.proxy.traefik.image.tag }}"
+          {{- with .Values.proxy.traefik.image.pullPolicy }}
+          imagePullPolicy: {{ . }}
+          {{- end }}
+          {{- with .Values.proxy.traefik.resources }}
+          resources:
+            {{- . | toYaml | nindent 12 }}
+          {{- end }}
           ports:
             - name: http
-              containerPort: 80
-              protocol: TCP
+              containerPort: 8080
             - name: https
-              containerPort: 443
-              protocol: TCP
-        - name: kube-lego
-          image: "{{ .Values.proxy.lego.image.name }}:{{ .Values.proxy.lego.image.tag }}"
-          {{- with .Values.proxy.lego.image.pullPolicy }}
+              containerPort: 8443
+            {{- with .Values.proxy.traefik.extraPorts }}
+            {{- . | toYaml | nindent 12 }}
+            {{- end }}
+          volumeMounts:
+            - name: traefik-config
+              mountPath: /etc/traefik
+            - name: certificates
+              mountPath: /etc/acme
+            {{- with .Values.proxy.traefik.extraVolumeMounts }}
+            {{- . | toYaml | nindent 12 }}
+            {{- end }}
+          {{- with .Values.proxy.traefik.extraEnv }}
+          env:
+            {{- include "jupyterhub.extraEnv" . | nindent 12 }}
+          {{- end }}
+          {{- with .Values.proxy.traefik.containerSecurityContext }}
+          securityContext:
+            {{- . | toYaml | nindent 12 }}
+          {{- end }}
+        - name: secret-sync
+          image: "{{ .Values.proxy.secretSync.image.name }}:{{ .Values.proxy.secretSync.image.tag }}"
+          {{- with .Values.proxy.secretSync.image.pullPolicy }}
           imagePullPolicy: {{ . }}
           {{- end }}
+          {{- with .Values.proxy.secretSync.resources }}
           resources:
-            {{- .Values.proxy.lego.resources | toYaml | trimSuffix "\n" | nindent 12 }}
+            {{- . | toYaml | nindent 12 }}
+          {{- end }}
+          args:
+            - watch-save
+            - --label=app={{ include "jupyterhub.appLabel" . }}
+            - --label=release={{ .Release.Name }}
+            - --label=chart={{ .Chart.Name }}-{{ .Chart.Version | replace "+" "_" }}
+            - --label=heritage=secret-sync
+            - {{ include "jupyterhub.proxy-public-tls.fullname" . }}
+            - acme.json
+            - /etc/acme/acme.json
           env:
-            - name: LEGO_NAMESPACE
-              valueFrom:
-                fieldRef:
-                  fieldPath: metadata.namespace
-            - name: LEGO_WATCH_NAMESPACE
-              valueFrom:
-                fieldRef:
-                  fieldPath: metadata.namespace
-            - name: LEGO_POD_IP
-              valueFrom:
-                fieldRef:
-                  fieldPath: status.podIP
-            - name: LEGO_EMAIL
-              # {{ required "proxy.https.letsencrypt.contactEmail is a required field" .Values.proxy.https.letsencrypt.contactEmail }}
-              value: {{ .Values.proxy.https.letsencrypt.contactEmail | quote }}
-            - name: LEGO_SUPPORTED_INGRESS_PROVIDER
-              value: "nginx"
-            - name: LEGO_SUPPORTED_INGRESS_CLASS
-              value: "jupyterhub-proxy-tls,dummy"
-            - name: LEGO_DEFAULT_INGRESS_CLASS
-              value: "jupyterhub-proxy-tls"
-            - name: LEGO_KUBE_ANNOTATION
-              value: "hub.jupyter.org/tls-terminator"
-            - name: LEGO_URL
-              value: "https://acme-v01.api.letsencrypt.org/directory"
-          ports:
-            - containerPort: 8080
-          readinessProbe:
-            httpGet:
-              path: /healthz
-              port: 8080
-            initialDelaySeconds: 5
-            timeoutSeconds: 1
+          # We need this to get logs immediately
+          - name: PYTHONUNBUFFERED
+            value: "True"
+          volumeMounts:
+            - name: certificates
+              mountPath: /etc/acme
+          {{- with .Values.proxy.secretSync.containerSecurityContext }}
+          securityContext:
+            {{- . | toYaml | nindent 12 }}
+          {{- end }}
+      {{- with .Values.proxy.traefik.extraPodSpec }}
+      {{- . | toYaml | nindent 6 }}
+      {{- end }}
 {{- end }}

@@ -4,20 +4,22 @@
 apiVersion: v1
 kind: Service
 metadata:
-  name: proxy-http
+  name: {{ include "jupyterhub.proxy-http.fullname" . }}
   labels:
     {{- include "jupyterhub.labels" . | nindent 4 }}
-    {{- range $key, $value := .Values.proxy.service.labels }}
-    {{ $key }}: {{ $value | quote }}
+    {{- with .Values.proxy.service.labels }}
+    {{- . | toYaml | nindent 4 }}
     {{- end }}
-  annotations: {{ toJson .Values.proxy.service.annotations }}
+  {{- with .Values.proxy.service.annotations }}
+  annotations:
+    {{- . | toYaml | nindent 4 }}
+  {{- end }}
 spec:
   type: ClusterIP
   selector:
     {{- $_ := merge (dict "componentLabel" "proxy") . }}
     {{- include "jupyterhub.matchLabels" $_ | nindent 4 }}
   ports:
-    - protocol: TCP
-      port: 8000
-      targetPort: 8000
+    - port: 8000
+      targetPort: http
 {{- end }}

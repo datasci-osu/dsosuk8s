@@ -1,19 +1,48 @@
+# fullnameOverride and nameOverride distinguishes blank strings, null values,
+# and non-blank strings. For more details, see the configuration reference.
+fullnameOverride: ""
+nameOverride:
+
+# custom can contain anything you want to pass to the hub pod, as all passed
+# Helm template values will be made available there.
 custom: {}
 
+# imagePullSecret is configuration to create a k8s Secret that Helm chart's pods
+# can get credentials from to pull their images.
+imagePullSecret:
+  create: false
+  automaticReferenceInjection: true
+  registry:
+  username:
+  password:
+  email:
+# imagePullSecrets is configuration to reference the k8s Secret resources the
+# Helm chart's pods can get credentials from to pull their images.
+imagePullSecrets: []
+
+# hub relates to the hub pod, responsible for running JupyterHub, its configured
+# Authenticator class KubeSpawner, and its configured Proxy class
+# ConfigurableHTTPProxy. KubeSpawner creates the user pods, and
+# ConfigurableHTTPProxy speaks with the actual ConfigurableHTTPProxy server in
+# the proxy pod.
 hub:
+  config:
+    JupyterHub:
+      admin_access: true
+      authenticator_class: dummy
   service:
     type: ClusterIP
     annotations: {}
     ports:
       nodePort:
+    extraPorts: []
     loadBalancerIP:
   baseUrl: /
   cookieSecret:
-  publicURL:
   initContainers: []
-  uid: 1000
   fsGid: 1000
   nodeSelector: {}
+  tolerations: []
   concurrentSpawnLimit: 64
   consecutiveFailureLimit: 5
   activeServerLimit:
@@ -40,38 +69,46 @@ hub:
     password:
   labels: {}
   annotations: {}
+  command: []
+  args: []
   extraConfig: {}
-  extraConfigMap: {}
+  extraFiles: {}
   extraEnv: {}
   extraContainers: []
   extraVolumes: []
   extraVolumeMounts: []
   image:
     name: jupyterhub/k8s-hub
-    tag: '0.9.0-alpha.1.088.1350ad7'
-    # pullSecrets:
-    #   - secretName
-  resources:
-    requests:
-      cpu: 200m
-      memory: 512Mi
+    tag: "set-by-chartpress"
+    pullPolicy:
+    pullSecrets: []
+  resources: {}
+  containerSecurityContext:
+    runAsUser: 1000
+    runAsGroup: 1000
+    allowPrivilegeEscalation: false
+  lifecycle: {}
+  loadRoles: {}
   services: {}
-  imagePullSecret:
-    enabled: false
-    registry:
-    username:
-    email:
-    password:
   pdb:
-    enabled: true
+    enabled: false
+    maxUnavailable:
     minAvailable: 1
   networkPolicy:
-    enabled: false
+    enabled: true
     ingress: []
+    ## egress for JupyterHub already includes Kubernetes internal DNS and
+    ## access to the proxy, but can be restricted further, but ensure to allow
+    ## access to the Kubernetes API server that couldn't be pinned ahead of
+    ## time.
+    ##
+    ## ref: https://stackoverflow.com/a/59016417/2220152
     egress:
       - to:
           - ipBlock:
               cidr: 0.0.0.0/0
+    interNamespaceAccessLabels: ignore
+    allowedIngressPorts: []
   allowNamedServers: false
   namedServerLimitPerUser:
   authenticatePrometheus:
@@ -80,21 +117,36 @@ hub:
   templatePaths: []
   templateVars: {}
   livenessProbe:
-    enabled: false
-    initialDelaySeconds: 30
+    # The livenessProbe's aim to give JupyterHub sufficient time to startup but
+    # be able to restart if it becomes unresponsive for ~5 min.
+    enabled: true
+    initialDelaySeconds: 300
     periodSeconds: 10
+    failureThreshold: 30
+    timeoutSeconds: 3
   readinessProbe:
+    # The readinessProbe's aim is to provide a successful startup indication,
+    # but following that never become unready before its livenessProbe fail and
+    # restarts it if needed. To become unready following startup serves no
+    # purpose as there are no other pod to fallback to in our non-HA deployment.
     enabled: true
     initialDelaySeconds: 0
-    periodSeconds: 10
-  # existingSecret: existing-secret
+    periodSeconds: 2
+    failureThreshold: 1000
+    timeoutSeconds: 1
+  existingSecret:
+  serviceAccount:
+    annotations: {}
+  extraPodSpec: {}
 
 rbac:
   enabled: true
 
-
+# proxy relates to the proxy pod, the proxy-public service, and the autohttps
+# pod and proxy-http service.
 proxy:
-  secretToken: ''
+  secretToken:
+  annotations: {}
   deploymentStrategy:
     ## type: Recreate
     ## - JupyterHub's interaction with the CHP proxy becomes a lot more robust
@@ -121,6 +173,7 @@ proxy:
     ##     Error: Deployment.apps "proxy" is invalid: spec.strategy.rollingUpdate: Forbidden: may not be specified when strategy `type` is 'Recreate'
     ##     Error: UPGRADE FAILED: Deployment.apps "proxy" is invalid: spec.strategy.rollingUpdate: Forbidden: may not be specified when strategy `type` is 'Recreate'
     rollingUpdate:
+  # service relates to the proxy-public service
   service:
     type: LoadBalancer
     labels: {}
@@ -128,84 +181,131 @@ proxy:
     nodePorts:
       http:
       https:
+    disableHttpPort: false
+    extraPorts: []
     loadBalancerIP:
     loadBalancerSourceRanges: []
+  # chp relates to the proxy pod, which is responsible for routing traffic based
+  # on dynamic configuration sent from JupyterHub to CHP's REST API.
   chp:
+    containerSecurityContext:
+      runAsUser: 65534 # nobody user
+      runAsGroup: 65534 # nobody group
+      allowPrivilegeEscalation: false
     image:
       name: jupyterhub/configurable-http-proxy
-      tag: 4.2.0
+      tag: 4.5.1 # https://github.com/jupyterhub/configurable-http-proxy/releases
+      pullPolicy:
+      pullSecrets: []
+    extraCommandLineFlags: []
     livenessProbe:
       enabled: true
-      initialDelaySeconds: 30
+      initialDelaySeconds: 60
       periodSeconds: 10
+      failureThreshold: 30
+      timeoutSeconds: 3
     readinessProbe:
       enabled: true
       initialDelaySeconds: 0
-      periodSeconds: 10
-    resources:
-      requests:
-        cpu: 200m
-        memory: 512Mi
-  nginx:
-    image:
-      name: quay.io/kubernetes-ingress-controller/nginx-ingress-controller
-      tag: 0.15.0
-    proxyBodySize: 64m
-    hstsIncludeSubdomains: 'false'
+      periodSeconds: 2
+      failureThreshold: 1000
+      timeoutSeconds: 1
     resources: {}
-  lego:
+    defaultTarget:
+    errorTarget:
+    extraEnv: {}
+    nodeSelector: {}
+    tolerations: []
+    networkPolicy:
+      enabled: true
+      ingress: []
+      egress:
+        - to:
+            - ipBlock:
+                cidr: 0.0.0.0/0
+      interNamespaceAccessLabels: ignore
+      allowedIngressPorts: [http, https]
+    pdb:
+      enabled: false
+      maxUnavailable:
+      minAvailable: 1
+    extraPodSpec: {}
+  # traefik relates to the autohttps pod, which is responsible for TLS
+  # termination when proxy.https.type=letsencrypt.
+  traefik:
+    containerSecurityContext:
+      runAsUser: 65534 # nobody user
+      runAsGroup: 65534 # nobody group
+      allowPrivilegeEscalation: false
     image:
-      name: jetstack/kube-lego
-      tag: 0.1.7
+      name: traefik
+      tag: v2.6.1 # ref: https://hub.docker.com/_/traefik?tab=tags
+      pullPolicy:
+      pullSecrets: []
+    hsts:
+      includeSubdomains: false
+      preload: false
+      maxAge: 15724800 # About 6 months
+    resources: {}
+    labels: {}
+    extraInitContainers: []
+    extraEnv: {}
+    extraVolumes: []
+    extraVolumeMounts: []
+    extraStaticConfig: {}
+    extraDynamicConfig: {}
+    nodeSelector: {}
+    tolerations: []
+    extraPorts: []
+    networkPolicy:
+      enabled: true
+      ingress: []
+      egress:
+        - to:
+            - ipBlock:
+                cidr: 0.0.0.0/0
+      interNamespaceAccessLabels: ignore
+      allowedIngressPorts: [http, https]
+    pdb:
+      enabled: false
+      maxUnavailable:
+      minAvailable: 1
+    serviceAccount:
+      annotations: {}
+    extraPodSpec: {}
+  secretSync:
+    containerSecurityContext:
+      runAsUser: 65534 # nobody user
+      runAsGroup: 65534 # nobody group
+      allowPrivilegeEscalation: false
+    image:
+      name: jupyterhub/k8s-secret-sync
+      tag: "set-by-chartpress"
+      pullPolicy:
+      pullSecrets: []
     resources: {}
   labels: {}
-  nodeSelector: {}
-  pdb:
-    enabled: true
-    minAvailable: 1
   https:
-    enabled: true
+    enabled: false
     type: letsencrypt
     #type: letsencrypt, manual, offload, secret
     letsencrypt:
-      contactEmail: ''
+      contactEmail:
+      # Specify custom server here (https://acme-staging-v02.api.letsencrypt.org/directory) to hit staging LE
+      acmeServer: https://acme-v02.api.letsencrypt.org/directory
     manual:
       key:
       cert:
     secret:
-      name: ''
+      name:
       key: tls.key
       crt: tls.crt
     hosts: []
-  networkPolicy:
-    enabled: false
-    ingress: []
-    egress:
-      - to:
-          - ipBlock:
-              cidr: 0.0.0.0/0
 
-
-auth:
-  type: dummy
-  whitelist:
-    users:
-  admin:
-    access: true
-    users:
-  dummy:
-    password:
-  ldap:
-    dn:
-      search: {}
-      user: {}
-    user: {}
-  state:
-    enabled: false
-    cryptoKey:
-
-
+# singleuser relates to the configuration of KubeSpawner which runs in the hub
+# pod, and its spawning of user pods such as jupyter-myusername.
 singleuser:
+  podNameTemplate:
   extraTolerations: []
   nodeSelector: {}
   extraNodeAffinity:
@@ -220,24 +320,37 @@ singleuser:
   networkTools:
     image:
       name: jupyterhub/k8s-network-tools
-      tag: '0.9.0-alpha.1.000.f995427'
+      tag: "set-by-chartpress"
+      pullPolicy:
+      pullSecrets: []
+    resources: {}
   cloudMetadata:
-    enabled: false
+    # block set to true will append a privileged initContainer using the
+    # iptables to block the sensitive metadata server at the provided ip.
+    blockWithIptables: true
     ip: 169.254.169.254
   networkPolicy:
-    enabled: false
+    enabled: true
     ingress: []
     egress:
-    # Required egress is handled by other rules so it's safe to modify this
+      # Required egress to communicate with the hub and DNS servers will be
+      # augmented to these egress rules.
+      #
+      # This default rule explicitly allows all outbound traffic from singleuser
+      # pods, except to a typical IP used to return metadata that can be used by
+      # someone with malicious intent.
       - to:
           - ipBlock:
               cidr: 0.0.0.0/0
               except:
                 - 169.254.169.254/32
+    interNamespaceAccessLabels: ignore
+    allowedIngressPorts: []
   events: true
   extraAnnotations: {}
   extraLabels:
-    hub.jupyter.org/network-access-hub: 'true'
+    hub.jupyter.org/network-access-hub: "true"
+  extraFiles: {}
   extraEnv: {}
   lifecycleHooks: {}
   initContainers: []
@@ -252,7 +365,7 @@ singleuser:
     extraVolumeMounts: []
     static:
       pvcName:
-      subPath: '{username}'
+      subPath: "{username}"
     capacity: 10Gi
     homeMountPath: /home/jovyan
     dynamic:
@@ -262,16 +375,9 @@ singleuser:
       storageAccessModes: [ReadWriteOnce]
   image:
     name: jupyterhub/k8s-singleuser-sample
-    tag: '0.9.0-alpha.1.022.59437a5'
-    pullPolicy: IfNotPresent
-    # pullSecrets:
-    #   - secretName
-  imagePullSecret:
-    enabled: false
-    registry:
-    username:
-    email:
-    password:
+    tag: "set-by-chartpress"
+    pullPolicy:
+    pullSecrets: []
   startTimeout: 300
   cpu:
     limit:
@@ -282,83 +388,244 @@ singleuser:
   extraResource:
     limits: {}
     guarantees: {}
-  cmd: jupyterhub-singleuser
+  cmd:
   defaultUrl:
   extraPodConfig: {}
+  profileList: []
 
-
+# scheduling relates to the user-scheduler pods and user-placeholder pods.
 scheduling:
   userScheduler:
     enabled: true
     replicas: 2
     logLevel: 4
-    ## policy:
-    ## Allows you to provide custom YAML/JSON to render into a JSON policy.cfg,
-    ## a configuration file for the kube-scheduler binary.
-    ## NOTE: The kube-scheduler binary in the kube-scheduler image we are
-    ## currently using may be version bumped. It would for example happen if we
-    ## increase the lowest supported k8s version for the helm chart. At this
-    ## point, the provided policy.cfg may require a change along with that due
-    ## to breaking changes in the kube-scheduler binary.
-    policy: {}
+    # plugins are configured on the user-scheduler to make us score how we
+    # schedule user pods in a way to help us schedule on the most busy node. By
+    # doing this, we help scale down more effectively. It isn't obvious how to
+    # enable/disable scoring plugins, and configure them, to accomplish this.
+    #
+    # plugins ref: https://kubernetes.io/docs/reference/scheduling/config/#scheduling-plugins-1
+    # migration ref: https://kubernetes.io/docs/reference/scheduling/config/#scheduler-configuration-migrations
+    #
+    plugins:
+      score:
+        # These scoring plugins are enabled by default according to
+        # https://kubernetes.io/docs/reference/scheduling/config/#scheduling-plugins
+        # 2022-02-22.
+        #
+        # Enabled with high priority:
+        # - NodeAffinity
+        # - InterPodAffinity
+        # - NodeResourcesFit
+        # - ImageLocality
+        # Remains enabled with low default priority:
+        # - TaintToleration
+        # - PodTopologySpread
+        # - VolumeBinding
+        # Disabled for scoring:
+        # - NodeResourcesBalancedAllocation
+        #
+        disabled:
+          # We disable these plugins (with regards to scoring) to not interfere
+          # or complicate our use of NodeResourcesFit.
+          - name: NodeResourcesBalancedAllocation
+          # Disable plugins to be allowed to enable them again with a different
+          # weight and avoid an error.
+          - name: NodeAffinity
+          - name: InterPodAffinity
+          - name: NodeResourcesFit
+          - name: ImageLocality
+        enabled:
+          - name: NodeAffinity
+            weight: 14631
+          - name: InterPodAffinity
+            weight: 1331
+          - name: NodeResourcesFit
+            weight: 121
+          - name: ImageLocality
+            weight: 11
+    pluginConfig:
+      # Here we declare that we should optimize pods to fit based on a
+      # MostAllocated strategy instead of the default LeastAllocated.
+      - name: NodeResourcesFit
+        args:
+          scoringStrategy:
+            resources:
+              - name: cpu
+                weight: 1
+              - name: memory
+                weight: 1
+            type: MostAllocated
+    containerSecurityContext:
+      runAsUser: 65534 # nobody user
+      runAsGroup: 65534 # nobody group
+      allowPrivilegeEscalation: false
     image:
-      name: gcr.io/google_containers/kube-scheduler-amd64
-      tag: v1.13.12
+      # IMPORTANT: Bumping the minor version of this binary should go hand in
+      #            hand with an inspection of the user-scheduelrs RBAC resources
+      #            that we have forked in
+      #            templates/scheduling/user-scheduler/rbac.yaml.
+      #
+      #            Debugging advice:
+      #
+      #            - Is configuration of kube-scheduler broken in
+      #              templates/scheduling/user-scheduler/configmap.yaml?
+      #
+      #            - Is the kube-scheduler binary's compatibility to work
+      #              against a k8s api-server that is too new or too old?
+      #
+      #            - You can update the GitHub workflow that runs tests to
+      #              include "deploy/user-scheduler" in the k8s namespace report
+      #              and reduce the user-scheduler deployments replicas to 1 in
+      #              dev-config.yaml to get relevant logs from the user-scheduler
+      #              pods. Inspect the "Kubernetes namespace report" action!
+      #
+      #            - Typical failures are that kube-scheduler fails to search for
+      #              resources via its "informers", and won't start trying to
+      #              schedule pods before they succeed which may require
+      #              additional RBAC permissions or that the k8s api-server is
+      #              aware of the resources.
+      #
+      #            - If "successfully acquired lease" can be seen in the logs, it
+      #              is a good sign kube-scheduler is ready to schedule pods.
+      #
+      name: k8s.gcr.io/kube-scheduler
+      tag: v1.23.4 # ref: https://github.com/kubernetes/website/blob/main/content/en/releases/patch-releases.md
+      pullPolicy:
+      pullSecrets: []
     nodeSelector: {}
+    tolerations: []
     pdb:
       enabled: true
-      minAvailable: 1
-    resources:
-      requests:
-        cpu: 50m
-        memory: 256Mi
+      maxUnavailable: 1
+      minAvailable:
+    resources: {}
+    serviceAccount:
+      annotations: {}
+    extraPodSpec: {}
   podPriority:
     enabled: false
     globalDefault: false
     defaultPriority: 0
+    imagePullerPriority: -5
     userPlaceholderPriority: -10
   userPlaceholder:
     enabled: true
+    image:
+      name: k8s.gcr.io/pause
+      # tag's can be updated by inspecting the output of the command:
+      # gcloud container images list-tags k8s.gcr.io/pause --sort-by=~tags
+      #
+      # If you update this, also update prePuller.pause.image.tag
+      tag: "3.6"
+      pullPolicy:
+      pullSecrets: []
     replicas: 0
+    containerSecurityContext:
+      runAsUser: 65534 # nobody user
+      runAsGroup: 65534 # nobody group
+      allowPrivilegeEscalation: false
+    resources: {}
   corePods:
+    tolerations:
+      - key: hub.jupyter.org/dedicated
+        operator: Equal
+        value: core
+        effect: NoSchedule
+      - key: hub.jupyter.org_dedicated
+        operator: Equal
+        value: core
+        effect: NoSchedule
     nodeAffinity:
       matchNodePurpose: prefer
   userPods:
+    tolerations:
+      - key: hub.jupyter.org/dedicated
+        operator: Equal
+        value: user
+        effect: NoSchedule
+      - key: hub.jupyter.org_dedicated
+        operator: Equal
+        value: user
+        effect: NoSchedule
     nodeAffinity:
       matchNodePurpose: prefer
 
-
+# prePuller relates to the hook|continuous-image-puller DaemonsSets
 prePuller:
+  annotations: {}
+  resources: {}
+  containerSecurityContext:
+    runAsUser: 65534 # nobody user
+    runAsGroup: 65534 # nobody group
+    allowPrivilegeEscalation: false
+  extraTolerations: []
+  # hook relates to the hook-image-awaiter Job and hook-image-puller DaemonSet
   hook:
     enabled: true
+    pullOnlyOnChanges: true
+    # image and the configuration below relates to the hook-image-awaiter Job
     image:
       name: jupyterhub/k8s-image-awaiter
-      tag: '0.9.0-alpha.1.000.f995427'
+      tag: "set-by-chartpress"
+      pullPolicy:
+      pullSecrets: []
+    containerSecurityContext:
+      runAsUser: 65534 # nobody user
+      runAsGroup: 65534 # nobody group
+      allowPrivilegeEscalation: false
+    podSchedulingWaitDuration: 10
+    nodeSelector: {}
+    tolerations: []
+    resources: {}
+    serviceAccount:
+      annotations: {}
   continuous:
     enabled: true
+  pullProfileListImages: true
   extraImages: {}
   pause:
+    containerSecurityContext:
+      runAsUser: 65534 # nobody user
+      runAsGroup: 65534 # nobody group
+      allowPrivilegeEscalation: false
     image:
-      name: gcr.io/google_containers/pause
-      tag: '3.1'
-
+      name: k8s.gcr.io/pause
+      # tag's can be updated by inspecting the output of the command:
+      # gcloud container images list-tags k8s.gcr.io/pause --sort-by=~tags
+      #
+      # If you update this, also update scheduling.userPlaceholder.image.tag
+      tag: "3.6"
+      pullPolicy:
+      pullSecrets: []
 
 ingress:
   enabled: false
   annotations: {}
+  ingressClassName:
   hosts: []
-  pathSuffix: ''
+  pathSuffix:
+  pathType: Prefix
   tls: []
 
-
+# cull relates to the jupyterhub-idle-culler service, responsible for evicting
+# inactive singleuser pods.
+#
+# The configuration below, except for enabled, corresponds to command-line flags
+# for jupyterhub-idle-culler as documented here:
+# https://github.com/jupyterhub/jupyterhub-idle-culler#as-a-standalone-script
+#
 cull:
   enabled: true
-  users: false
-  timeout: 3600
-  every: 600
-  concurrency: 10
-  maxAge: 0
-
+  users: false # --cull-users
+  removeNamedServers: false # --remove-named-servers
+  timeout: 3600 # --timeout
+  every: 600 # --cull-every
+  concurrency: 10 # --concurrency
+  maxAge: 0 # --max-age
 
 debug:
   enabled: false
+
+global:
+  safeToShowValues: false

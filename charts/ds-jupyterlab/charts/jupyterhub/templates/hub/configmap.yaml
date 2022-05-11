@@ -1,40 +1,30 @@
 kind: ConfigMap
 apiVersion: v1
 metadata:
-  name: hub-config
+  name: {{ include "jupyterhub.hub.fullname" . }}
   labels:
     {{- include "jupyterhub.labels" . | nindent 4 }}
 data:
-{{- $values := pick .Values "auth" "cull" "custom" "debug" "hub" "scheduling" "singleuser" }}
-{{- /* trim secret values. Update here if new secrets are added! */ -}}
-{{- /* make a copy of values.auth to avoid modifying the original */ -}}
-{{- $_ := set $values "auth" (merge dict .Values.auth) }}
-{{- $_ := set $values.auth "state" (omit $values.auth.state "cryptoKey") }}
-{{- range $key, $auth := .Values.auth }}
-  {{- if typeIs "map[string]interface {}" $auth }}
-    {{- if (or $auth.clientSecret $auth.password) }}
-      {{- $_ := set $values.auth $key (omit $auth "clientSecret" "password") }}
-    {{- end }}
-  {{- end }}
-{{- end }}
-{{- $_ := set $values "hub" (omit $values.hub "cookieSecret" "extraEnv" "extraConfigMap") -}}
-{{- $_ := set $values.hub "services" dict }}
-{{- range $key, $service := .Values.hub.services }}
-  {{- if $service.apiToken }}
-    {{- $_ := set $values.hub.services $key (omit $service "apiToken") }}
-  {{- end }}
-{{- end }}
-{{- /* copy values.singleuser */ -}}
-{{- $_ := set $values "singleuser" (omit .Values.singleuser "imagePullSecret") }}
-{{- $_ := set $values.singleuser "imagePullSecret" (omit .Values.singleuser.imagePullSecret "password") }}
-{{- /* preserve behavior of deprecated hub.extraConfigMap */ -}}
-{{- $_ := set $values "custom" (merge dict $values.custom .Values.hub.extraConfigMap) }}
-{{- /* passthrough subset of Chart / Release */ -}}
-{{- $_ := set $values "Chart" (dict "Name" .Chart.Name "Version" .Chart.Version) }}
-{{- $_ := set $values "Release" (pick .Release "Name" "Namespace" "Service") }}
-  values.yaml: |
-    {{- $values | toYaml | nindent 4 }}
+  {{- /*
+    Resource names exposed to reliably reference them.
 
-  {{- /* Glob files to allow them to be mounted by the hub pod */ -}}
-  {{- /* key=filename: value=content */ -}}
+    user-scheduler: "my-helm-release-user-scheduler"
+    ...
+  */}}
+  {{- include "jupyterhub.name-templates" . | nindent 2 }}
+
+  {{- /*
+    Glob files to allow them to be mounted by the hub pod
+
+    jupyterhub_config: |
+      multi line string content...
+    z2jh.py: |
+      multi line string content...
+  */}}
   {{- (.Files.Glob "files/hub/*").AsConfig | nindent 2 }}
+
+  {{- /*
+    Store away a checksum of the hook-image-puller daemonset so future upgrades
+    can compare and decide if it should run or not using the `lookup` function.
+  */}}
+  checksum_hook-image-puller: {{ include "jupyterhub.imagePuller.daemonset.hook.checksum" . | quote }}
