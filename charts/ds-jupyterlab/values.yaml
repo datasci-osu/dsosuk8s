@@ -51,8 +51,8 @@ jupyterhub:
       guarantee: 0.1
     image:
       #name: 'localhost:30050/oneilsh/jupyterlab-ubuntu-nvidia-scipy-rjulia'
-      name: 'localhost:30050/cjkeist/jupyterlab-ubuntu'
-      tag: 'v1.0.2-dev'      
+      name: 'localhost:30050/cjkeist/jupyterlab-ubuntu-base'
+      tag: 'v1.0.3-dev'      
     defaultUrl: "/lab/tree/{username}"
     cmd: ["start-singleuser.sh", "--allow-root"]  # don't think I need this? 
     storage:
