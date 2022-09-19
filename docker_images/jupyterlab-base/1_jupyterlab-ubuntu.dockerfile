@@ -1,4 +1,4 @@
-FROM nvidia/cuda:11.6.2-base-ubuntu20.04 as jupyterlab-ubuntu-nvidia
+FROM ubuntu:latest as jupyterlab-ubuntu-base
 # Use NVIDIA CUDA as base image and run the same installation as in the other packages.
 # The version of cudatoolkit must match those of the base image, see Dockerfile.pytorch
 
@@ -29,6 +29,7 @@ USER root
 ENV DEBIAN_FRONTEND noninteractive
 RUN apt-get update \
  && apt-get install -yq --no-install-recommends \
+    gnupg \
     wget \
     bzip2 \
     ca-certificates \
@@ -40,7 +41,11 @@ RUN apt-get update \
     default-jre \
     default-jdk \
     libxml2-dev \
+    #libxcomposite-dev \
+    #libxcursor-dev \
+    #libxdamage-dev \
     dnsutils \
+    libssl-dev \
     screen \
  && apt-get clean && rm -rf /var/lib/apt/lists/*
 
@@ -109,8 +114,8 @@ RUN mkdir /home/$NB_USER/work
     #fix-permissions /home/$NB_USER
 
 # Install conda as jovyan and check the md5 sum provided on the download site
-ENV MINICONDA_VERSION=4.11.0 \
-    MINICONDA_MD5=252d3b0c863333639f99fbc465ee1d61 \
+ENV MINICONDA_VERSION=4.12.0 \
+    MINICONDA_MD5=9986028a26f489f99af4398eac966d36 \
     CONDA_VERSION=4.12.0
 
 RUN cd /tmp && \
@@ -133,7 +138,7 @@ RUN cd /tmp && \
     #fix-permissions /home/$NB_USER
 
 # Install Tini
-RUN conda install --quiet --yes 'tini=0.18.0' && \
+RUN conda install --quiet --yes 'tini' && \
     conda list tini | grep tini | tr -s ' ' | cut -d ' ' -f 1,2 >> $CONDA_DIR/conda-meta/pinned && \
     conda clean --all -f -y
     #fix-permissions $CONDA_DIR && \
@@ -202,7 +207,7 @@ RUN apt-get update && apt-get install -yq --no-install-recommends \
 #    libxrender1 \
 #    lmodern \
 #    netcat \
-    python-dev \
+     python-dev-is-python3 \
     # ---- nbconvert dependencies ----
 #    texlive-xetex \
 #    texlive-fonts-recommended \
@@ -270,18 +275,23 @@ RUN pip install bash_kernel
 RUN python -m bash_kernel.install
 
 
-# nfs tools
+# Install common useful tools
 RUN apt-get update \
  && apt-get install -yq --no-install-recommends \
     htop \
+#    gnuplot \
     less \
     nano \
-    openssh-client \ 
-#    gnuplot \
-    nfs-common \
-    nfs-kernel-server \
+    openssh-client \
     subversion \
     vim \
+ && apt-get clean && rm -rf /var/lib/apt/lists/*
+
+# nfs tools
+RUN apt-get update \
+ && apt-get install -yq --no-install-recommends \
+    nfs-common \
+    nfs-kernel-server \
  && apt-get clean && rm -rf /var/lib/apt/lists/*
 
 # run a jupyter lab build for extensions and do some cleanup

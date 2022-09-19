@@ -1,8 +1,9 @@
-# TARGET jupyterlab-ubuntu-nvidia v1.3.4-dev
-# TARGET jupyterlab-ubuntu-nvidia-scipy v1.3.4-dev
-# TARGET jupyterlab-ubuntu-nvidia-scipy-rjulia v1.3.4-dev
-# TARGET jupyterlab-ubuntu-nvidia-scipy-rjulia-gpu v1.3.4-dev
+# TARGET jupyterlab-ubuntu-nvidia v1.3.5-dev
+# TARGET jupyterlab-ubuntu-nvidia-scipy v1.3.5-dev
+# TARGET jupyterlab-ubuntu-nvidia-scipy-rjulia v1.3.5-dev
+# TARGET jupyterlab-ubuntu-nvidia-scipy-rjulia-gpu v1.3.5-dev
 
+# 1.3.5-dev: Upgrading Rstudio 2022.07.1-554
 # 1.3.4-dev: Setting versions juyterhub 2.2.0 and jupyterlab 3.3.4. 
 # 1.3.2-dev: Added zlib via conda 
 # 1.3.1-dev: Added package default-jre and default-jdk
