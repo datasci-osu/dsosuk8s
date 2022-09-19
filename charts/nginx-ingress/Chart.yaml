@@ -8,8 +8,11 @@ keywords:
 maintainers:
 - email: shawn.oneil@oregonstate.edu
   name: Shawn T O'Neil
-version: 1.0
+version: 2.2.2
 changeLog:
+  v2.2.2:
+    major:
+    - Upgrading to https://github.com/nginxinc/kubernetes-ingress.git version 2.2.2
   v1.0:
     major:
     - First properly versioned chart (yay)

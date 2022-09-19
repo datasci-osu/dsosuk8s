@@ -4,7 +4,7 @@
 kubeContext: dev-green
 createNamespace: cluster-tools
 
-nginx-ingress:
+kubernetes-ingress:
   masterHost: dev-green.datasci.oregonstate.edu
   controller:
     defaultTLS:

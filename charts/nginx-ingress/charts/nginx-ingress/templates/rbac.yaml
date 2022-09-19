@@ -1,6 +1,6 @@
 {{- if .Values.rbac.create }}
 kind: ClusterRole
-apiVersion: rbac.authorization.k8s.io/v1beta1
+apiVersion: rbac.authorization.k8s.io/v1
 metadata:
   name: {{ include "nginx-ingress.name" . }}
   labels:
@@ -12,10 +12,23 @@ rules:
   resources: 
   - appolicies
   - aplogconfs
+  - apusersigs
   verbs: 
   - get 
   - watch
   - list
+{{- end }}
+{{- if .Values.controller.appprotectdos.enable }}
+- apiGroups:
+    - appprotectdos.f5.com
+  resources:
+    - apdospolicies
+    - apdoslogconfs
+    - dosprotectedresources
+  verbs:
+    - get
+    - watch
+    - list
 {{- end }}
 - apiGroups:
   - ""
@@ -62,16 +75,22 @@ rules:
   - patch
   - list
 - apiGroups:
-  - extensions
+  - networking.k8s.io
   resources:
   - ingresses
   verbs:
   - get
   - list
   - watch
+- apiGroups:
+  - networking.k8s.io
+  resources:
+  - ingressclasses
+  verbs:
+  - get
 {{- if .Values.controller.reportIngressStatus.enable }}
 - apiGroups:
-  - extensions
+  - networking.k8s.io
   resources:
   - ingresses/status
   verbs:
@@ -95,12 +114,56 @@ rules:
   resources:
   - virtualservers/status
   - virtualserverroutes/status
+  - policies/status
+  - transportservers/status
+  verbs:
+  - update
+{{- end }}
+{{- if .Values.controller.reportIngressStatus.ingressLink }}
+- apiGroups:
+  - cis.f5.com
+  resources:
+  - ingresslinks
+  verbs:
+  - list
+  - watch
+  - get
+{{- end }}
+{{- if .Values.controller.enableCertManager }}
+- apiGroups:
+  - cert-manager.io
+  resources:
+  - certificates
+  verbs:
+  - list
+  - watch
+  - get
+  - update
+  - create
+  - delete
+{{- end }}
+{{- if .Values.controller.enableExternalDNS }}
+- apiGroups:
+    - externaldns.nginx.org
+  resources:
+    - dnsendpoints
+  verbs:
+    - list
+    - watch
+    - get
+    - update
+    - create
+    - delete
+- apiGroups:
+  - externaldns.nginx.org
+  resources:
+  - dnsendpoints/status
   verbs:
   - update
 {{- end }}
 ---
 kind: ClusterRoleBinding
-apiVersion: rbac.authorization.k8s.io/v1beta1
+apiVersion: rbac.authorization.k8s.io/v1
 metadata:
   name: {{ include "nginx-ingress.name" . }}
   labels:

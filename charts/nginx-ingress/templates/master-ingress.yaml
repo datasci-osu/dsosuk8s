@@ -1,11 +1,13 @@
-apiVersion: extensions/v1beta1
+apiVersion: networking.k8s.io/v1
 kind: Ingress
 metadata:
   name: nginx-master-ingress
   annotations:
-    kubernetes.io/ingress.class: "nginx"
+    #ingressClassName: "nginx"
+    #kubernetes.io/ingress.class: "nginx"
     nginx.org/mergeable-ingress-type: "master"
 spec:
+  ingressClassName: nginx
   tls:
   - hosts:
     - {{ index .Values "nginx-ingress" "masterHost" }} # how to handle dashes in subchart names: https://github.com/helm/helm/issues/2192#issuecomment-306033149
