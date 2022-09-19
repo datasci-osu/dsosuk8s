@@ -13,8 +13,14 @@ maintainers:
 - email: shawn.oneil@oregonstate.edu
   name: Shawn T O'Neil
 name: ds-jupyterlab
-version: 1.5.1
+version: 2.1.0-dev
 changeLog:
+  v2.1.0:
+    minor: 
+    - Updating dependencies on k8s-network-tools, k8s-image-awaiter, configurable-http-proxy, jupyterlab-k8s-hub, and singleuser image to cjkeist/jupyterlab-ubuntu 1.0.2-dev
+  v2.0.0:
+    major:
+    - Update backing jupyterhub helm chart to 2.3.0
   v1.6.0:
     minor:
     - Update autosourced_by_rprofiles.R to work with R 4.1:w

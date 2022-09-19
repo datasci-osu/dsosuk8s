@@ -39,7 +39,7 @@ jupyterhub:
       enabled: true
       type: offload
     chp:
-      image: {name: 'localhost:30050/jupyterhub/configurable-http-proxy', tag: 4.2.0}
+      image: {name: 'localhost:30050/jupyterhub/configurable-http-proxy', tag: 4.5.3}
 
   singleuser:
     # looks like these should be set null to delete the key (including those defaulted in the jupyterhub chart) for the c.Spawner limits below to be used
@@ -51,8 +51,8 @@ jupyterhub:
       guarantee: 0.1
     image:
       #name: 'localhost:30050/oneilsh/jupyterlab-ubuntu-nvidia-scipy-rjulia'
-      name: 'localhost:30050/cjkeist/jupyterlab-ubuntu-nvidia-scipy-rjulia'
-      tag: 'v1.2.1-dev'      
+      name: 'localhost:30050/cjkeist/jupyterlab-ubuntu'
+      tag: 'v1.0.2-dev'      
     defaultUrl: "/lab/tree/{username}"
     cmd: ["start-singleuser.sh", "--allow-root"]  # don't think I need this? 
     storage:
@@ -81,23 +81,23 @@ jupyterhub:
       checkEvery: 600  # default 600
       quotaDbFilename: "/srv/jupyterhub/profile_quotas.sqlite" # default "/srv/jupyterhub/profile_quotas.sqlite"
     networkTools:
-      image: {name: 'localhost:30050/jupyterhub/k8s-network-tools', tag: '0.9.0-alpha.1.000.f995427'} 
+      image: {name: 'localhost:30050/jupyterhub/k8s-network-tools', tag: '2.0.0'} 
       
   ingress:
     enabled: true
+    ingressClassName: "nginx"
     annotations:
-      kubernetes.io/ingress.class: "nginx"
       nginx.org/mergeable-ingress-type: "minion"
       nginx.org/websocket-services: "proxy-public"
     hosts:
       - <%= $(index clusterHostname "") %>
-    tls:
-      - hosts:
-        - <%= $(index clusterHostname "") %>
+    #tls:
+    #  - hosts:
+    #    - <%= $(index clusterHostname "") %>
 
   prePuller:
     hook:
-      image: {name: 'localhost:30050/jupyterhub/k8s-image-awaiter', tag: '0.9.0-alpha.1.000.f995427'}
+      image: {name: 'localhost:30050/jupyterhub/k8s-image-awaiter', tag: '2.0.0'}
  
  
   hub:
@@ -108,8 +108,10 @@ jupyterhub:
     image:
       #name: 'localhost:30050/oneilsh/jupyterlab-k8s-hub'
       name: 'localhost:30050/cjkeist/jupyterlab-k8s-hub'
-      tag: "v1.5.7" 
-    uid: 0
+      tag: "v1.6.0" 
+    # 5/22/22: https://github.com/jupyterhub/zero-to-jupyterhub-k8s/commit/0e023689bdff196eb3f4e7d83e95d21174b53bf1
+    containerSecurityContext:
+      runAsUser: 0
     fsGid: 102
     extraVolumes:
       - name: data-volume

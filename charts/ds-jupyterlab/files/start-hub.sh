@@ -3,7 +3,7 @@
 # this script runs as root - it will mount the remove server (if specified via NFS_HOME_SVC) to /nfs_home, ensure that /nfs_home/.hub_local/automanaged/hub_user_db exists and is propery owned,
 # link /srv/jupyterhub to it so that the hub db info is written to the nfs share, and finally run jupyterhub with sudo in that dir
 cd /usr/local/bin
-
+pip install kubernetes-asyncio
 source /usr/local/bin/data/common.src 
 
 set_common_vars
@@ -21,4 +21,4 @@ cd jh-profile-quota
 pip3 install .
 
 cd /srv/jupyterhub
-exec sudo -E -H -u $ADMIN_USERNAME -- sh -c 'umask 0007 && jupyterhub --config /etc/jupyterhub/jupyterhub_config.py'
+exec sudo -E -H -u $ADMIN_USERNAME -- sh -c 'umask 0007 && jupyterhub --config /usr/local/etc/jupyterhub/jupyterhub_config.py'
