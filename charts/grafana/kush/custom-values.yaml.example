@@ -12,7 +12,8 @@ adminPassword: admin
 ingress:
   enabled: true
   annotations:
-    kubernetes.io/ingress.class: nginx
+    #kubernetes.io/ingress.class: nginx
+    ingressClassName: nginx
     nginx.org/mergeable-ingress-type: "minion"
     nginx.org/websocket-services: "grafana"
     #nginx.ingress.kubernetes.io/rewrite-target: /\$1
