@@ -9,22 +9,23 @@ clusterHostname: hub-green.datasci.oregonstate.edu
 kubeContext: hub-green
 adminPassword: admin
 
+# this is needed because the chart looks for .Values.admin.existingSecret
+# in an if-block check, but if admin is missing it will throw an error
+# about existingSecret, see https://github.com/helm/helm/issues/8026
+admin:
+  existingSecret: ""
 
 createNamespace: cluster-tools
 
 
 ingress:
   enabled: true
+  ingressClassName: nginx
   annotations:
-    kubernetes.io/ingress.class: nginx
     nginx.org/mergeable-ingress-type: "minion"
     nginx.org/websocket-services: "grafana"
-    #nginx.ingress.kubernetes.io/rewrite-target: /\$1
   path: /<%= $RELEASE_NAME %>/
   hosts:
-    - <%= $(index clusterHostname "") %>
-  tls:
-  - hosts:
     - <%= $(index clusterHostname "") %>
 
 persistence:
@@ -59,4 +60,3 @@ plugins:
 - natel-plotly-panel
 - mxswat-separator-panel
 - grafana-kubernetes-app
-- devopsprodigy-kubegraf-app

@@ -13,8 +13,8 @@ nodeSelector:
 
 priorities: |- 
   10:
-    - '.*g4dn-xlarge.*'
-  20:
-    - '.*t3a-2xlarge.*'
+    - '.*4vcpu-16gb-gpu.*'
+  15:
+    - '.*8vcpu-32gb.*'
   30:
-    - '.*t3a-large.*'
+    - '.*2vcpu-8gb.*'

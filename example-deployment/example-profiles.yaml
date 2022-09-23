@@ -13,7 +13,7 @@ clusterHostname: hub-green.datasci.oregonstate.edu
 
 securitySalt: supersecret
 createHomeDrive:
-  size: 50Gi
+  size: 10Gi
   chart: https://datasci-osu.github.io/dsosuk8s/nfs-drive-1.1.0.tgz
 
 authType: native
@@ -24,6 +24,7 @@ jupyterhub:
     memory: {guarantee: 0.5G, limit: 1.0G}
     cpu:    {guarantee: 0.1,  limit: 1.0}
     
+    # see docs/doscify/README_ADMINS.md Compute Profiles section
     profileList:
     - display_name: "Standard"
       slug: "standard"
