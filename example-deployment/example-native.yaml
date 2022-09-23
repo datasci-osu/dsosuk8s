@@ -8,8 +8,8 @@
 
 ---
 
-kubeContext: hub-green
-clusterHostname: hub-green.datasci.oregonstate.edu
+kubeContext: example-cluster
+clusterHostname: example-cluster.datasci.oregonstate.edu
 
 ## lti (canvas-based) is default, other options: dummy (no passwords), native (self-contained passwords, admin-managed)
 authType: native

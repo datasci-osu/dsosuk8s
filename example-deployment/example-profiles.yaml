@@ -7,8 +7,8 @@
 # helm kush run uninstall ../charts/ds-jupyterlab example-profiles
 ---
 
-kubeContext: hub-green
-clusterHostname: hub-green.datasci.oregonstate.edu
+kubeContext: example-cluster
+clusterHostname: example-cluster.datasci.oregonstate.edu
 
 
 securitySalt: supersecret

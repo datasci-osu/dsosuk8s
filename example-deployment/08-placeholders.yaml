@@ -6,8 +6,8 @@
 
 ---
 
-kubeContext: hub-green
-clusterHostname: hub-green.datasci.oregonstate.edu
+kubeContext: example-cluster
+clusterHostname: example-cluster.datasci.oregonstate.edu
 
 
 securitySalt: somethingsecret

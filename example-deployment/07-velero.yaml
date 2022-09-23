@@ -5,11 +5,11 @@
 
 # uninstall: helm delete velero -n cluster-tools
 
-kubeContext: hub-green
+kubeContext: example-cluster
 
 veleroS3Bucket: velero-backups-dsosu
 veleroBackupRegion: us-west-2
-eksClusterName: hub-green
+eksClusterName: example-cluster
 veleroCredentialsFile: /datascience/keys/awsconfigs/velero-backups-dsosu.credentials
 
 

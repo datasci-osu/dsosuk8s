@@ -5,7 +5,7 @@
 
 # uninstall: helm delete prometheus -n cluster-tools 
 
-kubeContext: hub-green
+kubeContext: example-cluster
 createNamespace: cluster-tools
 
 configmapReload:

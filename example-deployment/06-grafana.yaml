@@ -5,8 +5,8 @@
 
 # uninstall: helm delete grafana -n cluster-tools 
 
-clusterHostname: hub-green.datasci.oregonstate.edu
-kubeContext: hub-green
+clusterHostname: example-cluster.datasci.oregonstate.edu
+kubeContext: example-cluster
 adminPassword: admin
 
 # this is needed because the chart looks for .Values.admin.existingSecret

@@ -3,11 +3,11 @@
 # example deployment:
 # helm kush upgrade master-ingress ../charts/nginx-ingress --install --kush-interpolate --values <thisfile>
 
-kubeContext: hub-green
+kubeContext: example-cluster
 createNamespace: cluster-tools
 
 nginx-ingress:
-  masterHost: hub-green.datasci.oregonstate.edu
+  masterHost: example-cluster.datasci.oregonstate.edu
   controller:
     defaultTLS:
       cert:  <%= $( /usr/bin/base64 -w 0 /datascience/keys/ssl/__datasci_oregonstate_edu.pem) %>
