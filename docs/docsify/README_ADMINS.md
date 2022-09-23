@@ -54,14 +54,13 @@ minimally familiar with AWS, docker, and kubernetes--especially helm charts, nam
 First, start by checking out the master branch of this repo:
 
 ```bash
-git clone https://github.com/oneilsh/dsosuk8s
+git clone https://github.com/datasci-osu/dsosuk8s
 ```
 
-Next, you'll need to create a cluster--the example definition in `cluster/eksctl/example-cluster.yaml` contains
+Next, you'll need to create a cluster--the example definition in `example-deployment/cluster/example-cluster.yaml` contains
 an example for use with JupyterHub deployments, including different nodepools for cluster-scoped resources described below (ingress, autoscaler, etc.),
 NFS storage pods and JupyterHub "hub" pods (which run for long periods of time and thus prevent efficient down-scaling), and several types for user pods (which run for
-shorter periods of time allowing more down-scaling opportunities). User-facing nodepool sizes are `t3a.large`, `t3a.2xlarge`, and `g4dn.xlarge` (for GPU-compute; note 
-that this nodepool references a specific AMI image for kubernetes 1.16 compatibility). 
+shorter periods of time allowing more down-scaling opportunities). User-facing nodepool sizes are `t3a.large`, `t3a.2xlarge`, and `g4dn.xlarge` (for GPU-compute). 
 
 Experience suggests it is not a good idea to use small instance types for user-facing pods; a 1 CPU, 4 Gb RAM node for example can only host 4 students if each is gauranteed 1G of RAM; these small numbers result in too-frequent autoscaling causing service issues and frequent autoscaling wait times. The default hub deployment
 described later gaurantees students 0.1 CPU and 0.5 Gb RAM and limits users to 1.0 Gb RAM; `t3a.large` nodes thus support between 8 and 16 users. Very active clusters 
@@ -70,14 +69,14 @@ may want to use `t3a.2xlarge` and larger sizes only.
 You may wish to edit the `example-cluster.yaml` definition to change the cluster name and other information - see comments in the file for more details. Assuming the command-line `aws` and `eksctl` utilities are installed and configured to create AWS resources, the cluster can be created with
 
 ```bash
-eksctl create cluster -f dsosuk8s/cluster/eksctl/example-cluster.yaml
+eksctl create cluster -f dsosuk8s/example-deployment/cluster/example-cluster.yaml
 ```
 
 AWS EKS clusters take a while to create, so be patient. After installation you may want to see the new cluster "context" with `kubectl config get-contexts` 
 and rename the context to something shorter with `kubectl config rename-context`, especially if you are managing multiple clusters. 
 
 By the way, given how easy it is to create and destroy entire clusters, it is wise to have at least a "production" cluster and a "test" cluster. You may even 
-decide to create new clusters rather than upgrade existing ones for upgrades to critical cluster components, migrating users or letting old clusters 'age out'.
+decide to create new clusters rather than upgrade existing ones for upgrades to critical cluster components, migrating users until the old one can be de-commissioned.
 
 ### 01 Cluster Ingress
 
