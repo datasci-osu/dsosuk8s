@@ -1,10 +1,10 @@
 # requires helm-kush plugin from https://github.com/oneilsh/helm-kush
 
 # example deployment:
-# helm kush upgrade example-simple ../charts/ds-jupyterlab --install --kush-interpolate --timeout 10m0s --values <thisfile>
+# helm kush upgrade example-native ../charts/ds-jupyterlab --install --kush-interpolate --timeout 10m0s --values <thisfile>
 
 # example uninstall:
-# helm kush run uninstall ../charts/ds-jupyterlab example-simple
+# helm kush run uninstall ../charts/ds-jupyterlab example-native
 
 ---
 
