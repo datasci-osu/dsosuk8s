@@ -6,7 +6,7 @@ kind: ClusterConfig
 metadata:
   name: example-cluster
   region: us-west-2
-  version: "1.16"
+  version: "1.22"
 
 # default availabilityzones unless otherwise specified?
 availabilityZones: ["us-west-2b", "us-west-2c"] 
@@ -90,7 +90,7 @@ nodeGroups:
       - "modprobe nfsd"
 
   # user pod nodegroup
-  - name: jhworkers-t3a-large
+  - name: jhworkers-2vcpu-8gb
     instanceType: t3a.large
 #    ssh:
 #      allow: true
@@ -123,7 +123,7 @@ nodeGroups:
       - "modprobe nfsd"
 
   # user pod nodegroup
-  - name: jhworkers-t3a-2xlarge
+  - name: jhworkers-8vcpu-32gb
     instanceType: t3a.2xlarge
 #    ssh:
 #      allow: true
@@ -148,6 +148,7 @@ nodeGroups:
       k8s.io/cluster-autoscaler/node-template/label/nodegroup-role: jhusers
       k8s.io/cluster-autoscaler/node-template/label/hub.jupyter.org/nodegroup-purpose: user
       k8s.io/cluster-autoscaler/node-template/taint/hub.jupyter.org/dedicated: "user:NoSchedule"
+     propagateASGTags: true
     preBootstrapCommands:
       - "#!/bin/bash -xe"
       - "cat > /etc/sysctl.d/90-kubelet.conf << EOF \nvm.overcommit_memory=1 \nkernel.panic=10 \nkernel.panic_on_oops=1 \nEOF"
@@ -161,9 +162,9 @@ nodeGroups:
 
  
   # user pod nodegroup
-  - name: jhworkers-g4dn-xlarge-ami-0d190d9117f2bca4a
+  - name: jhworkers-4vcpu-16gb-gpu
     instanceType: g4dn.xlarge
-    ami: "ami-0d190d9117f2bca4a"   # from https://docs.aws.amazon.com/eks/latest/userguide/gpu-ami.html for k8s 1.16; shot in the dark...
+    amiFamily: AmazonLinux2
 #    ssh:
 #      allow: true
 #      publicKeyPath: /datascience/keys/sshkeys/eksctl_id_rsa.pub
@@ -189,6 +190,7 @@ nodeGroups:
       k8s.io/cluster-autoscaler/node-template/label/nodegroup-role: jhusers
       k8s.io/cluster-autoscaler/node-template/label/hub.jupyter.org/nodegroup-purpose: user
       k8s.io/cluster-autoscaler/node-template/taint/hub.jupyter.org/dedicated: "user:NoSchedule"
+      propogateASGTags: true
     preBootstrapCommands:
       - "#!/bin/bash -xe"
       - "cat > /etc/sysctl.d/90-kubelet.conf << EOF \nvm.overcommit_memory=1 \nkernel.panic=10 \nkernel.panic_on_oops=1 \nEOF"

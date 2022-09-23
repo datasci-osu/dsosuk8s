@@ -42,7 +42,7 @@ as the volume, or detaches and re-attaches the PV (EBS vol) to a node where the 
 For reasons desribed below we use three nodegroups: a `clustertools` nodegroup, a `jhcontrolplane` nodegroup and a `jhusers` nodegroup. 
 Pods accessing persistent volumes are not run on the jhusers nodegroup. Thus, the physical architecture looks like so:
 
-<img src="images/physical_layout_nodegroups.png" width="50%"/>
+<img src="readme_images/physical_layout_nodegroups.png" width="50%"/>
 
 ### Applications and Nodegroups
 
@@ -103,6 +103,6 @@ Cluster-level tools are generally deployed either in the `kube-system` namespace
 
 The base JupyterHub chart is constructed in such a way that *only one* jupyterhub may be deployed per-namespace, so we generally name the namespace the same as the overall hub "name", and this also corresponds to the access/launch URL (this is all setup by `hub_deploy.sh`).
 
-<img src="images/single_namespace_w_url.png" width="50%"/>
+<img src="readme_images/single_namespace_w_url.png" width="50%"/>
 
  
