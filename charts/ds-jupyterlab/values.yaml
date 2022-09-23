@@ -137,7 +137,7 @@ jupyterhub:
       NFS_SVC_HOME: <%= $DRIVE_RELEASE_NAME %>
       # e.g. oneils,keistc
       # but only used if not using lti AUTH_TYPE
-      ADMIN_USERS: <%= $(index adminUsers "") %> 
+      ADMIN_USERS: <%= $(index adminUsers "''") %> 
 
     extraConfig:
       globalScheduler:
