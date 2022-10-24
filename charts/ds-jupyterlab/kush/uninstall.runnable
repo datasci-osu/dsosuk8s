@@ -1,6 +1,6 @@
 
 if [ "$#" != "2" ] && [ "$#" != "3" ]; then
-  echo "${red}Usage: helm kush run uninstall $CHART <release-name> [--dry-run]${white}" 1>&2
+  echo "${red}Usage: helm kush run uninstall $CHART <release-name>${white}" 1>&2
   echo "${yellow}(Note that \`helm kush uninstall $CHART\` assumes the release exists in a namespace with the same name, as installed by \`helm kush install [RELEASE-NAME] $CHART\`)${white}" 1>&2
   return 1
 fi
@@ -22,10 +22,6 @@ fi
 
 # force namespace to be the same as the release name
 HELM_NAMESPACE=$RELEASE_NAME
-
-if [ "$DRY_RUN" == "True" ]; then
-  echo "${green}DRY_RUN is set (template or --dry-run), not uninstalling.${white}" 1>&2
-fi
 
 # check and see if any user pods are running, if so list them
 if kubectl get pods --selector=component=singleuser-server --namespace $HELM_NAMESPACE --context $HELM_KUBECONTEXT 2> /dev/null | grep -q jupyter; then
