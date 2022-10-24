@@ -74,20 +74,27 @@ done
 # delete the pvc
 echo "${yellow}Deleting homedrive persistent volume claim (pvc)... ${white}"
 PVC_NAME=storagevol-nfs-${RELEASE_NAME}homedrive-dep-0
+
 PV_NAME=$(kubectl get pv --context $HELM_KUBECONTEXT | grep ${RELEASE_NAME}homedrive | awk '{print $1}')
-echo "${magenta}kubectl delete pvc $PVC_NAME --namespace $HELM_NAMESPACE --context $HELM_KUBECONTEXT ${white}"
-kubectl delete pvc $PVC_NAME --namespace $HELM_NAMESPACE --context $HELM_KUBECONTEXT
-echo ""
-
-# just for good measure
-sleep 2
-
-# delete the pv
-echo "${yellow}Deleting homedrive persistent volume (pv)... ${white}"
-echo "${magenta}kubectl delete pv $PV_NAME --context $HELM_KUBECONTEXT ${white}"
-kubectl delete pv $PV_NAME --context $HELM_KUBECONTEXT
-echo ""
-
+if [ "$PV_NAME" != "" ]; then
+  echo "${magenta}kubectl delete pvc $PVC_NAME --namespace $HELM_NAMESPACE --context $HELM_KUBECONTEXT ${white}"
+  kubectl delete pvc $PVC_NAME --namespace $HELM_NAMESPACE --context $HELM_KUBECONTEXT
+  echo ""
+  
+  # just for good measure
+  sleep 2
+  
+  # delete the pv
+  echo "${yellow}Deleting homedrive persistent volume (pv)... ${white}"
+  echo "${magenta}kubectl delete pv $PV_NAME --context $HELM_KUBECONTEXT ${white}"
+  kubectl delete pv $PV_NAME --context $HELM_KUBECONTEXT
+  echo ""
+else
+  echo "${red}Warning: expected persistent homedrive volume not found, likely due to a previously interrupted uninstall. Full list:${white}"
+  kubectl get pv --context $HELM_KUBECONTEXT
+  echo ""
+fi
+  
 # check for empty namespace
 ALL_CHECK=$(kubectl get all --namespace $HELM_NAMESPACE --context $HELM_KUBECONTEXT | wc -l | awk '{print $1}')   # should be 0
 PVC_CHECK=$(kubectl get pvc --namespace $HELM_NAMESPACE --context $HELM_KUBECONTEXT | wc -l | awk '{print $1}')   # should be 0     
