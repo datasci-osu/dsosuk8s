@@ -7,6 +7,7 @@
 
 kubeContext: example-cluster
 createNamespace: cluster-tools
+clusterHostname: example-cluster.datasci.oregonstate.edu
 
 configmapReload:
   prometheus:
@@ -23,6 +24,7 @@ pushgateway:
     nodegroup-role: clustertools
 
 kubeStateMetrics:
+  enabled: false
   nodeSelector:
     nodegroup-role: clustertools
   service:
@@ -47,6 +49,16 @@ server:
     requests:
       cpu: 500m
       memory: 2Gi
+  ingress:
+    enabled: true
+    ingressClassName: nginx
+    annotations:
+      nginx.org/mergeable-ingress-type: "minion"
+      # I'm not sure this is the right syntax - https://docs.nginx.com/nginx-ingress-controller/configuration/ingress-resources/advanced-configuration-with-annotations/
+      nginx.org/websocket-services: "prometheus"
+    path: /<%= $RELEASE_NAME %>/
+    hosts:
+      - <%= $(index clusterHostname "") %>
 
 nodeExporter:
   image:

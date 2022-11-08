@@ -55,6 +55,7 @@ First, start by checking out the master branch of this repo:
 
 ```bash
 git clone https://github.com/datasci-osu/dsosuk8s
+cd dsosuk8s
 ```
 
 Next, you'll need to create a cluster--the example definition in `example-deployment/cluster/example-cluster.yaml` contains
@@ -69,11 +70,15 @@ may want to use `t3a.2xlarge` and larger sizes only.
 You may wish to edit the `example-cluster.yaml` definition to change the cluster name and other information - see comments in the file for more details. Assuming the command-line `aws` and `eksctl` utilities are installed and configured to create AWS resources, the cluster can be created with
 
 ```bash
-eksctl create cluster -f dsosuk8s/example-deployment/cluster/example-cluster.yaml
+eksctl create cluster -f example-deployment/cluster/example-cluster.yaml
 ```
 
 AWS EKS clusters take a while to create, so be patient. After installation you may want to see the new cluster "context" with `kubectl config get-contexts` 
-and rename the context to something shorter with `kubectl config rename-context`, especially if you are managing multiple clusters. 
+and rename the context to something shorter with `kubectl config rename-context`, especially if you are managing multiple clusters:
+
+```bash
+kubectl config rename-context <username>@example-cluster.us-west-2.eksctl.io example-cluster
+``` 
 
 By the way, given how easy it is to create and destroy entire clusters, it is wise to have at least a "production" cluster and a "test" cluster. You may even 
 decide to create new clusters rather than upgrade existing ones for upgrades to critical cluster components, migrating users until the old one can be de-commissioned.
@@ -84,9 +89,9 @@ The `example-deployment` folder in this repo contains a number of yaml files to 
 these is `01-ingress.yaml`, which contains the following fields that need to be set:
 
 
-`kubeContext`: the name of the kubernetes context (cluster) as reported by `kubectl config get-contexts`. Example: `"prod-cluster"`
+`kubeContext`: the name of the kubernetes context (cluster) as reported by `kubectl config get-contexts`. Example: `"example-cluster"`
 
-`masterHost`: a CNAME under your control. Example: `"prod-cluster.datasci.institution.edu"`
+`masterHost`: a CNAME under your control. Example: `"example-cluster.datasci.institution.edu"`
 
 `*.cert` and `*.key`: replace these 4 entries with paths to certificate files for the CNAME on your local machine
 
@@ -96,7 +101,7 @@ the hostname provided by `masterHost` without other subdomains (utilizing the ng
 Deploy the file against the ingress chart using the `helm-kush` plugin as follows:
 
 ```bash
-helm kush upgrade master-ingress dsosuk8s/charts/nginx-ingress --install --kush-interpolate --values 01-ingress.yaml
+helm kush upgrade master-ingress charts/nginx-ingress --install --kush-interpolate --values example-deployment/01-ingress.yaml
 ```
 
 To check the deployment status, run `helm list -n cluster-tools` or `kubectl get all -n cluster-tools`. 
@@ -128,7 +133,7 @@ the autoscaler to scale back down, since only empty nodes will be removed (jupty
 Deploy the autoscaler with:
 
 ```bash
-helm kush upgrade master-ingress dsosuk8s/charts/eksctl-autoscaler --install --kush-interpolate --values 02-autoscaler.yaml
+helm kush upgrade master-ingress charts/eksctl-autoscaler --install --kush-interpolate --values example-deployment/02-autoscaler.yaml
 ```
 
 *A special note about the AWS autoscaler*: due to the way previous versions of the AWS autoscaler worked, it may be unaware of resources provided by nodepools
@@ -139,15 +144,21 @@ realize that some of these are running no workloads and scale them back down to 
 as expected, try setting the minimum size to 1 in the AWS GUI console (in the EC2 panel, under autoscaling groups), or with `eksctl scale` which should
 re-trigger the autoscaler to recognize the nodepool. 
 
-Be aware that it is also possible to add new nodepools to an existing cluster with `eksctl`, for example provide a new instance size for users to take advantage of. 
+Be aware that it is also possible to add new nodepools to an existing cluster with `eksctl`, for example to provide a new instance size for users to take advantage of. 
 
 ### 03 Cluster Registry
 
-Docker images used are hosted on DockerHub; these include JupyterHub defaults and custom images for the hub (https://hub.docker.com/r/oneilsh/jupyterlab-k8s-hub) and user-server compontents (https://hub.docker.com/r/oneilsh/jupyterlab-ubuntu-nvidia-scipy-rjulia and other flavors). While DockerHub is convenient, it presents two
+Docker images used are hosted on DockerHub; these include JupyterHub defaults
+and custom images for the hub and user-server
+compontents. (Image definitions for these are located in the `docker_images` 
+directory, several utilize build scripts to help automate building, tagging, and
+pushing the images to Dockerhub.)
+
+While DockerHub is convenient, it presents two
 challenges:
 
-1. DockerHub recently instituted a maximum pulls-per-day policy for images
-2. the user images can be quite large--up to 12 gigs fora  full software stack and common libraries
+1. DockerHub free accounts rate limit image pulls
+2. the user images can be quite large--up to 12 gigs for a full software stack and common libraries.
 
 Every time a new node is spawned by the autoscaler, these images need to be loaded. The size of the images slows down scaleup and dockerhub limits may cause issues. 
 
@@ -161,14 +172,15 @@ And the deployment works similarly to others:
 
 
 ```bash
-helm kush upgrade registry dsosuk8s/charts/docker-registry --install --kush-interpolate --values 03-registry.yaml
+helm kush upgrade registry charts/docker-registry --install --kush-interpolate --values example-deployment/03-registry.yaml
 ```
 
-One other caveat about DockerHub: they've also announced a new policy (coming mid-2021) of *removing* "stale" images
-that are not pulled or pushed for some amount of time. You may thus want to `docker pull` them periodically manually (or via CRON job),
+One other caveat about DockerHub: DockerHub now removes "stale" images
+that have not been pulled or pushed for 6 months. You may thus want to `docker pull` them periodically manually (or via CRON job),
 especially since local caching of images in the registry means many fewer pulls from dockerhub. 
 
 We haven't investigated this yet, but [this post](https://poweruser.blog/avoiding-the-docker-hub-retention-limit-e18cdcacdfde) may prove useful.
+(Within-cluster image hosting is a potential future development direction.)
 
 
 ### 04 Cluster GPU Driver
@@ -182,7 +194,7 @@ and to deploy:
 
 
 ```bash
-helm kush upgrade registry dsosuk8s/charts/nvidia-device-plugin --install --kush-interpolate --values 04-gpudriver.yaml
+helm kush upgrade gpudriver charts/nvidia-device-plugin --install --kush-interpolate --values example-deployment/04-gpudriver.yaml
 ```
 
 The `image` line in the config file configures the installation to also make use of the local image registry/pull-through cache (since
@@ -192,16 +204,19 @@ Note GPU utilities (e.g. tensorflow) are not present in the default user image a
 
 ### 05 Cluster Monitoring: Prometheus
 
-Prometheus is one of two components (Grafana being the other) for monitoring cluster resources and usage. Prometheus provides data export from
-nodes, while Grafana is a visualization tool specializing in large timescale data. `05-prometheus.yaml` needs only the same `kubeContext` config as
-above:
+Prometheus is one of three components (Kube-State-Metrics and Grafana being the other) for monitoring cluster resources and usage. Prometheus 
+serves as storage and queryable database for log-like metrics, Kube-State-Metrics 
+nodes, while Grafana is a visualization tool specializing in large timescale data. `05-prometheus.yaml` needs the same `kubeContext` config as
+above, and a `clusterHostname`, to configure the ingress path to the monitoring dashboard (note: this is still in testing). 
 
 `kubeContext`: the name of the kubernetes context (cluster) as reported by `kubectl config get-contexts`. Example: `"prod-cluster"`
+
+`clusterHostname`: the CNAME of the cluster as used by the ingress; Example: `"prod-cluster.datasci.institution.edu"`
 
 and is deployed with 
 
 ```bash
-helm kush upgrade registry dsosuk8s/charts/prometheus --install --kush-interpolate --values 05-prometheus.yaml
+helm kush upgrade prometheus charts/prometheus --install --kush-interpolate --values example-deployment/05-prometheus.yaml
 ```
 
 In our experience prometheus and grafana can occasionally crash if one attempts to visualize too much data simultaneously (resource needs
@@ -212,33 +227,61 @@ handy to know that this component (and most components, in fact) can be deleted 
 helm delete prometheus -n cluster-tools
 ```
 
-and then reinstalled with the `helm kush upgrade` command above. You may want to try reinstalling Grafana (below) only first, but you may need to remove both prometheus and grafana before re-installing both, should you need to. 
+and then reinstalled with the `helm kush upgrade` command above. You may want
+to try reinstalling Grafana (below) only first, but you may need to remove both
+prometheus and grafana before re-installing both, should you need to. 
 
-### 06 Cluster Monitoring: Grafana
 
-Grafana is the visualization component of the prometheus/grafana pair, and `06-grafana.yaml` has several fields in need of setting:
+### 06 Cluster Monitoring: Kube-State-Metrics
 
-`kubeContext`: the name of the kubernetes context (cluster) as reported by `kubectl config get-contexts`. Example: `"prod-cluster"`
+Kube-state-metrics is a service that feeds cluster state information (namespaces, deployuments, 
+pods, etc.) to the Prometheus metrics database. These metrics
+are used by JupyterHub dashboards (next).
 
-`clusterHostname`: the CNAME of the cluster as used by the ingress; Example: `"prod-cluster.datasci.institution.edu"`
+The chart is a simple fork of the official chart, so can be installed directly with helm. Don't forget
+to change to your cluster context first (and this also assumes previous steps have been
+run so that the `cluster-tools` namespade exists):
+
+```bash
+kubectl config use-context example-cluster
+helm upgrade kube-state-metrics charts/kube-state-metrics --install --namespace cluster-tools
+```
+
+The `06-kube-state-metrics.sh` script does exactly this:
+
+```bash
+./example-deployment/06-kube-state-metrics.sh
+```
+
+
+### 07 Cluster Monitoring: Grafana
+
+Grafana is the visualization component of the prometheus/kube-state-metrics/grafana trio, and `07-grafana.yaml` has several fields in need of setting:
+
+`kubeContext`: the name of the kubernetes context (cluster) as reported by `kubectl config get-contexts`. Example: `"example-cluster"`
+
+`clusterHostname`: the CNAME of the cluster as used by the ingress; Example: `"example-cluster.datasci.institution.edu"`
 
 `adminPassword`: the initial password for the admin user. Example: `"heythattickles"`
 
 After installing with 
 
 ```bash
-helm kush upgrade grafana dsosuk8s/charts/grafana --install --kush-interpolate --values 06-grafana.yaml
+helm kush upgrade grafana charts/grafana --install --kush-interpolate --values example-deployment/07-grafana.yaml
 ```
 
 you should be able to (eventually, after the install completes) navigate to `https://<clusterHostname>/grafana` and login 
 with username `admin`, password `<adminPassword>`. It is wise to change the admin password immediately. 
 
 Grafana is configured with "dashboard" files (in JSON format) for specific visualization dashboards--this repo includes
+JupyterHub-specific dashboards initially sourced from 
+[https://github.com/jupyterhub/grafana-dashboards](https://github.com/jupyterhub/grafana-dashboards)
+
 a dashboards to monitor JupyterHub activity in `cluster/grafana_prometheus/jhub_cluster_metrics.json` and a dashboard for
 more general cluster metrics in `cluster/grafana_prometheus/cluster_dashboard.json`. To add one of these dashboards in Grafana, 
 use the + icon in the left navigation menu and select "Import", then just paste in the JSON file contents. 
 
-These dashboards are far from perfect; you can explore other kubernetes Grafana dahsboards at [grafana.com](https://grafana.com)
+You can explore other kubernetes Grafana dahsboards at [grafana.com](https://grafana.com)
 and another JupyterHub-specific dashboard for the popular [mybinder.org](https://mybinder.org) service at [grafana.mybinder.org](https://grafana.mybinder.org). The
 
 As with prometheus, if Grafana crashes it can be removed with 
@@ -249,61 +292,26 @@ helm delete grafana -n cluster-tools
 
 before reinstalling with the `helm kush upgrade` command. 
 
-### 07 Cluster Backups: velero
-
-Velero is a tool for routine backups of resources and data in kubernetes clusters. Backups and restores via entire volume snapshots, and are
-not easy to restore, so this is not recommended for "ooops, I need a file undeleted" except for extreme cases. It can however provide some
-extra measure of safety should the absolute worst happen.
-
-To use velero, you must configure an AWS S3 buicket and IAM permissions to access it: see [the AWS plugin on GitHub](https://github.com/vmware-tanzu/velero-plugin-for-aws) for details. At the end, you should have a defined BUCKET (string), REGION (string), and credentials (file). Configure
-the following in the `07-velero.yaml` file:
-
-`kubeContext`: the name of the kubernetes context (cluster) as reported by `kubectl config get-contexts`. Example: `"prod-cluster"`
-
-`veleroS3Bucket`: name of the configured bucket. Example: `"prod-velero-backups"`
-
-`veleroBackupRegion`: name of the configured region. Example: `"us-west-2"`
-
-`eksClusterName`: name of the cluster as defined in the EKS cluster definiton file. Example: `"prod-cluster"`
-
-`veleroCredentialsFile`: path to the credentials file. Example: `"/path/to/prod-velero-backups.creds"`
-
-As usual, the install is
-
-```bash
-helm kush upgrade velero dsosuk8s/charts/velero --install --kush-interpolate --values 07-velero.yaml
-```
-
-We'll leave the creation of backup schedules and restore procedures to the offical documentation at [velero.io](https://velero.io/docs/).
-
-Notes: As well discuss below, user data volumes are removed from kubernetes when a hub is deleted, *but*, the volume itself in AWS is not. It is simply 
-detached from the node, but is still available in the AWS EC2 GUI console, and these detached volumes must be removed manually periodically (detached
-volumes still cost money!). This provides a safety mechanism for post-hub-deletion recovery independent of velero. Unfortunately, the names given to volumes
-are not human readable, making it difficult to associate a volume with a hub (especially after the hub has been deleted!)
-
-Additionally, new hubs are generally created with *new* storage, and there is currently no automated feature for directing a new hub to use previous existing
-storage (either from backup or undeleted detached volumes). When the need has arizen to migrate data from one hub to another, we've generally done so by manually
-zipping the shared drive contents and staging them to a 3rd server before pulling into the target Hub's storage. If the jupyterhub is not function, it is possible
-to log directly into the running NFS server with `kubectl exec`; see below for more details on managing user data. 
-
 
 ### 08 Cluster Placeholders
 
 In the standard configuration, JuptyerHub suppots the use of "placeholders" -- these fake users are "bumpable" from nodes 
 by real users (real users are not bumpable), and help ensure that some amount of resources are ready and available for users on login. 
-For example, consider a node that can support 8 users, and is currently being utilized by 6. If 3 new users login in rapid succession, 2 will be able to login
+For example, consider a node that can support 8 users that is currently being utilized by 6. If 3 new users login in rapid succession, 2 will be able to login
 immediately, while the third will have to wait until a new node autoscales up which can take several minutes. (During this time their login waits at a progress 
-bar and shows a number of scary-looking warnings and errors that aren't actually problems.) However, if say 8 placeholders are used, then there will be 2 nodes
+bar and shows a number of scary-looking warnings and errors that aren't actually problems.) However, if 8 placeholders are used, then there will be 2 nodes
 prior to the new user logins: one (node A) hosting the 6 real users and 2 placeholders, and the other (node B) hosting the other 6 placeholders. When the 3 new
 users login, two can be placed on node A (bumping 2 placeholders to node B, making it full), and the other two will land on node B, bumping two placeholders.
-These bumped placeholders will then need to wait on a new node to autoscale up. 
+These bumped placeholders will then trigger another autoscale up to support them.
 
-Placeholders thus "keep seats warm" for students. They are not a perfect solution: if 30 users attempt to login in rapid succession not enough warm seats may be available and some users will need to wait for autoscaling regardless. (This happens commonly at the start of lab-based classes, see management sections below for 
+Placeholders thus "keep seats warm" for students. They are not a perfect solution: if 30 users attempt to login in rapid succession not enough warm seats 
+may be available and some users will need to wait for autoscaling regardless. (This happens commonly at the start of lab-based classes, see management sections below for 
 mitigation strategies). 
 
 However, this is one pernicious issue with placeholders that can lead to failures to start when a single cluster hosts multiple instancs of JupyterHub,
 documented [here](https://www.mail-archive.com/jupyter@googlegroups.com/msg05004.html). The recommended workaround, which we implement via `08-placeholders.yaml`, 
-is to create a single JupyterHub to house all the placeholders, and then to configure all other hubs to use the placeholder hub's scheduler component. `08-placeholders.yaml` thus deploys a hub for the sole purpose of housing placeholders for the entire cluster. 
+is to create a single JupyterHub to house all the placeholders, and then to configure all other hubs to use the placeholder hub's scheduler component. 
+`08-placeholders.yaml` thus deploys a hub for the sole purpose of housing placeholders for the entire cluster. 
 
 The relavent configuration fields are: 
 
@@ -322,23 +330,22 @@ The relavent configuration fields are:
 Deploy the placeholder hub with: 
 
 ```bash
-helm kush upgrade placeholders dsosuk8s/charts/ds-jupyterlab --install --kush-interpolate --timeout 10m0s --values 08-placeholders.yaml
+helm kush upgrade placeholders charts/ds-jupyterlab --install --kush-interpolate --timeout 10m0s --values example-deployment/08-placeholders.yaml
 ```
 
 The above sets the timeout to 10 minutes, as the first install of a JupyterHub on a cluster typically takes a while as various docker images are pulled and components
-communicate. Should the process fail due to timeout, try again. 
+communicate. Should the process fail due to timeout, try again. Note that the placeholders won't be running when the deployment script completes; run
+`kubectl get pods -n placeholders` to see the status of individual pods.
 
 You may want to change the number and size of placeholders as your cluster usage grows. Fortunately, this is easy to do: just edit the configuration file
-and redeploy with the above deployment command, and kubernetes will align the actual configuration with the requested on. You can see the running placeholders
+and redeploy with the above deployment command, and kubernetes will align the actual configuration with the requested one. You can see the running placeholders
 (and other placeholder hub components) with `kubectl get all -n placeholders`.
 
 Unfortunately, at this time due to the nature of the issue and the workaround it is not possible to deploy placeholders of varying sizes, making it difficult
 to deploy placeholders that keep nodepools of different sizes warm. In practice we use a standard 0.5G RAM and 0.1 CPU placeholder size for the most common
 case of keeping small-compute seats warm, and no placeholders large enough to ensure warm seats for larger node types and compute profiles, resulting in autoscaling waits for those.
 
-Should you need to remove the placeholder hub, a more complex removal command is needed to remove all of the hub's components (including the shared storage component, even though it's not a requirement for the placeholder hub and unused it is still created). 
-
-To delete:
+To delete the placeholders deployment, use the `kush run uninstall` script to ensure that all components (including volumes and namespaces):
 
 ```bash
 helm kush run uninstall dsosuk8s/charts/ds-jupyterlab placeholders
