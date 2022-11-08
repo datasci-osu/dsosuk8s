@@ -366,17 +366,18 @@ component parts.
 
 ### Basic Hub Install (Canvas)
 
-The example deployment file `example-deployment/example-simple.yaml` describes required configuration for a basic Canvas-connecting hub, which is the default
-authentication option.
+The example deployment file `example-deployment/example-lti.yaml` describes required configuration for a basic Canvas-connecting hub.
 
 ```yaml
-kubeContext: hub-green
-clusterHostname: hub-green.datasci.oregonstate.edu
+kubeContext: example-cluster
+clusterHostname: example-cluster.datasci.oregonstate.edu
 
+## lti (canvas-based) is default, other options: dummy (no passwords), native (self-contained passwords, admin-managed)
+authType: lti
 
 securitySalt: supersecret
 createHomeDrive:
-  size: 50Gi
+  size: 10Gi
   chart: https://datasci-osu.github.io/dsosuk8s/nfs-drive-1.1.0.tgz
 
 
@@ -403,22 +404,25 @@ Given that kubernetes can fairly redistribute CPU resources proportionally it ma
 fungible: once allocated by a user it is reserved until the process releases it (frequently only on user logout). RAM resources thus should be be tailerd more closely
 to user needs. Fortunately, these values can be changed at any time with minimal disruption (see Changing Configuration below).
 
-The hub is deployed via
+The hub is deployed via `helm kush upgrade <hubName> charts/ds-jupyterlab --install --kush-interpolate --timeout 10m0s --values <hubConfig.yaml>`. For example, 
 
 ```bash
-helm kush upgrade <hubName> ../charts/ds-jupyterlab --install --kush-interpolate --timeout 10m0s --values <hubConfig.yaml>
+helm kush upgrade example-lti charts/ds-jupyterlab --install --kush-interpolate --timeout 10m0s --values example-deployment/example-lti.yaml
 ```
 
-For example, `helm kush upgrade example-simple ../charts/ds-jupyterlab --install --kush-interpolate --timeout 10m0s --values example-simple.yaml`. Once the hub is deployed (which can take several minutes), the install will report 3 pieces of information necessary to connect the hub to Canvas:
+Once the hub is deployed (which can take several minutes), the install will report 3 pieces of information necessary to connect the hub to Canvas:
 
 
 ```
-Hub launch URL: https://hub-green.datasci.oregonstate.edu/example-simple/hub/lti/launch
-Consumer Key: 9cc6ebca80d7aa322cfbafb72565b79f35ee374c22d98f5fa4160fa28a98f330
-Shared Secret: dbc3eb6f43a6ca0256c0a1a60c8fa11a336308cefc770d1afffb635e59e41974
+Hub launch URL: https://example-cluster.datasci.oregonstate.edu/example-lti/hub/lti/launch
+Consumer Key: 74b6c62bce9ac0f085dea96554a56803a51b87d52be0af11b437445554aa5dbc
+Shared Secret: d94cd550d68f9ace79c64bafed2ca597eba21b6a1f5e9727921143f04c7a6941
 ```
 
-The hub then needs to be "connected" to the Canvas course in the following way (and this requires sufficient priveledges in the Canvas course such as Instructor or Designer). Under the course **Settings**, click the **Apps** tab, and then **View App Configurations** button. 
+The hub then needs to be "connected" to the Canvas course in the following way
+(and this requires sufficient priveledges in the Canvas course such as
+Instructor or Designer). Under the course **Settings**, click the **Apps** tab,
+and then **View App Configurations** button. 
 
 ![](media/canvas_app_configurations.png ':size=90%')
 
@@ -427,7 +431,7 @@ select "Public" in the privacy dropdown: this allows Canvas to share user login 
 
 ![](media/addapp.png ':size=60%')
 
-The hub can then be accessed in Canvas by adding either 1) an "External Tool" module int he Modules section, or 2) an assignment with the "External Tool" submission type. In both cases, use the Find button to locate the newly installed app, or just enter the launch URL in the link section of the dialog. Be sure to check
+The hub can then be accessed in Canvas by adding either 1) an "External Tool" module in the Modules section, or 2) an assignment with the "External Tool" submission type. In both cases, use the Find button to locate the newly installed app, or just enter the launch URL in the link section of the dialog. Be sure to check
 "load This Tool In A New Tab" or it won't work. 
 
 ![](media/canvas_external_tool.png ':size=70%')
@@ -436,10 +440,30 @@ Finally, users (instructors and students) can log into the hub by opening the re
 
 #### Username configuration
 
-Usernames in a Canvas-connected hub are parsed from information provided by the Canvas API. To complicate matters, institutions may customize this information
-and how/where it is stored in the response from Canvas. As Oregon State U., usernames are provded as `<username>@oregonstate.edu` in the `custom_canvas_user_login_id` field. (Information passed form Canvas to the hub on user login is is logged in the hub container logs, these can be used to inspect the fields and formatting provided. See Viewing Logs below for information.) This is true *unless* the instructor is using "student view" in Canvas, in which case the `custom_canvas_user_login_id` field is a long random hex string. The OSU Canvas instance also supports user-managed Canvas "Studio Sites" that allow social logins, and are nice options for short workshops etc. In these cases the username is reported as their social login email in the `lis_person_contact_email_primary` field.  
+Usernames in a Canvas-connected hub are parsed from information provided by the
+Canvas API. To complicate matters, institutions may customize this information
+and how/where it is stored in the response from Canvas. As Oregon State U.,
+usernames are provded as `<username>@oregonstate.edu` in the
+`custom_canvas_user_login_id` field. (Information passed from Canvas to the hub
+is logged in the hub container logs, these can be used to
+inspect the fields and formatting provided. See Viewing Logs below for
+information.) This is true *unless* the instructor is using "student view" in
+Canvas, in which case the `custom_canvas_user_login_id` field is a long random
+hex string. The OSU Canvas instance also supports user-managed Canvas "Studio
+Sites" that allow social logins, and are nice options for short workshops etc.
+In these cases the username is reported as their social login email in the
+`lis_person_contact_email_primary` field.  
 
-These various username options need to be mapped to a username in the hub, and ideally usernames would be username-like: short, memorable, and unique. For regular class use, we can gaurantee that the `<username>` segment of `<username>@oregonstate.edu` is unique (and is in fact the users' OSU net ID) and so is a fine username. Social logins cannot use the same extraction; `joe@gmail.com` should not get access to the same account as `joe@oregonstate.edu` (or any other Joe). For these cases we use the entire social login email as the username. For usernames provided by the "student view" we truncate the long hex string IDs to just the first 6 characters, so `19ab34cfdd87168e` becomes hub username `19ab34`. 
+These various username options need to be mapped to a username in the hub, and
+ideally usernames would be username-like: short, memorable, and unique. For
+regular class use, we can gaurantee that the `<username>` segment of
+`<username>@oregonstate.edu` is unique (and is in fact the users' OSU net ID)
+and so is a fine username. Social logins cannot use the same extraction;
+`joe@gmail.com` should not get access to the same account as
+`joe@oregonstate.edu` (or any other Joe). For these cases we use the entire
+social login email as the username. For usernames provided by the "student
+view" we truncate the long hex string IDs to just the first 6 characters, so
+`19ab34cfdd87168e` becomes hub username `19ab34`. 
 
 This is accomplished via a customized version of the [ltiauthenticator](https://github.com/oneilsh/ltiauthenticator) JupyterHub plugin to map potential usernames
 to hub usernames via a series of regular expressions with capture groups. Configuration can be customized via environment variables as follows:
@@ -463,35 +487,53 @@ regular expression in `LTI_ID_REGEXES`. If a match is found, the username is gra
 is checked. (If none match, a default is used, the LTI user ID, which is unlikely to be anything more than a long random string.) Notice that this example, which is the
 default, implements the logic described above. 
 
-The `LTI_ADMIN_ROLES` value describes a set of Canvas-defined roles that should be given admin access in the hub. The example aboe makes Instructors, TAs, 
+The `LTI_ADMIN_ROLES` value describes a set of Canvas-defined roles that should be given admin access in the hub. The example above makes Instructors, TAs, 
 and "Content Developers" admins, but one could e.g. remove `"TeachingAssistant"` from the list to make them regular users in the hub. This means that a person
 can be an admin in one hub, and a regular user in another, depending on their Canvas role. Roles and access can also be changed from within Canvas, and their group/admin
-permissions will be updated in the hub to reflect to the change (though all files previously owned by will preserve their permissions regardless of location). 
+permissions will be updated in the hub to reflect to the change (though all files previously owned by the user will preserve their permissions regardless of location). 
 
-One last thing to note: usernames are mapped to Unix UID numbers using a hash-based process for repeatability. When a user first logs in, this UID is associated with the username, but the UID->username mapping will only appear for user servers that were started *after* the mapping has been made (since the mapping is picked up on server start). The effect of this is that a user who lists files in the hub as other users are logging in for the first time will see UID values instead of usernames in the file listing, until they restart their own server to pickup the new UID->username mappings. 
+One last thing to note: usernames are mapped to Unix UID numbers using a
+hash-based process for repeatability. The first time a user logs in they are
+assigned a UID, and the username -> UID mapping is stored in a mapping file.
+This mapping file is read when user servers start to associate UIDs to
+usernames. The effect of this is that if user A lists files, and some of those
+were created by user B, where user B logged in the first time during A's session,
+A will see UIDs rather than usernames for B's files.
+
 
 ### Basic Hub Deployment (Native Authenticator)
 
 For deployments where Canvas is not preferred, DS@OSU is also configured to allow users to self-register with a desired username and password, with their access
 being subject to approval by an admin user. This is supported by the [NativeAuthenticator](https://native-authenticator.readthedocs.io/en/latest/) plugin. To use this, 
-just add two lines to the the configuration file as follows: 
+just change the `authType` to `native` and add a list of pre-determined admin usernams via `adminUsers` (and note that admin users can promote other users to admin status later):
 
 ```yaml
 authType: native
 adminUsers: oneils, keistc
-
-jupyterhub:
-  singleuser:
-    memory: {guarantee: 0.5G, limit: 1.0G}
-    cpu:    {guarantee: 0.1,  limit: 1.0}
 ```
 
-where `authType: native` specifies to use the native authenticator, and `adminUsers` is a comma-separated list of initial usernames to designate as admins (admins
-can promote other users to admin status later). 
+Example deployment:
 
-Although [well-documented](https://native-authenticator.readthedocs.io/en/latest/), the workflow for Native Authenticator
-is a little confusing. Users can sign up (pick a username and password) at the hub URL `https://<clusterHostname>/<hubName>/hub/signup`, which is linked from the main login page at `https://<clusterHostname>/<hubName>`, though the login and signup pages are very similar looking and may be confusing to users. Admin users can login and authorize/de-authorize users at `https://<clusterHostname>/<hubName>/hub/authorize`, after which those users will be able to login. Admin usernames specified in the hub
-config above are *pre-authorized*, but the passwords for these usernames need to be set initially by using the signup form. All users can change their password after login by navigating to `https://<clusterHostname>/<hubName>/hub/change-password`.
+```bash
+helm kush upgrade example-native charts/ds-jupyterlab --install --kush-interpolate --timeout 10m0s --values example-deployment/example-native.yaml
+```
+
+The hub will be available at https://<clusterHostname>/<hubname>, in this case https://example-cluster.datasci.oregonstate.edu/example-native.
+
+Although
+[well-documented](https://native-authenticator.readthedocs.io/en/latest/), the
+workflow for Native Authenticator is a little confusing. Users can sign up
+(pick a username and password) at the hub URL
+`https://<clusterHostname>/<hubName>/hub/signup`, which is linked from the main
+login page at `https://<clusterHostname>/<hubName>`, though the login and
+signup pages are very similar looking and may be confusing to users. Admin
+users can login and authorize/de-authorize users at
+`https://<clusterHostname>/<hubName>/hub/authorize`, after which those users
+will be able to login. Admin usernames specified in the hub config above are
+*pre-authorized*, but the passwords for these usernames need to be set
+initially by using the signup form. All users can change their password after
+login by navigating to
+`https://<clusterHostname>/<hubName>/hub/change-password`.
 
 ### Uninstalling a Hub
 
@@ -511,6 +553,10 @@ Uninstalling a hub performs the following actions:
 * Removing the NFS server component and detaching the persistent volume for shared storage
 * Removing the persistent volume claim and persistent volume (from the kuternetes cluster)
 * Removing the kubernetes namespace (unless for some reason any resources still exist, in which case a warning is reported)
+
+**_WARNING_**: Although the volume is deleted from the kubernetes cluster and detached from its host, it is **not** deleted as an AWS EBS 
+volume. You will need to delete it manually (via the AWS EC2 web console or command-line client), but note that it is not easy
+to identify which volumes in the AWS console are in use by which hubs.  
 
 ### Compute Profiles and Resource Allocation
 
