@@ -38,8 +38,14 @@ update_user_files() {
   fi
   
   grep -sqxF "source(\"$ADMIN_HOME_DIR/autosourced_by_rprofiles.R\")" /home/$NB_USER/.Rprofile || echo "source(\"$ADMIN_HOME_DIR/autosourced_by_rprofiles.R\")" >> /home/$NB_USER/.Rprofile
+  grep -sqxF "source(\"$ADMIN_HOME_DIR/autosourced_by_bashrcs\")" /home/$NB_USER/.bashrc || echo "source $ADMIN_HOME_DIR/autosourced_by_bashrcs" >> /home/$NB_USER/.bashrc
   chown $NB_UID:$ADMIN_GID /home/$NB_USER/.Rprofile
   chmod 664 /home/$NB_USER/.Rprofile
+  chown $NB_UID:$ADMIN_GID /home/$NB_USER/.bashrc
+  chmod 664 /home/$NB_USER/.bashrc
+  if [ ! -e /home/$NB_USER/hub_data_share ]; then
+    ln -s /home/hub_data_share /home/$NB_USER/.
+  fi
 }
 
 

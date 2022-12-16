@@ -38,10 +38,3 @@ export PATH=$HOME/.local/bin:$PATH
 #### home .julia (for Julia package installs)
 #############################################
 export JULIA_DEPOT_PATH=$HOME/.julia 
-
-#############################################
-#### create link to /home/hub_data
-#############################################
-if [ ! -e $HOME/hub_data ]; then
-  ln -s /home/hub_data_share $HOME
-fi
