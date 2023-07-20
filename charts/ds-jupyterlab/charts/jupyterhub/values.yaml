@@ -489,7 +489,7 @@ scheduling:
       #            - If "successfully acquired lease" can be seen in the logs, it
       #              is a good sign kube-scheduler is ready to schedule pods.
       #
-      name: k8s.gcr.io/kube-scheduler
+      name: registry.k8s.io/kube-scheduler
       tag: v1.23.4 # ref: https://github.com/kubernetes/website/blob/main/content/en/releases/patch-releases.md
       pullPolicy:
       pullSecrets: []
@@ -512,7 +512,7 @@ scheduling:
   userPlaceholder:
     enabled: true
     image:
-      name: k8s.gcr.io/pause
+      name: registry.k8s.io/pause
       # tag's can be updated by inspecting the output of the command:
       # gcloud container images list-tags k8s.gcr.io/pause --sort-by=~tags
       #
@@ -590,7 +590,7 @@ prePuller:
       runAsGroup: 65534 # nobody group
       allowPrivilegeEscalation: false
     image:
-      name: k8s.gcr.io/pause
+      name: registry.k8s.io/pause
       # tag's can be updated by inspecting the output of the command:
       # gcloud container images list-tags k8s.gcr.io/pause --sort-by=~tags
       #

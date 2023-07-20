@@ -63,6 +63,7 @@ RUN mamba install --quiet --yes 'r-irkernel'
 RUN mamba install --quiet --yes 'r-rcurl'
 #    'r-reshape2=1.4*' \
 RUN mamba install --quiet --yes 'r-rmarkdown'
+RUN mamba install --quiet --yes 'r-tidyverse'
 RUN mamba install --quiet --yes 'r-rsqlite'
 RUN mamba install --quiet --yes 'r-shiny'
     #'r-tidyverse=1.3*' \

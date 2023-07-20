@@ -1,7 +1,10 @@
-# TARGET jupyterlab-ubuntu-base v1.0.3-dev
-# TARGET jupyterlab-ubuntu-base-scipy v1.0.3-dev
-# TARGET jupyterlab-ubuntu-base-scipy-rjulia v1.0.3-dev
+# TARGET jupyterlab-ubuntu-base v1.0.5-dev
+# TARGET jupyterlab-ubuntu-base-scipy v1.0.5-dev
+# TARGET jupyterlab-ubuntu-base-scipy-rjulia v1.0.5-dev
 
+# 1.0.5: Adding r-tidyverse
+# 1.0.4: Adding in following libraries: libfreetype6-dev libpng-dev libtiff5-dev libjpeg-dev
+# 1.0.3: Stable build
 # 1.0.3-dev: ugrade JH v2.20 to 2.3.1, and jupyterlab from 3.3.4 to 3.4.7
 # 1.0.2-dev: removed libxcomposite-dev, libxcursor-dev, libxdamage-dev, corected rstudio-server download
 # 1.0.1-dev: add libxcomposite-dev, libxcursor-dev, libxdamage-dev needed for RStudio
@@ -52,6 +55,10 @@ RUN apt-get update \
     #libxcomposite-dev \
     #libxcursor-dev \
     #libxdamage-dev \
+    libfreetype6-dev \
+    libpng-dev \
+    libtiff5-dev \
+    libjpeg-dev \
     dnsutils \
     libssl-dev \
     screen \
@@ -450,6 +457,7 @@ RUN mamba install --quiet --yes 'r-irkernel'
 RUN mamba install --quiet --yes 'r-rcurl'
 #    'r-reshape2=1.4*' \
 RUN mamba install --quiet --yes 'r-rmarkdown'
+RUN mamba install --quiet --yes 'r-tidyverse'
 RUN mamba install --quiet --yes 'r-rsqlite'
 RUN mamba install --quiet --yes 'r-shiny'
     #'r-tidyverse=1.3*' \

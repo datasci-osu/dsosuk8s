@@ -44,6 +44,10 @@ RUN apt-get update \
     #libxcomposite-dev \
     #libxcursor-dev \
     #libxdamage-dev \
+    libfreetype6-dev \
+    libpng-dev \
+    libtiff5-dev \
+    libjpeg-dev \
     dnsutils \
     libssl-dev \
     screen \
