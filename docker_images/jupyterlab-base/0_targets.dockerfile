@@ -1,6 +1,6 @@
-# TARGET jupyterlab-ubuntu-base v1.0.5-dev
-# TARGET jupyterlab-ubuntu-base-scipy v1.0.5-dev
-# TARGET jupyterlab-ubuntu-base-scipy-rjulia v1.0.5-dev
+# TARGET jupyterlab-ubuntu-base v1.0.5
+# TARGET jupyterlab-ubuntu-base-scipy v1.0.5
+# TARGET jupyterlab-ubuntu-base-scipy-rjulia v1.0.5
 
 # 1.0.5: Adding r-tidyverse
 # 1.0.4: Adding in following libraries: libfreetype6-dev libpng-dev libtiff5-dev libjpeg-dev
