@@ -1,12 +1,12 @@
 {{- $proxy_service := include "jupyterhub.proxy-public.fullname" . -}}
 
 {{- /* Generated with https://patorjk.com/software/taag/#p=display&h=0&f=Slant&t=JupyterHub */}}
-.      __                             __                   __  __            __
-      / /  __  __    ____    __  __  / /_  ___    _____   / / / /  __  __   / /_
- __  / /  / / / /   / __ \  / / / / / __/ / _ \  / ___/  / /_/ /  / / / /  / __ \
-/ /_/ /  / /_/ /   / /_/ / / /_/ / / /_  /  __/ / /     / __  /  / /_/ /  / /_/ /
-\____/   \__,_/   / .___/  \__, /  \__/  \___/ /_/     /_/ /_/   \__,_/  /_.___/
-                 /_/      /____/
+.      __                          __                  __  __          __
+      / / __  __  ____    __  __  / /_  ___    _____  / / / / __  __  / /_
+ __  / / / / / / / __ \  / / / / / __/ / _ \  / ___/ / /_/ / / / / / / __ \
+/ /_/ / / /_/ / / /_/ / / /_/ / / /_  /  __/ / /    / __  / / /_/ / / /_/ /
+\____/  \__,_/ / .___/  \__, /  \__/  \___/ /_/    /_/ /_/  \__,_/ /_.___/
+              /_/      /____/
 
        You have successfully installed the official JupyterHub Helm chart!
 
@@ -92,7 +92,7 @@
 
 
 {{- /*
-  Warnings for likely misconfiguration
+  Warnings for likely misconfigurations
 */}}
 
 {{- if and (not .Values.scheduling.podPriority.enabled) (and .Values.scheduling.userPlaceholder.enabled .Values.scheduling.userPlaceholder.replicas) }}
@@ -110,23 +110,11 @@
 {{- end }}
 
 
-{{- if eq .Values.proxy.https.enabled false }}
-{{- if or (not (eq .Values.proxy.https.type "letsencrypt")) (not (eq (.Values.proxy.https.letsencrypt.contactEmail | default "") "")) }}
-#################################################################################
-######   WARNING: proxy.https.enabled is set to false by default since      #####
-######            version 0.10.0. It is now set to false but proxy.https    #####
-######            has been modified indicating you may want it enabled.     #####
-#################################################################################
-{{- println }}
-{{- end }}
-{{- end }}
-
-
 
 
 
 {{- /*
-  Breaking changes.
+  Breaking changes and failures for likely misconfigurations.
 */}}
 
 {{- $breaking := "" }}
@@ -148,6 +136,21 @@
   {{- $breaking = print $breaking "\n\nCHANGED: singleuser.cloudMetadata.enabled must as of 1.0.0 be configured using singleuser.cloudMetadata.blockWithIptables with the opposite value." }}
   {{- end }}
 */}}
+
+
+{{- if hasKey .Values.rbac "enabled" }}
+{{- $breaking = print $breaking "\n\nCHANGED: rbac.enabled must as of version 2.0.0 be configured via rbac.create and <hub|proxy.traefik|scheduling.userScheduler|prePuller.hook>.serviceAccount.create." }}
+{{- end }}
+
+
+{{- if hasKey .Values.hub "fsGid" }}
+{{- $breaking = print $breaking "\n\nCHANGED: hub.fsGid must as of version 2.0.0 be configured via hub.podSecurityContext.fsGroup." }}
+{{- end }}
+
+
+{{- if and .Values.singleuser.cloudMetadata.blockWithIptables (and .Values.singleuser.networkPolicy.enabled .Values.singleuser.networkPolicy.egressAllowRules.cloudMetadataServer) }}
+{{- $breaking = print $breaking "\n\nCHANGED: singleuser.cloudMetadata.blockWithIptables must as of version 3.0.0 not be configured together with singleuser.networkPolicy.egressAllowRules.cloudMetadataServer as it leads to an ambiguous configuration." }}
+{{- end }}
 
 
 {{- if $breaking }}

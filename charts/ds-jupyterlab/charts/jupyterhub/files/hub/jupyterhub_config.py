@@ -1,13 +1,14 @@
+# load the config object (satisfies linters)
+c = get_config()  # noqa
+
 import glob
 import os
 import re
 import sys
 
-from binascii import a2b_hex
-
-from tornado.httpclient import AsyncHTTPClient
-from kubernetes_asyncio import client
 from jupyterhub.utils import url_path_join
+from kubernetes_asyncio import client
+from tornado.httpclient import AsyncHTTPClient
 
 # Make sure that modules placed in the same directory as the jupyterhub config are added to the pythonpath
 configuration_directory = os.path.dirname(os.path.realpath(__file__))
@@ -15,10 +16,10 @@ sys.path.insert(0, configuration_directory)
 
 from z2jh import (
     get_config,
-    set_config_if_not_none,
     get_name,
     get_name_env,
     get_secret_value,
+    set_config_if_not_none,
 )
 
 
@@ -142,6 +143,7 @@ for trait, cfg_key in (
     ("events_enabled", "events"),
     ("extra_labels", None),
     ("extra_annotations", None),
+    # ("allow_privilege_escalation", None), # Managed manually below
     ("uid", None),
     ("fs_gid", None),
     ("service_account", "serviceAccountName"),
@@ -178,6 +180,15 @@ if image:
         image = f"{image}:{tag}"
 
     c.KubeSpawner.image = image
+
+# allow_privilege_escalation defaults to False in KubeSpawner 2+. Since its a
+# property where None, False, and True all are valid values that users of the
+# Helm chart may want to set, we can't use the set_config_if_not_none helper
+# function as someone may want to override the default False value to None.
+#
+c.KubeSpawner.allow_privilege_escalation = get_config(
+    "singleuser.allowPrivilegeEscalation"
+)
 
 # Combine imagePullSecret.create (single), imagePullSecrets (list), and
 # singleuser.image.pullSecrets (list).
@@ -362,6 +373,9 @@ if get_config("cull.enabled", False):
         cull_cmd.append("--cull-users")
         jupyterhub_idle_culler_role["scopes"].append("admin:users")
 
+    if not get_config("cull.adminUsers"):
+        cull_cmd.append("--cull-admin-users=false")
+
     if get_config("cull.removeNamedServers"):
         cull_cmd.append("--remove-named-servers")
 
@@ -396,27 +410,37 @@ for key, role in get_config("hub.loadRoles", {}).items():
 
     c.JupyterHub.load_roles.append(role)
 
+# respect explicit null command (distinct from unspecified)
+# this avoids relying on KubeSpawner.cmd's default being None
+_unspecified = object()
+specified_cmd = get_config("singleuser.cmd", _unspecified)
+if specified_cmd is not _unspecified:
+    c.Spawner.cmd = specified_cmd
 
-set_config_if_not_none(c.Spawner, "cmd", "singleuser.cmd")
 set_config_if_not_none(c.Spawner, "default_url", "singleuser.defaultUrl")
 
-cloud_metadata = get_config("singleuser.cloudMetadata", {})
+cloud_metadata = get_config("singleuser.cloudMetadata")
 
 if cloud_metadata.get("blockWithIptables") == True:
     # Use iptables to block access to cloud metadata by default
     network_tools_image_name = get_config("singleuser.networkTools.image.name")
     network_tools_image_tag = get_config("singleuser.networkTools.image.tag")
     network_tools_resources = get_config("singleuser.networkTools.resources")
+    ip = cloud_metadata["ip"]
     ip_block_container = client.V1Container(
         name="block-cloud-metadata",
         image=f"{network_tools_image_name}:{network_tools_image_tag}",
         command=[
             "iptables",
-            "-A",
+            "--append",
             "OUTPUT",
-            "-d",
-            cloud_metadata.get("ip", "169.254.169.254"),
-            "-j",
+            "--protocol",
+            "tcp",
+            "--destination",
+            ip,
+            "--destination-port",
+            "80",
+            "--jump",
             "DROP",
         ],
         security_context=client.V1SecurityContext(

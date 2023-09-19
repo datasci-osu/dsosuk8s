@@ -28,14 +28,17 @@ spec:
       labels:
         {{- /* Changes here will cause the Job to restart the pods. */}}
         {{- include "jupyterhub.matchLabels" . | nindent 8 }}
+        {{- with .Values.prePuller.labels }}
+        {{- . | toYaml | nindent 8 }}
+        {{- end }}
       {{- with .Values.prePuller.annotations }}
       annotations:
         {{- . | toYaml | nindent 8 }}
       {{- end }}
     spec:
       restartPolicy: Never
-      {{- if .Values.rbac.enabled }}
-      serviceAccountName: {{ include "jupyterhub.hook-image-awaiter.fullname" . }}
+      {{- with include "jupyterhub.hook-image-awaiter-serviceaccount.fullname" . }}
+      serviceAccountName: {{ . }}
       {{- end }}
       {{- with .Values.prePuller.hook.nodeSelector }}
       nodeSelector:
@@ -58,9 +61,10 @@ spec:
             - /image-awaiter
             - -ca-path=/var/run/secrets/kubernetes.io/serviceaccount/ca.crt
             - -auth-token-path=/var/run/secrets/kubernetes.io/serviceaccount/token
-            - -api-server-address=https://$(KUBERNETES_SERVICE_HOST):$(KUBERNETES_SERVICE_PORT)
+            - -api-server-address=https://kubernetes.default.svc:$(KUBERNETES_SERVICE_PORT)
             - -namespace={{ .Release.Namespace }}
-            - -daemonset=hook-image-puller
+            - -daemonset={{ include "jupyterhub.hook-image-puller.fullname" . }}
+            - -pod-scheduling-wait-duration={{ .Values.prePuller.hook.podSchedulingWaitDuration }}
           {{- with .Values.prePuller.hook.containerSecurityContext }}
           securityContext:
             {{- . | toYaml | nindent 12 }}

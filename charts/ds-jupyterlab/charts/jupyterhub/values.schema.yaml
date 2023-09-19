@@ -1,6 +1,6 @@
 # This schema (a jsonschema in YAML format) is used to generate
 # values.schema.json which is packaged with the Helm chart for client side
-# validation by Helm of values before template rendering.
+# validation by helm of values before template rendering.
 #
 # This schema is also used by our documentation system to build the
 # configuration reference section based on the description fields. See
@@ -27,6 +27,12 @@ required:
   - rbac
   - global
 properties:
+  enabled:
+    type: [boolean, "null"]
+    description: |
+      `enabled` is ignored by the jupyterhub chart itself, but a chart depending
+      on the jupyterhub chart conditionally can make use this config option as
+      the condition.
   fullnameOverride:
     type: [string, "null"]
     description: |
@@ -111,13 +117,7 @@ properties:
         ```
 
         If you just want to let all Pods reference an existing secret, use the
-        `imagePullSecrets` configuration instead.
-
-        To learn the username and password fields to access a gcr.io registry from
-        a Kubernetes cluster not associated with the same google cloud
-        credentials, look into [this
-        guide](http://docs.heptio.com/content/private-registries/pr-gcr.html) and
-        read the notes about the password.
+        [`imagePullSecrets`](schema_imagePullSecrets) configuration instead.
       properties:
         create:
           type: boolean
@@ -172,9 +172,6 @@ properties:
                 ...
               }
             ```
-
-            Learn more in [this
-            guide](http://docs.heptio.com/content/private-registries/pr-gcr.html).
         email:
           type: [string, "null"]
           description: |
@@ -199,6 +196,15 @@ properties:
     additionalProperties: false
     required: [baseUrl]
     properties:
+      revisionHistoryLimit: &revisionHistoryLimit
+        type: [integer, "null"]
+        minimum: 0
+        description: |
+          Configures the resource's `spec.revisionHistoryLimit`. This is
+          available for Deployment, StatefulSet, and DaemonSet resources.
+
+          See the [Kubernetes docs](https://kubernetes.io/docs/concepts/workloads/controllers/deployment/#revision-history-limit)
+          for more info.
       config:
         type: object
         additionalProperties: true
@@ -233,6 +239,8 @@ properties:
           ```python
           c.JupyterHub.admin_access = true
           c.JupyterHub.admin_users = ["jovyan1", "jovyan2"]
+          c.KubeSpawner.k8s_api_request_timeout = 10
+          c.GitHubOAuthenticator.allowed_organizations = ["jupyterhub"]
           ```
 
           Then, you would be able to represent it with this configuration like:
@@ -245,6 +253,11 @@ properties:
                 admin_users:
                   - jovyan1
                   - jovyan2
+              KubeSpawner:
+                k8s_api_request_timeout: 10
+              GitHubOAuthenticator:
+                allowed_organizations:
+                  - jupyterhub
           ```
 
           ```{admonition} YAML limitations
@@ -575,19 +588,208 @@ properties:
           enabled:
             type: boolean
             description: |
-              Toggle the creation of the NetworkPolicy resource for this pod.
+              Toggle the creation of the NetworkPolicy resource targeting this
+              pod, and by doing so, restricting its communication to only what
+              is explicitly allowed in the NetworkPolicy.
           ingress:
             type: array
             description: |
-              Additional ingress rules to add except those that is known to be needed by the respective pods in the Helm chart.
+              Additional ingress rules to add besides those that are required
+              for core functionality.
           egress:
             type: array
             description: |
-              Additional egress rules to add except those that is known to be needed by  the respective pods in the Helm chart.
+              Additional egress rules to add besides those that are required for
+              core functionality and those added via
+              [`.egressAllowRules`](schema_hub.networkPolicy.egressAllowRules).
 
-              The default value of this egress is to allow all traffic, except for the `singleuser.networkPolicy.egress`, which is also limiting access to a metadata server that can be exploited.
+              ```{versionchanged} 2.0.0
+              The default value changed from providing one very permissive rule
+              allowing all egress to providing no rule. The permissive rule is
+              still provided via
+              [`.egressAllowRules`](schema_hub.networkPolicy.egressAllowRules)
+              set to true though.
+              ```
 
-              If you want to restrict egress, you can override this permissive default to be an empty list.
+              As an example, below is a configuration that disables the more
+              broadly permissive `.privateIPs` egress allow rule for the hub
+              pod, and instead provides tightly scoped permissions to access a
+              specific k8s local service as identified by pod labels.
+
+              ```yaml
+              hub:
+                networkPolicy:
+                  egressAllowRules:
+                    privateIPs: false
+                  egress:
+                    - to:
+                        - podSelector:
+                            matchLabels:
+                              app: my-k8s-local-service
+                      ports:
+                        - protocol: TCP
+                          port: 5978
+              ```
+          egressAllowRules:
+            type: object
+            additionalProperties: false
+            description: |
+              This is a set of predefined rules that when enabled will be added
+              to the NetworkPolicy list of egress rules.
+
+              The resulting egress rules will be a composition of:
+              - rules specific for the respective pod(s) function within the
+                Helm chart
+              - rules based on enabled `egressAllowRules` flags
+              - rules explicitly specified by the user
+
+              ```{note}
+              Each flag under this configuration will not render into a
+              dedicated rule in the NetworkPolicy resource, but instead combine
+              with the other flags to a reduced set of rules to avoid a
+              performance penalty.
+              ```
+
+              ```{versionadded} 2.0.0
+              ```
+            properties:
+              cloudMetadataServer:
+                type: boolean
+                description: |
+                  Defaults to `false` for singleuser servers, but to `true` for
+                  all other network policies.
+
+                  When enabled this rule allows the respective pod(s) to
+                  establish outbound connections to the cloud metadata server.
+
+                  Note that the `nonPrivateIPs` rule is allowing all non Private
+                  IP ranges but makes an exception for the cloud metadata
+                  server, leaving this as the definitive configuration to allow
+                  access to the cloud metadata server.
+
+                  ```{versionchanged} 3.0.0
+                  This configuration is not allowed to be configured true at the
+                  same time as
+                  [`singleuser.cloudMetadata.blockWithIptables`](schema_singleuser.cloudMetadata.blockWithIptables)
+                  to avoid an ambiguous configuration.
+                  ```
+              dnsPortsCloudMetadataServer:
+                type: boolean
+                description: |
+                  Defaults to `true` for all network policies.
+
+                  When enabled this rule allows the respective pod(s) to
+                  establish outbound connections to the cloud metadata server
+                  via port 53.
+
+                  Relying on this rule for the singleuser config should go hand
+                  in hand with disabling
+                  [`singleuser.cloudMetadata.blockWithIptables`](schema_singleuser.cloudMetadata.blockWithIptables)
+                  to avoid an ambiguous configuration.
+
+                  Known situations when this rule can be relevant:
+
+                  - In GKE clusters with Cloud DNS that is reached at the
+                    cloud metadata server's non-private IP.
+
+                  ```{note}
+                  This chart doesn't know how to identify the DNS server that
+                  pods will rely on due to variations between how k8s clusters
+                  have been setup. Due to that, multiple rules are enabled by
+                  default to ensure DNS connectivity.
+                  ```
+
+                  ```{versionadded} 3.0.0
+                  ```
+              dnsPortsKubeSystemNamespace:
+                type: boolean
+                description: |
+                  Defaults to `true` for all network policies.
+
+                  When enabled this rule allows the respective pod(s) to
+                  establish outbound connections to pods in the kube-system
+                  namespace via port 53.
+
+                  Known situations when this rule can be relevant:
+
+                  - GKE, EKS, AKS, and other clusters relying directly on
+                    `kube-dns` or `coredns` pods in the `kube-system` namespace.
+
+                  ```{note}
+                  This chart doesn't know how to identify the DNS server that
+                  pods will rely on due to variations between how k8s clusters
+                  have been setup. Due to that, multiple rules are enabled by
+                  default to ensure DNS connectivity.
+                  ```
+
+                  ```{versionadded} 3.0.0
+                  ```
+              dnsPortsPrivateIPs:
+                type: boolean
+                description: |
+                  Defaults to `true` for all network policies.
+
+                  When enabled this rule allows the respective pod(s) to
+                  establish outbound connections to private IPs via port 53.
+
+                  Known situations when this rule can be relevant:
+
+                  - GKE clusters relying on a DNS server indirectly via a a node
+                    local DNS cache at an unknown private IP.
+
+                  ```{note}
+                  This chart doesn't know how to identify the DNS server that
+                  pods will rely on due to variations between how k8s clusters
+                  have been setup. Due to that, multiple rules are enabled by
+                  default to ensure DNS connectivity.
+
+                  ```{warning}
+                  This rule is not expected to work in clusters relying on
+                  Cilium to enforce the NetworkPolicy rules (includes GKE
+                  clusters with Dataplane v2), this is due to a [known
+                  limitation](https://github.com/cilium/cilium/issues/9209).
+                  ```
+              nonPrivateIPs:
+                type: boolean
+                description: |
+                  Defaults to `true` for all network policies.
+
+                  When enabled this rule allows the respective pod(s) to
+                  establish outbound connections to the non-private IP ranges
+                  with the exception of the cloud metadata server. This means
+                  respective pod(s) can establish connections to the internet
+                  but not (say) an unsecured prometheus server running in the
+                  same cluster.
+              privateIPs:
+                type: boolean
+                description: |
+                  Defaults to `false` for singleuser servers, but to `true` for
+                  all other network policies.
+
+                  Private IPs refer to the IP ranges `10.0.0.0/8`,
+                  `172.16.0.0/12`, `192.168.0.0/16`.
+
+                  When enabled this rule allows the respective pod(s) to
+                  establish outbound connections to the internal k8s cluster.
+                  This means users can access the internet but not (say) an
+                  unsecured prometheus server running in the same cluster.
+
+                  Since not all workloads in the k8s cluster may have
+                  NetworkPolicies setup to restrict their incoming connections,
+                  having this set to false can be a good defense against
+                  malicious intent from someone in control of software in these
+                  pods.
+
+                  If possible, try to avoid setting this to true as it gives
+                  broad permissions that could be specified more directly via
+                  the [`.egress`](schema_singleuser.networkPolicy.egress).
+
+                  ```{warning}
+                  This rule is not expected to work in clusters relying on
+                  Cilium to enforce the NetworkPolicy rules (includes GKE
+                  clusters with Dataplane v2), this is due to a [known
+                  limitation](https://github.com/cilium/cilium/issues/9209).
+                  ```
           interNamespaceAccessLabels:
             enum: [accept, ignore]
             description: |
@@ -873,14 +1075,15 @@ properties:
       fsGid:
         type: [integer, "null"]
         minimum: 0
-        description:
-          The gid the hub process should be using when touching any volumes mounted.
-
-          Use this only if you are building your own image & know that a group with this gid
-          exists inside the hub container! Advanced feature, handle with care!
-
-          Defaults to 1000, which is the gid of the `jovyan` user that is present in the
-          default hub image.
+        # This schema entry is needed to help us print a more helpful error
+        # message in NOTES.txt if hub.fsGid is set.
+        #
+        description: |
+          ```{note}
+          Removed in version 2.0.0. Use
+          [`hub.podSecurityContext`](schema_hub.podSecurityContext) and specify
+          `fsGroup` instead.
+          ```
       service:
         type: object
         additionalProperties: false
@@ -915,7 +1118,7 @@ properties:
           extraPorts:
             type: array
             description: |
-              Extra ports to add to the Hub Service object besides `hub` / `8081`.  
+              Extra ports to add to the Hub Service object besides `hub` / `8081`.
               This should be an array that includes `name`, `port`, and `targetPort`.
               See [Multi-port Services](https://kubernetes.io/docs/concepts/services-networking/service/#multi-port-services) for more details.
           loadBalancerIP:
@@ -1015,7 +1218,7 @@ properties:
         type: [integer, "null"]
         description: &jupyterhub-native-config-description |
           JupyterHub native configuration, see the [JupyterHub
-          documentation](https://jupyterhub.readthedocs.io/en/stable/api/app.html)
+          documentation](https://jupyterhub.readthedocs.io/en/stable/reference/api/app.html)
           for more information.
       allowNamedServers:
         type: [boolean, "null"]
@@ -1035,6 +1238,12 @@ properties:
       consecutiveFailureLimit:
         type: [integer, "null"]
         description: *jupyterhub-native-config-description
+      podSecurityContext: &podSecurityContext-spec
+        additionalProperties: true
+        description: |
+          A k8s native specification of the pod's security context, see [the
+          documentation](https://kubernetes.io/docs/reference/generated/kubernetes-api/v1.23/#podsecuritycontext-v1-core)
+          for details.
       containerSecurityContext: &containerSecurityContext-spec
         type: object
         additionalProperties: true
@@ -1115,7 +1324,7 @@ properties:
           This is where you register JupyterHub services. For details on how to
           configure these services in this Helm chart just keep reading but for
           details on services themselves instead read [JupyterHub's
-          documentation](https://jupyterhub.readthedocs.io/en/stable/api/service.html).
+          documentation](https://jupyterhub.readthedocs.io/en/stable/reference/api/service.html).
 
           ```{note}
           Only a selection of JupyterHub's configuration options that can be
@@ -1210,7 +1419,7 @@ properties:
           permissions as defined in JupyterHub's RBAC system.
 
           Complement this documentation with [JupyterHub's
-          documentation](https://jupyterhub.readthedocs.io/en/latest/rbac/roles.html#defining-roles)
+          documentation](https://jupyterhub.readthedocs.io/en/stable/rbac/roles.html#defining-roles)
           about `load_roles`.
 
           Note that while JupyterHub's native configuration `load_roles` accepts
@@ -1247,11 +1456,26 @@ properties:
         description: *jupyterhub-native-config-description
       serviceAccount: &serviceAccount
         type: object
+        required: [create]
         additionalProperties: false
         description: |
           Configuration for a k8s ServiceAccount dedicated for use by the
           specific pod which this configuration is nested under.
         properties:
+          create:
+            type: boolean
+            description: |
+              Whether or not to create the `ServiceAccount` resource.
+          name:
+            type: ["string", "null"]
+            description: |
+              This configuration serves multiple purposes:
+
+              - It will be the `serviceAccountName` referenced by related Pods.
+              - If `create` is set, the created ServiceAccount resource will be named like this.
+              - If [`rbac.create`](schema_rbac.create) is set, the associated (Cluster)RoleBindings will bind to this name.
+
+              If not explicitly provided, a default name will be used.
           annotations:
             type: object
             additionalProperties: false
@@ -1319,6 +1543,7 @@ properties:
           Configure the configurable-http-proxy (chp) pod managed by jupyterhub to route traffic
           both to itself and to user pods.
         properties:
+          revisionHistoryLimit: *revisionHistoryLimit
           networkPolicy: *networkPolicy-spec
           extraCommandLineFlags:
             type: array
@@ -1620,6 +1845,7 @@ properties:
         description: |
           Configure the traefik proxy used to terminate TLS when 'autohttps' is enabled
         properties:
+          revisionHistoryLimit: *revisionHistoryLimit
           labels:
             type: object
             additionalProperties: false
@@ -1806,10 +2032,9 @@ properties:
       networkPolicy: *networkPolicy-spec
       podNameTemplate:
         type: [string, "null"]
-        description: &kubespawner-native-config-description |
-          KubeSpawner native configuration, see the [KubeSpawner
-          documentation](https://jupyterhub-kubespawner.readthedocs.io/en/latest/spawner.html)
-          for more information.
+        description: |
+          Passthrough configuration for
+          [KubeSpawner.pod_name_template](https://jupyterhub-kubespawner.readthedocs.io/en/latest/spawner.html#kubespawner.KubeSpawner.pod_name_template).
       cpu:
         type: object
         additionalProperties: false
@@ -1985,6 +2210,7 @@ properties:
       cloudMetadata:
         type: object
         additionalProperties: false
+        required: [blockWithIptables, ip]
         description: |
           Please refer to dedicated section in [the Helm chart
           documentation](block-metadata-iptables) for more information about
@@ -1997,31 +2223,49 @@ properties:
 
       cmd:
         type: [array, string, "null"]
-        description: *kubespawner-native-config-description
+        description: |
+          Passthrough configuration for
+          [KubeSpawner.cmd](https://jupyterhub-kubespawner.readthedocs.io/en/latest/spawner.html#kubespawner.KubeSpawner.cmd).
+          The default is "jupyterhub-singleuser".
+          Use `cmd: null` to launch a custom CMD from the image,
+          which must launch jupyterhub-singleuser or an equivalent process eventually.
+          For example: Jupyter's docker-stacks images.
       defaultUrl:
         type: [string, "null"]
-        description: *kubespawner-native-config-description
+        description: |
+          Passthrough configuration for
+          [KubeSpawner.default_url](https://jupyterhub-kubespawner.readthedocs.io/en/latest/spawner.html#kubespawner.KubeSpawner.default_url).
       # FIXME: name mismatch, named events_enabled in kubespawner
       events:
         type: [boolean, "null"]
-        description: *kubespawner-native-config-description
+        description: |
+          Passthrough configuration for
+          [KubeSpawner.events_enabled](https://jupyterhub-kubespawner.readthedocs.io/en/latest/spawner.html#kubespawner.KubeSpawner.events_enabled).
       extraAnnotations:
         type: object
         additionalProperties: false
         patternProperties: *labels-and-annotations-patternProperties
-        description: *kubespawner-native-config-description
+        description: |
+          Passthrough configuration for
+          [KubeSpawner.extra_annotations](https://jupyterhub-kubespawner.readthedocs.io/en/latest/spawner.html#kubespawner.KubeSpawner.extra_annotations).
       extraContainers:
         type: array
-        description: *kubespawner-native-config-description
+        description: |
+          Passthrough configuration for
+          [KubeSpawner.extra_containers](https://jupyterhub-kubespawner.readthedocs.io/en/latest/spawner.html#kubespawner.KubeSpawner.extra_containers).
       extraLabels:
         type: object
         additionalProperties: false
         patternProperties: *labels-and-annotations-patternProperties
-        description: *kubespawner-native-config-description
+        description: |
+          Passthrough configuration for
+          [KubeSpawner.extra_labels](https://jupyterhub-kubespawner.readthedocs.io/en/latest/spawner.html#kubespawner.KubeSpawner.extra_labels).
       extraPodConfig:
         type: object
         additionalProperties: true
-        description: *kubespawner-native-config-description
+        description: |
+          Passthrough configuration for
+          [KubeSpawner.extra_pod_config](https://jupyterhub-kubespawner.readthedocs.io/en/latest/spawner.html#kubespawner.KubeSpawner.extra_pod_config).
       extraResource:
         type: object
         additionalProperties: false
@@ -2030,19 +2274,27 @@ properties:
           guarantees:
             type: object
             additionalProperties: true
-            description: *kubespawner-native-config-description
+            description: |
+              Passthrough configuration for
+              [KubeSpawner.extra_resource_guarantees](https://jupyterhub-kubespawner.readthedocs.io/en/latest/spawner.html#kubespawner.KubeSpawner.extra_resource_guarantees).
           # FIXME: name mismatch, named extra_resource_limits in kubespawner
           limits:
             type: object
             additionalProperties: true
-            description: *kubespawner-native-config-description
+            description: |
+              Passthrough configuration for
+              [KubeSpawner.extra_resource_limits](https://jupyterhub-kubespawner.readthedocs.io/en/latest/spawner.html#kubespawner.KubeSpawner.extra_resource_limits).
       fsGid:
         type: [integer, "null"]
-        description: *kubespawner-native-config-description
+        description: |
+          Passthrough configuration for
+          [KubeSpawner.fs_gid](https://jupyterhub-kubespawner.readthedocs.io/en/latest/spawner.html#kubespawner.KubeSpawner.fs_gid).
       lifecycleHooks:
         type: object
         additionalProperties: false
-        description: *kubespawner-native-config-description
+        description: |
+          Passthrough configuration for
+          [KubeSpawner.lifecycle_hooks](https://jupyterhub-kubespawner.readthedocs.io/en/latest/spawner.html#kubespawner.KubeSpawner.lifecycle_hooks).
         properties:
           postStart:
             type: object
@@ -2067,10 +2319,14 @@ properties:
       # FIXME: name mismatch, named service_account in kubespawner
       serviceAccountName:
         type: [string, "null"]
-        description: *kubespawner-native-config-description
+        description: |
+          Passthrough configuration for
+          [KubeSpawner.service_account](https://jupyterhub-kubespawner.readthedocs.io/en/latest/spawner.html#kubespawner.KubeSpawner.service_account).
       startTimeout:
         type: [integer, "null"]
-        description: *kubespawner-native-config-description
+        description: |
+          Passthrough configuration for
+          [KubeSpawner.start_timeout](https://jupyterhub-kubespawner.readthedocs.io/en/latest/spawner.html#kubespawner.KubeSpawner.start_timeout).
       storage:
         type: object
         additionalProperties: false
@@ -2160,15 +2416,25 @@ properties:
               Decide if you want storage to be provisioned dynamically
               (dynamic), or if you want to attach existing storage (static), or
               don't want any storage to be attached (none).
+      allowPrivilegeEscalation:
+        type: [boolean, "null"]
+        description: |
+          Passthrough configuration for
+          [KubeSpawner.allow_privilege_escalation](https://jupyterhub-kubespawner.readthedocs.io/en/latest/spawner.html#kubespawner.KubeSpawner.allow_privilege_escalation).
       uid:
         type: [integer, "null"]
         description: |
+          Passthrough configuration for
+          [KubeSpawner.uid](https://jupyterhub-kubespawner.readthedocs.io/en/latest/spawner.html#kubespawner.KubeSpawner.uid).
+
           This dictates as what user the main container will start up as.
 
           As an example of when this is needed, consider if you want to enable
           sudo rights for some of your users. This can be done by starting up as
           root, enabling it from the container in a startup script, and then
           transitioning to the normal user.
+
+          Default is 1000, set to null to use the container's default.
 
   scheduling:
     type: object
@@ -2189,6 +2455,7 @@ properties:
             type: boolean
             description: |
               Enables the user scheduler.
+          revisionHistoryLimit: *revisionHistoryLimit
           replicas:
             type: integer
             description: |
@@ -2198,6 +2465,21 @@ properties:
           pdb: *pdb-spec
           nodeSelector: *nodeSelector-spec
           tolerations: *tolerations-spec
+          labels:
+            type: object
+            additionalProperties: false
+            patternProperties: *labels-and-annotations-patternProperties
+            description: |
+              Extra labels to add to the userScheduler pods.
+
+              See the [Kubernetes docs](https://kubernetes.io/docs/concepts/overview/working-with-objects/labels/)
+              to learn more about labels.
+          annotations:
+            type: object
+            additionalProperties: false
+            patternProperties: *labels-and-annotations-patternProperties
+            description: |
+              Extra annotations to add to the user-scheduler pods.
           containerSecurityContext: *containerSecurityContext-spec
           logLevel:
             type: integer
@@ -2206,7 +2488,7 @@ properties:
               kube-scheduler binary running within the user-scheduler pod.
           plugins:
             type: object
-            additionalProperties: false
+            additionalProperties: true
             description: |
               These plugins refers to kube-scheduler plugins as documented
               [here](https://kubernetes.io/docs/reference/scheduling/config/).
@@ -2214,29 +2496,6 @@ properties:
               The user-scheduler is really just a kube-scheduler configured in a
               way to pack users tight on nodes using these plugins. See
               values.yaml for information about the default plugins.
-            properties:
-              score:
-                type: object
-                additionalProperties: false
-                properties:
-                  disabled:
-                    type: array
-                    items:
-                      type: object
-                      additionalProperties: false
-                      properties:
-                        name:
-                          type: string
-                  enabled:
-                    type: array
-                    items:
-                      type: object
-                      additionalProperties: false
-                      properties:
-                        name:
-                          type: string
-                        weight:
-                          type: integer
           pluginConfig:
             type: array
             description: |
@@ -2338,10 +2597,26 @@ properties:
           enabled:
             type: boolean
           image: *image-spec
+          revisionHistoryLimit: *revisionHistoryLimit
           replicas:
             type: integer
             description: |
               How many placeholder pods would you like to have?
+          labels:
+            type: object
+            additionalProperties: false
+            patternProperties: *labels-and-annotations-patternProperties
+            description: |
+              Extra labels to add to the userPlaceholder pods.
+
+              See the [Kubernetes docs](https://kubernetes.io/docs/concepts/overview/working-with-objects/labels/)
+              to learn more about labels.
+          annotations:
+            type: object
+            additionalProperties: false
+            patternProperties: *labels-and-annotations-patternProperties
+            description: |
+              Extra annotations to add to the placeholder pods.
           resources:
             type: object
             additionalProperties: true
@@ -2471,7 +2746,7 @@ properties:
         description: |
           The path type to use. The default value is 'Prefix'.
 
-          See [the Kubernetes documentation](https://kubernetes.io/docs/concepts/services-networking/ingress/#path-types) 
+          See [the Kubernetes documentation](https://kubernetes.io/docs/concepts/services-networking/ingress/#path-types)
           for more details about path types.
       tls:
         type: array
@@ -2487,6 +2762,16 @@ properties:
     additionalProperties: false
     required: [hook, continuous]
     properties:
+      revisionHistoryLimit: *revisionHistoryLimit
+      labels:
+        type: object
+        additionalProperties: false
+        patternProperties: *labels-and-annotations-patternProperties
+        description: |
+          Extra labels to add to the pre puller job pods.
+
+          See the [Kubernetes docs](https://kubernetes.io/docs/concepts/overview/working-with-objects/labels/)
+          to learn more about labels.
       annotations:
         type: object
         additionalProperties: false
@@ -2584,7 +2869,7 @@ properties:
           ```yaml
           prePuller:
             extraImages:
-              myExtraImageIWantPulled:
+              my-extra-image-i-want-pulled:
                 name: jupyter/all-spark-notebook
                 tag: 2343e33dec46
           ```
@@ -2644,6 +2929,9 @@ properties:
       users:
         type: [boolean, "null"]
         description: See the `--cull-users` flag.
+      adminUsers:
+        type: [boolean, "null"]
+        description: See the `--cull-admin-users` flag.
       removeNamedServers:
         type: [boolean, "null"]
         description: See the `--remove-named-servers` flag.
@@ -2673,13 +2961,43 @@ properties:
   rbac:
     type: object
     additionalProperties: false
-    required: [enabled]
+    required: [create]
     properties:
       enabled:
         type: boolean
+        # This schema entry is needed to help us print a more helpful error
+        # message in NOTES.txt if hub.fsGid is set.
+        #
         description: |
-          Decides if RBAC resources are to be created and referenced by the the
-          Helm chart's workloads.
+          ````{note}
+          Removed in version 2.0.0. If you have been using `rbac.enable=false`
+          (strongly discouraged), then the equivalent configuration would be:
+
+          ```yaml
+          rbac:
+            create: false
+          hub:
+            serviceAccount:
+              create: false
+          proxy:
+            traefik:
+              serviceAccount:
+                create: false
+          scheduling:
+            userScheduler:
+              serviceAccount:
+                create: false
+          prePuller:
+            hook:
+              serviceAccount:
+                create: false
+          ```
+          ````
+      create:
+        type: boolean
+        description: |
+          Decides if (Cluster)Role and (Cluster)RoleBinding resources are
+          created and bound to the configured serviceAccounts.
 
   global:
     type: object

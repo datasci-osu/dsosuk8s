@@ -5,6 +5,9 @@ metadata:
   labels:
     {{- include "jupyterhub.labels" . | nindent 4 }}
 spec:
+  {{- if typeIs "int" .Values.hub.revisionHistoryLimit }}
+  revisionHistoryLimit: {{ .Values.hub.revisionHistoryLimit }}
+  {{- end }}
   replicas: 1
   selector:
     matchLabels:
@@ -75,11 +78,13 @@ spec:
           persistentVolumeClaim:
             claimName: {{ include "jupyterhub.hub-pvc.fullname" . }}
         {{- end }}
-      {{- if .Values.rbac.enabled }}
-      serviceAccountName: {{ include "jupyterhub.hub.fullname" . }}
+      {{- with include "jupyterhub.hub-serviceaccount.fullname" . }}
+      serviceAccountName: {{ . }}
       {{- end }}
+      {{- with .Values.hub.podSecurityContext }}
       securityContext:
-        fsGroup: {{ .Values.hub.fsGid }}
+        {{- . | toYaml | nindent 8 }}
+      {{- end }}
       {{- with include "jupyterhub.imagePullSecrets" (dict "root" . "image" .Values.hub.image) }}
       imagePullSecrets: {{ . }}
       {{- end }}

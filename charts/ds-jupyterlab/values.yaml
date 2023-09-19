@@ -1,6 +1,8 @@
 jupyterhub:
   #debug: 
   #  enabled: true
+  user-scheduler-serviceaccount:
+    fullname: my-user-scheduler-serviceaccount
   auth:
     type: dummy
     dummy:
@@ -108,7 +110,7 @@ jupyterhub:
     image:
       #name: 'localhost:30050/oneilsh/jupyterlab-k8s-hub'
       name: 'localhost:30050/cjkeist/jupyterlab-k8s-hub'
-      tag: "v1.6.0" 
+      tag: "v1.7.0" 
     # 5/22/22: https://github.com/jupyterhub/zero-to-jupyterhub-k8s/commit/0e023689bdff196eb3f4e7d83e95d21174b53bf1
     containerSecurityContext:
       runAsUser: 0
