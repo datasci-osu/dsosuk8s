@@ -41,7 +41,7 @@ jupyterhub:
       enabled: true
       type: offload
     chp:
-      image: {name: 'localhost:30050/jupyterhub/configurable-http-proxy', tag: 4.5.3}
+      image: {name: 'localhost:30050/jupyterhub/configurable-http-proxy', tag: 4.5.6}
 
   singleuser:
     # looks like these should be set null to delete the key (including those defaulted in the jupyterhub chart) for the c.Spawner limits below to be used
@@ -114,7 +114,8 @@ jupyterhub:
     # 5/22/22: https://github.com/jupyterhub/zero-to-jupyterhub-k8s/commit/0e023689bdff196eb3f4e7d83e95d21174b53bf1
     containerSecurityContext:
       runAsUser: 0
-    fsGid: 102
+    podSecurityContext:
+      fsGroup: 102
     extraVolumes:
       - name: data-volume
         configMap:

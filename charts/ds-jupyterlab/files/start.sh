@@ -100,6 +100,7 @@ main_setup() {
   create_uids_gids
   stage_home_temp_copy $NB_USER
   
+  echo "NB_USER: $NB_USER"
   NB_UID=$(get_uid $NB_USER)
 
   do_mount $NFS_SVC_HOME /home
