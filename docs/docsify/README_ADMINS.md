@@ -487,6 +487,15 @@ Although [well-documented](https://native-authenticator.readthedocs.io/en/latest
 is a little confusing. Users can sign up (pick a username and password) at the hub URL `https://<clusterHostname>/<hubName>/hub/signup`, which is linked from the main login page at `https://<clusterHostname>/<hubName>`, though the login and signup pages are very similar looking and may be confusing to users. Admin users can login and authorize/de-authorize users at `https://<clusterHostname>/<hubName>/hub/authorize`, after which those users will be able to login. Admin usernames specified in the hub
 config above are *pre-authorized*, but the passwords for these usernames need to be set initially by using the signup form. All users can change their password after login by navigating to `https://<clusterHostname>/<hubName>/hub/change-password`.
 
+### Expanding Hub NFS Volume Size
+It is possible to expand the size of a JH course volume storage on the NFS server. To do this you must make sure no user pods are running on the JH instance. It would be best to go to the Canvas course page and unpublish the link to the JH instance while you work on expanding the NFS volume.
+
+To do this, you will need,to be logged into the AWS console. On the console go to the EC2 dashboard. On this page on the left find Volumes and click that. This will list all the volumes currently in use and maybe not in use. In the search field, you can shorten the list of volumes displayed by typing in the color of the hub you are working on.
+
+Back on the DS controller server, you will need to describe the NFS pod of the JH instance you want to expand. Example:
+```bash
+k describe pod nfs-cjtesthomedrive-dep-0
+```
 ### Uninstalling a Hub
 
 To avoid issues with unmounting and releasing storage volumes hub components need to be de-commissioned in a specific order; the helm-kush enhanced chart handles this
