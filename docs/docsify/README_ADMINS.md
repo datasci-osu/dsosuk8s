@@ -535,6 +535,37 @@ initially by using the signup form. All users can change their password after
 login by navigating to
 `https://<clusterHostname>/<hubName>/hub/change-password`.
 
+#### Expanding NFS Server Volume
+It is possible to expand the size of a JH course volume storage on the NFS server. To do this you must make sure no user pods are running on the JH instance. It would be best to go to the Canvas course page and unpublish the link to the JH instance while you work on expanding the NFS volume.
+
+To do this, you will need,to be logged into the AWS console. On the console go to the EC2 dashboard. On this page on the left find Volumes and click that. This will list all the volumes currently in use and maybe not in use. In the search field, you can shorten the list of volumes displayed by typing in the color of the hub you are working on.
+
+Back on the DS controller server, you will need to describe the NFS pod of the JH instance you want to expand. Example:
+```bash
+k describe pod nfs-cjtesthomedrive-dep-0
+```
+In the “Events” section of this command, which will be at the bottom, look for the line with
+```bash
+"AttachedVolume.Attach succeeded for volume "pvc-5f72d636-56ce-4292-bae9-ec7c0999dfd1"
+```
+You will want that number string following pvc-.
+
+Back on the AWS console with the volumes listed, you will need to match that number string with the listed volume names starting with “dev-gray-dynamic-pvc-” and then match the number string to it. That will be the volume for the JH instance you are working on. Click on that volume ID name in the second column. This will bring up a page with a bunch of info on that volume. The only thing we want is to click the “Modify” button on the top of the page.
+
+On the next page, you will see the place where you can change the size of the volume. Put in the new volume size, note you cannot shrink the volume only can expand it. After putting in the new size click the “modify” button. It will ask to confirm the action, so click the “modify” button again.
+
+That will bring you back out to the list of volumes. In the column “Volume state” it will show “in-use - optimizing (%X). Wait for that to finish before proceeding. It can take several minutes depending on how much you are expanding the volume.
+
+When the volume is back to “in-use” state you can then proceed to update the JH instance by doing the following commands
+```bash
+k delete pod {name of the nfsserver pod} (ex: nfs-cjtesthomedrive-dep-0)
+```
+What for the nfs server pod to restart before running the next command.
+```bash
+k delete pod {name of the hub pod} (ex: hub-8586656848-lr44h)
+```
+Again what for the hub pod to restart. That should be it. When you start your JH session for that hub you should see the new expanded NFS share size.
+
 ### Uninstalling a Hub
 
 To avoid issues with unmounting and releasing storage volumes hub components need to be de-commissioned in a specific order; the helm-kush enhanced chart handles this
