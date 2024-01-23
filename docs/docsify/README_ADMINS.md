@@ -351,6 +351,35 @@ To delete the placeholders deployment, use the `kush run uninstall` script to en
 helm kush run uninstall dsosuk8s/charts/ds-jupyterlab placeholders
 ```
 
+## NodeGroup Management
+Once a EKS cluster is up and running there are some options in managing nodegroups suchas creating new nodegroups, modifiying min/man values on number of nodes to start
+for each nodegroup and draining/deleting a nodegroup.  
+
+### Add a new Nodegroup
+To add a new nodegroup you will need to edit the eksctl yaml for for the EKS cluster.  Find the section of a jworkers nodegroup. Copy and add that section to the yaml file. Then
+rename the node group. For example "- name: jhworkers-2vcpu-8gb-labeled" to "- name: jhworkers-2vcpu-8gb-labeled-new". For the new nodegroup you can then modifiy settings
+like minSize, maxSize, desiredCapacity, and volumeSize.  Once you have the new nodegroup ready you then run the eksctl command:
+```bash
+eksctl create nodegroup -f dev-gray.yaml
+```
+If this is to replace an existing nodegroup, you will then need drain the old nodegroup.
+```bash
+eksctl drain nodegroup --cluster dev-gray --name jhworkers-2vcpu-8gb-labeled
+```
+This will terminate and restart all pods to the new nodegroup. Next you need to delete the nodegroup. Also, remove the entry from the eksctl yaml file.
+```bash
+eksctl delete nodegroup --cluster dev-gray --name jhworkers-2vcpu-8gb-labeled
+```
+
+### Modify Nodegroup
+You can modidy the options with nodegroup such as minSiz/maxSize of nodes to start for a nodegroup. To get list of nodegroups run:
+```bash
+eksctl get nodegroups --cluster dev-gray
+```
+To modify min/maxSize example:
+```bash
+eksctl scale nodegroup --cluster dev-gray --name jhworkers-2vcpu-8gb-labeled --nodes-min 3
+```
 
 ## Hub Deployment and Management
 
