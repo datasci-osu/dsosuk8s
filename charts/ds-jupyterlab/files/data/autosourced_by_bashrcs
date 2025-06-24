@@ -37,4 +37,4 @@ export PATH=$HOME/.local/bin:$PATH
 #############################################
 #### home .julia (for Julia package installs)
 #############################################
-export JULIA_DEPOT_PATH=$HOME/.julia 
+export JULIA_DEPOT_PATH=$HOME/.julia:/opt/julia

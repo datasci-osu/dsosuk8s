@@ -58,9 +58,9 @@ set_common_vars() {
   ADMIN_USERNAME=dsadmin
   ADMIN_GROUPNAME=dsadmins
   USER_GROUPNAME=dsusers
-  ADMIN_GID=102               # ssh group is 101 by default
-  USER_GID=103
-  ADMIN_UID=1001
+  ADMIN_GID=5000               # ssh group is 101 and 102 snagged by OS for default
+  USER_GID=1003
+  ADMIN_UID=5000
 }
 
 create_uids_gids() {

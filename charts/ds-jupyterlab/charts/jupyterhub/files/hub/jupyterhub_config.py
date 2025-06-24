@@ -56,6 +56,7 @@ c.JupyterHub.last_activity_interval = 60
 # Don't wait at all before redirecting a spawning user to the progress page
 c.JupyterHub.tornado_settings = {
     "slow_spawn_timeout": 0,
+    "xsrf_cookies": False
 }
 
 

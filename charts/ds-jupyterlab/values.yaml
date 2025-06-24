@@ -60,6 +60,8 @@ jupyterhub:
     storage:
       type: none
       extraVolumes:
+        #- name: julia-depot
+        #emptyDir: {}
         - name: data-volume
           configMap:
             name: data-configmap
@@ -68,6 +70,8 @@ jupyterhub:
             name: start-configmap
             defaultMode: 0554
       extraVolumeMounts:
+        #- name: julia-depot
+        #mountPath: /opt/julia
         - name: start-volume
           mountPath: /usr/local/bin/start.sh
           subPath: start.sh
@@ -115,7 +119,7 @@ jupyterhub:
     containerSecurityContext:
       runAsUser: 0
     podSecurityContext:
-      fsGroup: 102
+      fsGroup: 5000
     extraVolumes:
       - name: data-volume
         configMap:
