@@ -21,13 +21,11 @@ assign("hub.install.packages",
        envir = globalenv())
 
 # for devtools::install_github
-assign("hub.install_github", 
-       function(...) {
-         withr::with_libpaths(Sys.getenv("R_LIBS_SITE"),
-                              devtools::install_github(...))
-       },
-       envir = globalenv())
-
+assign("hub.install_github",
+         function(...) {
+           pak::pak(..., lib = Sys.getenv("R_LIBS_SITE"))
+         },
+         envir = globalenv())
 # for bioconductor installs
 assign("hub.install_bioconductor", 
        function(...) {
