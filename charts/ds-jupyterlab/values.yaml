@@ -311,6 +311,7 @@ jupyterhub:
               # NB_USER is the username logged in with
               # ADMIN_USER is "True" if they're an admin, "False" otherwise
               spawner.environment['NB_USER'] = user.name
+              spawner.environment['NBGITPULLER_PARENTPATH'] = f"{user.name}"
               spawner.environment['ADMIN_USER'] = str(user.admin)
               # below for debugging
               #spawner.environment['NB_UID'] = "1000"
@@ -333,6 +334,7 @@ jupyterhub:
               # NB_USER is the username logged in with
               # ADMIN_USER is "True" if they're an admin, "False" otherwise
               spawner.environment['NB_USER'] = user.name
+              spawner.environment['NBGITPULLER_PARENTPATH'] = f"{user.name}"
               spawner.environment['ADMIN_USER'] = str(user.admin)
               # below for debugging
               #spawner.environment['NB_UID'] = "1000"
@@ -356,6 +358,7 @@ jupyterhub:
             @gen.coroutine
             def pre_spawn_start(self, user, spawner):
               spawner.environment['NB_USER'] = user.name
+              spawner.environment['NBGITPULLER_PARENTPATH'] = f"{user.name}"
               spawner.environment['ADMIN_USER'] = str(user.admin)
        
           ## read admin user list from provided values 
